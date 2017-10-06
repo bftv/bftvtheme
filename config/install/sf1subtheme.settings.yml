@@ -1,0 +1,38 @@
+page_title:
+  allowed_types:
+    - sf_page
+    - sf_photo_gallery
+  image_field: field_sf_primary_image
+article_category_field: field_sf_article_category
+event_category_field: field_sf_event_type
+photo_gallery_category_field: field_sf_gallery_category
+branding_field: field_sf_branding
+brand_color_field: field_sf_brand_color
+use_www_quicklinks: 1
+quick_links_highlight: 0
+quick_links_two_columns: 0
+ucd_logo_right: 0
+remove_fixed_header: 0
+color_header_bar: 0
+use_page_title_category_color: 1
+use_category_colors: 1
+use_flex_footer: 1
+features:
+  node_user_picture: 1
+  comment_user_picture: 1
+  comment_user_verification: 1
+  favicon: 1
+logo:
+  use_default: 1
+  path: ''
+favicon:
+  use_default: 1
+  path: ''
+use_top_content_fixed: 0
+top_content_quad_front_only: 1
+top_content_quad_layout: l-quad--fixed
+use_bottom_content_fixed: 0
+bottom_content_quad_front_only: 1
+bottom_content_quad_layout: l-quad--fixed
+left_sidebar_split: ''
+right_sidebar_split: "/people\r\n/events\r\n"

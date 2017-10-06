@@ -1,0 +1,27 @@
+{% extends "node.html.twig" %}
+
+{#
+/**
+ * @file
+ * Theme override for a node sf-article defualt display
+ *
+ * Available variables:
+ * - Look in the node.html.twig file for available variables.
+ */
+#}
+{% block submitted %}{% endblock %}
+
+{% block content %}
+<div{{ content_attributes.addClass('node__content') }}>
+
+	<h1>Mail List: {{ label }}</h1>
+	{{ content|without (
+	'field_bftv_assoc_lists',
+	'field_bftv_departments',
+	'field_bftv_subscriber',
+	'field_bftv_cust_manage',
+	'field_bftv_managed_by'
+	) }}
+	
+</div>
+{% endblock %}

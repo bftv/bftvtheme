@@ -1,0 +1,40 @@
+/* Add CSS theme overrides here. */
+
+/* Fixes longer links not to break the main panel */
+.panel {
+	word-wrap: break-word;
+}
+
+/* This class is for grouping header used on people's page */
+.view-grouping-header {
+	background-color: #ccc; 
+	padding: .5em; 
+	margin: 0.5em auto;
+	color: #002855;
+	font-weight: 700;
+	font-size: 1.5625rem;
+	line-height: 1.04;
+}
+
+/* This class is for grouping header used on quick links and quick forms page, it doesn't harm the same selection on people's page */
+div.view-content h3:not(.vm-teaser__title), div.view-content h3:not(.vm-teaser__title) a {
+	background-color: #ccc;
+	padding: 0.4em 0 0.4em 0.1em;
+	margin: 0.4em auto;
+	line-height: 1.2;
+}
+
+/* Adds the little arrow for links, forms, additional information */
+.bftv-row::before {
+	position: absolute;
+	margin: 1px .5em 0 -.75em;
+	color: #deb31a;
+	content: "\203A";
+	font-family: Georgia;
+	font-size: 1.25em;
+	font-weight: normal;
+	line-height: 1;
+}
+.bftv-row {
+	margin-left: 1em;
+}

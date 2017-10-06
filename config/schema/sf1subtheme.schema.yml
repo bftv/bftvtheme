@@ -1,0 +1,5 @@
+# Schema for the configuration files of the SiteFarm One subtheme.
+
+sf1subtheme.settings:
+  type: theme_settings
+  label: 'SiteFarm One subtheme settings'

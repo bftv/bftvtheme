@@ -1,0 +1,49 @@
+{% extends "node.html.twig" %}
+
+{#
+/**
+ * @file
+ * Theme override for a node sf-article defualt display
+ *
+ * Available variables:
+ * - Look in the node.html.twig file for available variables.
+ */
+#}
+{% block submitted %}{% endblock %}
+
+{% block content %}
+<div{{ content_attributes.addClass('node__content') }}>
+
+	<h1>Mail List: {{ label }}</h1>
+	{{ content|without (
+	'field_bftv_assoc_lists',
+	'field_bftv_departments',
+	'field_bftv_subscriber',
+	'field_bftv_cust_manage',
+	'field_bftv_managed_by'
+	) }}
+	
+	{% if node.field_bftv_managed_by is not empty %}
+		<h4>Managed by:</h4>
+		{% for item in node.field_bftv_managed_by|children %}
+			{{ item.value }}
+		{% endfor %}
+		{{ content.field_bftv_managed_by }}
+	{% endif %}
+	
+	{% if node.field_bftv_subscriber.value == 1 %}
+		<strong>Subscribers: </strong><em>This list has indiviually managed subscribers.</em>
+	{% endif %}
+	
+	{% if node.field_bftv_assoc_lists is not empty %}
+		<h4>Associated Lists</h4>
+		<ul>
+			{% for item in node.field_bftv_assoc_lists.entity.title %}
+				<li >{{ item.value }}</li>
+			{% endfor %}
+		</ul>
+		{{ content.field_bftv_assoc_lists }}
+	{% endif %}
+	
+</div>
+{% endblock %}

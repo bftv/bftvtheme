@@ -1,0 +1,104 @@
+{% extends "node--teaser.html.twig" %}
+
+{#
+/**
+ * @file
+ * Theme override for a node sf-person teaser display
+ *
+ * Available variables:
+ * - Look in the node.html.twig file for available variables.
+ */
+#}
+{% block content %}
+  {% if content.field_sf_position_title | render or content.field_bftv_departments | render %}
+    <ul class="vm-teaser__position">
+      {% if content.field_sf_position_title | render %}
+        <li><b>{{ content.field_sf_position_title }}</b></li>
+      {% endif %}
+      {% if content.field_bftv_departments | render %}
+        <li>{{ content.field_bftv_departments }}</li>
+      {% endif %}
+    </ul>
+  {% endif %}
+
+  <div class="text--smaller">{{ content.body }}</div>
+
+  {% if content.field_sf_emails | render or content.field_sf_websites | render %}
+    <ul class="vm-teaser__contact list--pipe text--smaller">
+      {% if content.field_sf_emails | render %}
+        <li class="icon icon--link icon--envelope">{{ content.field_sf_emails.0 }}</li>
+      {% endif %}
+      {% if content.field_sf_websites | render %}
+        <li class="icon icon--link icon--web">{{ content.field_sf_websites.0 }}</li>
+      {% endif %}
+      <li><a class="icon icon--link icon--view-more" href="{{ url }}">View Listing</a></li>
+    </ul>
+  {% endif %}
+
+  {% if content.field_bftv_location | render or content.field_sf_address | render %}
+  <div class="text--smaller u-space-bottom--small">
+    {% if node.field_bftv_location.entity.title.value | render %}
+      {% for item in node.field_bftv_location %}
+		{% if item.entity.title.value != 'unknown' %}
+			<span class="icon icon--location">{{ item.entity.title.value }}</span>
+		{% endif %}
+		{% if item.entity.field_sf_office_hours.value is not empty %}
+			| <span class="icon icon--clock">{{ item.entity.field_sf_office_hours.value }}</span>
+		{% endif %}
+		{% for phone in item.entity.field_sf_phone_numbers %}
+		{% if phone.value is not empty %}
+		    | <span class="icon icon--link icon--phone"><a href="tel:{{ phone.value  }}">{{ phone.value }}</a></span>
+		{% endif %}
+		{% endfor %}
+		{% if item.entity.field_bftv_fax.value is not empty %}
+		    <span>| <b>Fax:</b> {{ item.entity.field_bftv_fax.value  }}</span>
+		{% endif %}<br>
+    {% endfor %}
+    {% endif %}
+	{% if content.field_bftv_lab_location | render or content.field_bftv_lab_phone | render  %}
+		{% set lablocation %}
+			{{ content.field_bftv_lab_location }}
+		{% endset %}
+		{% set labphone %}
+			{{ content.field_bftv_lab_phone }}
+		{% endset %}
+		<span class="icon icon--location"><strong>Lab: </strong>{{ lablocation|striptags }}</span>
+		{% if content.field_bftv_lab_phone | render %}
+			<span class="icon icon--link icon--phone"><a href="tel:{{ labphone|striptags }}">{{ labphone|striptags }}</a></span>
+		{% endif %}
+		<br />
+	{% endif %}
+    {% if content.field_sf_address | render %}
+      {% set address %}
+	    {{ content.field_sf_address }}
+      {% endset %}
+	  {% if address|render|trim is not empty %}
+	      <span class="icon icon--map">{{ address|striptags }}</span>
+	  {% endif %}
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div{{ content_attributes.addClass('vm-teaser__summary') }}>
+    {{ content|without(
+      'links',
+	  'field_sf_first_name',
+      'field_sf_middle_initial',
+      'field_sf_last_name',
+      'field_sf_credentials',
+      'field_sf_name_prefix',
+	  'field_bftv_location',
+	  'field_bftv_departments',
+      'field_sf_featured_status',
+      'field_sf_primary_image',
+      'field_sf_position_title',
+      'field_sf_emails',
+      'field_sf_websites',
+      'field_sf_office_location',
+      'field_sf_address',
+	  'field_bftv_lab_phone',
+	  'field_bftv_lab_location',
+      'body'
+    ) }}
+  </div>
+{% endblock %}

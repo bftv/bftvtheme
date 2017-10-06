@@ -1,0 +1,33 @@
+name: SiteFarme One - Subtheme
+type: theme
+description: This is a subtheme of Sitefarm One
+package: SiteFarm
+core: 8.x
+
+base theme: sitefarm_one
+
+libraries:
+  - sf1subtheme/global-styles
+
+ckeditor_stylesheets:
+  - css/ckeditor.css
+
+regions:
+  header: Header
+  navigation: Navigation
+  quick_links: Quick Links
+  page_title: Page Title
+  pre_content: Pre Content
+  top_content_first: Top Content 1
+  top_content_second: Top Content 2
+  top_content_third: Top Content 3
+  top_content_fourth: Top Content 4
+  content: Content
+  sidebar_first: First Sidebar
+  sidebar_second: Second Sidebar
+  bottom_content_first: Bottom Content 1
+  bottom_content_second: Bottom Content 2
+  bottom_content_third: Bottom Content 3
+  bottom_content_fourth: Bottom Content 4
+  footer: Footer
+  footer_credits: Footer Credits

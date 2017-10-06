@@ -1,0 +1,17 @@
+{% extends "block.html.twig" %}
+{#
+/**
+ * @file
+ * Theme override for a views exposed filter.
+ *
+ * Available variables:
+ * - Look in the block.html.twig file for available variables.
+ */
+#}
+{% block content %}
+  <div class="panel__content">
+	<ul class="vm-teaser__contact list--pipe text--smaller">
+    <li class="icon icon--link icon--envelope">{{ content }}</li>
+	</ul>
+  </div>
+{% endblock %}

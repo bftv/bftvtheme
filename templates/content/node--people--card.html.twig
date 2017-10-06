@@ -1,0 +1,42 @@
+{% extends "node--teaser.html.twig" %}
+
+{#
+/**
+ * @file
+ * Theme override for a node sf-person teaser display
+ *
+ * Available variables:
+ * - Look in the node.html.twig file for available variables.
+ */
+#}
+{% block content %}
+  {% if content.field_sf_position_title | render or content.field_bftv_departments | render %}
+    <ul class="vm-teaser__position">
+      {% if content.field_sf_position_title | render %}
+        <li><b>{{ content.field_sf_position_title }}</b></li>
+      {% endif %}
+      {% if content.field_bftv_departments | render %}
+        <li>{{ content.field_bftv_departments[0] }}</li>
+      {% endif %}
+    </ul>
+  {% endif %}
+
+  <div class="text--smaller">{{ content.body }}</div>
+
+
+  <div{{ content_attributes.addClass('vm-teaser__summary') }}>
+    {{ content|without(
+      'links',
+	  'field_sf_first_name',
+      'field_sf_middle_initial',
+      'field_sf_last_name',
+      'field_sf_credentials',
+      'field_sf_name_prefix',
+	  'field_bftv_departments',
+      'field_sf_featured_status',
+      'field_sf_primary_image',
+      'field_sf_position_title',
+      'body'
+    ) }}
+  </div>
+{% endblock %}
