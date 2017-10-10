@@ -21,7 +21,7 @@ div.view-content h3:not(.vm-teaser__title), div.view-content h3:not(.vm-teaser__
 	background-color: #ccc;
 	padding: 0.4em 0 0.4em 0.1em;
 	margin: 0.4em auto;
-	line-height: 1.2;
+	line-height: 1.5;
 }
 
 /* Adds the little arrow for links, forms, additional information */
@@ -37,4 +37,45 @@ div.view-content h3:not(.vm-teaser__title), div.view-content h3:not(.vm-teaser__
 }
 .bftv-row {
 	margin-left: 1em;
+}
+
+/* Fixes the layout margins on leave approval page */
+@media screen and (min-width: 38em) {
+	.layout-container {
+		margin: 0 0;
+	}
+}
+.layout-container {
+	margin: 0 0;
+}
+
+/* This will prevent leave approvers to go to next/previous submisstions */
+.webform-submission-navigation {
+	display: none;
+}
+
+/* This removes the submisstion meta details for leave approvers */
+details {
+	display: none;
+}
+
+/* This makes tables to be non-breakable on mobile devices */
+table {
+	overflow-x: auto;
+}
+
+/* This will remove the labels on Leave history */
+
+td[class*="views-field-webform-submission-value"] label {
+	display: none;
+}
+
+/* This fixes the caption style of the table on mail list page */
+table[class^="views-table views-view-table cols-4"] caption {
+	color: #335377;
+	background-color: #ccc;
+	padding: .5em;
+	font-size: 1.125em;
+	font-weight: 700;
+	margin-top: 1em;
 }
