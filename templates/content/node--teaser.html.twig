@@ -63,12 +63,16 @@
  *   in different view modes.
  */
 #}
-{% set people_brand %}
-	{{ node.field_bftv_departments.entity.field_sf_brand_color.value }}
-{% endset %}
-{% if people_brand %}
+{% set people_brand = "default" %}
+
+{% if node.field_bftv_primary_dept.entity.field_sf_brand_color.value is defined %}
+	{% set people_brand = node.field_bftv_primary_dept.entity.field_sf_brand_color.value %}
+	{% set category_brand = people_brand %}
+{% elseif node.field_bftv_departments.entity.field_sf_brand_color.value is defined %}
+	{% set people_brand = node.field_bftv_departments.entity.field_sf_brand_color.value %}
 	{% set category_brand = people_brand %}
 {% endif %}
+
 {%
   set classes = [
     'node',

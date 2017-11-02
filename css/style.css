@@ -59,13 +59,12 @@ details {
 	display: none;
 }
 
-/* This makes tables to be non-breakable on mobile devices */
-table {
+/* This makes monthly leave tables to be non-breakable on mobile devices */
+.view-leave-history, .view-bftv-mailing-list {
 	overflow-x: auto;
 }
 
 /* This will remove the labels on Leave history */
-
 td[class*="views-field-webform-submission-value"] label {
 	display: none;
 }
