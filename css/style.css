@@ -18,10 +18,10 @@
 
 /* This class is for grouping header used on quick links and quick forms page, it doesn't harm the same selection on people's page */
 div.view-content h3:not(.vm-teaser__title), div.view-content h3:not(.vm-teaser__title) a {
-	background-color: #ccc;
-	padding: 0.4em 0 0.4em 0.1em;
-	margin: 0.4em auto;
-	line-height: 1.5;
+	background-color: #eee;
+	padding: 0.1em 0 0.1em 0.4em;
+	/*margin: 0.4em auto;
+	line-height: 1.5;*/
 }
 
 /* Adds the little arrow for links, forms, additional information */
