@@ -16,11 +16,11 @@
   </div>
   {% set fullname %}
       {{ content.field_sf_name_prefix }} {{ content.field_sf_first_name }} {{ content.field_sf_middle_initial }} {{ content.field_sf_last_name }}
-	  {% if node.field_bftv_abbr is not empty %}
-		({{content.field_bftv_abbr}})
+	  {% if node.field_bftv_abbr is not empty -%}
+		({{- content.field_bftv_abbr -}})
 	  {% endif %}
-	  {% if node.field_sf_credentials is not empty %}
-	      , {{ content.field_sf_credentials }}
+	  {%- if node.field_sf_credentials is not empty %}
+	      {{- "," }} {{ content.field_sf_credentials }}
 	  {% endif %}
   {% endset %}
   <h1 class="u-space-bottom--small">{{ fullname |striptags }}</h1>
