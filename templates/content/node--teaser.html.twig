@@ -101,9 +101,9 @@
         <h3{{ title_attributes.addClass('vm-teaser__title') }}><a href="{{ url }}" rel="bookmark">{{ label }}</a></h3>
 	{% endif %}
 	{% set fullname %}
-      {{ content.field_sf_name_prefix }} {{ content.field_sf_first_name }} {{ content.field_sf_middle_initial }} {{ content.field_sf_last_name }}
-	  {% if node.field_sf_credentials is not empty %}
-	      , {{ content.field_sf_credentials }}
+      {{ content.field_sf_name_prefix }} {{ content.field_sf_first_name }} {{ content.field_sf_middle_initial }} {% spaceless %}{{ content.field_sf_last_name }}{% endspaceless %}
+	  {%- if node.field_sf_credentials is not empty %}
+	      {{- "," }} {{ content.field_sf_credentials }}
 	  {% endif %}
     {% endset %}
     {% if node.type.entity.label == 'People' %}
