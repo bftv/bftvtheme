@@ -78,3 +78,9 @@ table[class^="views-table views-view-table cols-4"] caption {
 	font-weight: 700;
 	margin-top: 1em;
 }
+
+/* Fixes the 3rd level side navigation */
+.sub-nav li li li a {
+	padding-left: 6em;
+	font-weight: 300;
+}
