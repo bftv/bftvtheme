@@ -84,3 +84,8 @@ table[class^="views-table views-view-table cols-4"] caption {
 	padding-left: 6em;
 	font-weight: 300;
 }
+
+/* Red text color on keycard webform */
+.red-text {
+	color: red !important;
+}
