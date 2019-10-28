@@ -1,0 +1,18 @@
+name: Air Media App Download
+machine_name: vue-air-media-block
+type: pdb
+description: 'Downloads the Air Media App automatically based on OS'
+package: Vue
+core: '8.x'
+module_status: active
+presentation: vue
+template: template.html
+add_css:
+    header:
+        component:
+            'https://use.fontawesome.com/releases/v5.7.2/css/all.css': { minified: true, type: external, attributes: { integrity: sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr, crossorigin: anonymous }}            
+add_js:
+  footer:
+        'https://unpkg.com/axios/dist/axios.min.js': {type: external} 
+        'vue-router.js': {}
+        'script.js': {}
