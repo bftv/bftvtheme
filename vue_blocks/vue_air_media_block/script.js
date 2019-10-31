@@ -16,6 +16,7 @@ var airMediaCmp = Vue.extend({
 			//otherOs: false,
 			force: false,
 			manual: false,
+			info: false,
 			time: 5,
 			interval: null,
 			os: "",
@@ -75,11 +76,9 @@ var airMediaCmp = Vue.extend({
 				this.time = parseInt(this.time) - 1;
 			}
 		},
-		download: function(url) {
-			popout = window.open(url, '_blank');
-			window.setTimeout(function(){
-				popout.close();
-			}, 2000);
+		download: function(url) {			
+			window.location.href = url;
+			this.info = true;
 		},
 		manualDownload: function() {
 			this.loading = true;
