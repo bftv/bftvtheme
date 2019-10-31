@@ -1,168 +1,45 @@
-<div id="phaff-block" class="cc-main">    
+<div id="air-media-block" class="cc-main">    
     <router-view></router-view>
 </div>
 
-<template id="record-list-template">
+<template id="air-media">
 	<div v-if="!loading">
-		<div v-if="visibleRecords">
-			<div v-if="viewMode === 'list'">
-				<div>
-					<h3>Search</h3>
-					<form class="search-form" @submit.prevent="search()">
-						<div class="row">
-							<div class="column">
-								<label>Strain ID</label><input type="text" name="strain_id" v-model="s_strain_id" />
-								<label>Genus</label>
-								<select name="genus" v-model="s_genus">
-									<option v-for="item in genus_set" :value="item">
-										{{item}}
-									</option>								
-								</select>
-								<label>Species</label><input type="text" name="species" v-model="s_species" />
-							</div>
-							<div class="column">
-								<label>Source Habitat [<a href="http://phaff.local/sites/default/files/files/page/PYCCHabitats.pdf" target="_blank">PDF</a>]</label><input type="text" name="source_habitat" v-model="s_source_habitat" />
-								<label>CBS#</label><input type="text" name="cbs_number" v-model="s_cbs_number" />
-								<label>ATCC#</label><input type="text" name="atcc_number" v-model="s_atcc_number" />
-							</div>
-							<div class="column">
-								<label>NRRL#</label><input type="text" name="nrrl_number" v-model="s_nrrl_number" />
-								<label>Other Collection#</label><input type="text" name="other_collection_numbers" v-model="s_other_collection_numbers" />							
-								<label>&nbsp;</label><div style="float: left"><input type="submit" value="Search" class="button" style="margin-left: 0"></div><div class="smallText"><span v-if="moreFields" @click="hideMoreFields()" class="addtocart">Hide Advanced Search</span><span v-else @click="showMoreFields()" class="addtocart">Show Advanced Search</span><br/><span @click="clearSearch()" class="addtocart">Clear Search</span></div>
-							</div>
-						</div>
-						<div v-if="moreFields" class="row">
-							<div class="column">
-								<label>Synonym</label><input type="text" name="synonym" v-model="s_synonym" />
-								<label>Geographic Origin</label><input type="text" name="geographic_origin" v-model="s_geographic_origin" />
-							</div>
-							<div class="column">
-								<label>Source Country</label><input type="text" name="source_country" v-model="s_source_country" />
-								<label>Source Name</label><input type="text" name="source_name" v-model="s_source_name" />
-							</div>
-							<div class="column">
-								<label>Date of Isolation</label><input type="text" name="date_of_isolation" v-model="s_date_of_isolation" />
-							</div>
-						</div>
-					</form>
-				</div>
-				<div class="cart-button"><button class="button" @click="showCart()">View Cart / Checkout</button></div>
-				<div v-if="filteredData.length > 0">
-					<table>
-						<thead>
-							<tr>
-								<!-- <th v-for="col in columns">{{ col }} </th> -->
-								<th style="width: 90px;">Strain ID</th>
-								<th>Genus</th>
-								<th>Species</th>
-								<!-- <th>Source Habitat</th> -->
-								<th>CBS Number</th>
-								<th>ATCC Number</th>
-								<th>NRRL Number</th>
-								<!-- <th>Other Collection Numbers</th> -->
-								<th style="width: 150px;">&nbsp;</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr v-for="(row, index) in visibleRecords" :visibleRecords="visibleRecords" :currentPage="currentPage" :filteredData="filteredData">
-								<td>{{ row.strain_id }}</td>
-								<td>{{ row.genus }}</td>
-								<td>{{ row.species }}</td>
-								<!-- <td>{{ row.source_habitat }}</td> -->
-								<td>{{ row.cbs_number }}</td>
-								<td>{{ row.atcc_number }}</td>
-								<td>{{ row.nrrl_number }}</td>
-								<!-- <td>{{ row.other_collection_numbers }}</td> -->
-								<td><span class="addtocart" @click="showSingleItem(index)">view</span> | <span class="addtocart" @click="addToCart(index)">add to cart</span></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<div v-else><p style="text-align: center; color: red;"><strong>No records found with your search criteria. Try a different search.</strong></p></div>
-				<div v-if="totalPages() > 0" class="pagination-wrapper">
-					<span v-if="showPreviousLink()" class="pagination-btn" v-on:click="updatePage(currentPage - 1)"> < </span>
-					{{ currentPage + 1 }} of {{ totalPages() }}
-					<span v-if="showNextLink()" class="pagination-btn" v-on:click="updatePage(currentPage + 1)"> > </span>
-				</div>
+		<div class="air-media-wrap">
+			<div v-if="windows">
+				<h3>You are using a Windows system</h3>
+				<p>&nbsp;</p>
+				<p><strong>The "Air Media" application will start in <span id="counter">{{ time }}</span> seconds.</strong></p>
+				<p v-if="force"><a :href="url">Click here</a> if the download is not started.</p>
 			</div>
-			<div v-else-if="viewMode === 'cart'">
-				<div class="cart-button"><button class="button" @click="showList()">Close Cart</button><button v-if="cart.length" class="button" @click="emptyCart()">Empty Cart</button><button v-if="cart.length > 0" class="button" @click="checkOut()">Checkout</button></div>
-				<div v-if="cart.length > 0">
-					<p>Your item(s) in the cart:</p>
-					<ol>
-						<li v-for="(item, key) in cart">
-							<span><b>Strain ID: </b>{{ item.StrainID }}, <b>Genus: </b>{{ item.Genus }}, <b>Species: </b>{{ item.Species }}</span> | <span class="addtocart" @click="removeItem(key)">remove from cart</span>
-						</li>
-					</ol>
-				</div>
-				<div v-else><p style="text-align: center; color: red;"><strong>You don't have anything in the cart.</strong></p></div>
+			<div v-else-if="macOs">
+				<h3>You are using a Mac system</h3>
+				<p>&nbsp;</p>
+				<p><strong>The "Air Media" application will start in <span id="counter">{{ time }}</span> seconds.</strong></p>
+				<p v-if="force"><a :href="url">Click here</a> if the download is not started.</p>
+			</div>			
+			<div class="smallText" v-if="!manual">
+				<p>If you want to download any version manually, <a href="#" @click="manualDownload()">click here</a></p>
 			</div>
-			<div v-else-if="viewMode === 'single'">
-				<div class="back-button cart-button"><button class="button" @click="addToCart(singleItem.id - 1)">Add to Cart</button><button class="button" @click="showCart()">View Cart / Checkout</button><button class="button" @click="showList()"><-- Go Back</button></div>
-				<table>
-					<tr><td style="width: 220px"><h4>Strain ID</h4></td><td>{{ singleItem.strain_id }}</td></tr>					
-					<tr><td><h4>Genus</h4></td><td>{{ singleItem.genus }}</td></tr>
-					<tr><td><h4>Species</h4></td><td>{{ singleItem.species }}</td></tr>
-					<tr><td><h4>Synonym</h4></td><td>{{ singleItem.synonym }}</td></tr>
-					<tr><td><h4>Geographic Origin</h4></td><td>{{ singleItem.geographic_origin }}</td></tr>
-					<tr><td><h4>Source Country</h4></td><td>{{ singleItem.source_country }}</td></tr>
-					<tr><td><h4>Source Habitat</h4></td><td>{{ singleItem.source_habitat }}</td></tr>
-					<tr><td><h4>Source Name</h4></td><td>{{ singleItem.source_name }}</td></tr>
-					<tr><td><h4>CBS #</h4></td><td>{{ singleItem.cbs_number }}</td></tr>
-					<tr><td><h4>ATCC #</h4></td><td>{{ singleItem.atcc_number }}</td></tr>
-					<tr><td><h4>NRRL #</h4></td><td>{{ singleItem.nrrl_number }}</td></tr>
-					<tr><td><h4>Other Collection Number(s)</h4></td><td>{{ singleItem.other_collection_numbers }}</td></tr>
-					<tr><td><h4>Date of Isolation</h4></td><td>{{ singleItem.date_of_isolation }}</td></tr>
-				</table>
+			<div v-else>
+				<h4>Choose a Version</h4>
+				<p>&nbsp;</p>
+				<p><span class="icon icon--link icon--download"> <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip">Air Media - Windows</a></span></p>
+				<p><span class="icon icon--link icon--download"> <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Mac.zip">Air Media - Mac</a></span></p>
+				<p>&nbsp;</p>
+				<a href="#" @click="manualDownloadOff()">Go back</a>
 			</div>
-		</div>	
+		</div>
 	</div>
 	<div v-else style="text-align: center"><i  v-show="loading" class="fa fa-spinner fa-spin fa-4x" style="color: #999"></i></div>
 </template>
 
 
 <style scoped>
-	table {
-	display: block;
-	overflow-x: auto;
-}
-input, select {
-	height: auto;
-}
-.back-button {
-	text-align: right;
-	padding-bottom: 1rem;
-}
-.addtocart {
-	text-decoration: underline;
-	color: #06c;
-}
-.addtocart:hover {
-	text-decoration: none;
-	color: #1a8cff;
-}
-.cart-button {
-	text-align: right;
-	padding-top: 1rem;
-	padding-bottom: 1rem;
-}
-.pagination-btn, .addtocart {
-	cursor: pointer;
-}
-.pagination-wrapper {
+.air-media-wrap {
 	text-align: center;
-}
-.row {
-	display: flex;
-	background-color: #eee;
-}
-.column {
-	flex: 33%;
-	padding: 10px;
 }
 .smallText {
 	font-size: 14px;
-	float: left;
-	margin-left: 10px;
+	margin-top: 3em;
 }
 </style>
