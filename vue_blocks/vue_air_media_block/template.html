@@ -8,17 +8,17 @@
 			<div v-if="windows">
 				<h3>You are using a Windows system</h3>
 				<p>&nbsp;</p>
-				<p><strong>The "Air Media" application will start in <span id="counter">{{ time }}</span> seconds.</strong></p>
+				<p><strong>The "Air Media" application download will start in <span id="counter">{{ time }}</span> seconds.</strong></p>
 				<p v-if="force"><a :href="url">Click here</a> if the download is not started.</p>
 			</div>
 			<div v-else-if="macOs">
 				<h3>You are using a Mac system</h3>
 				<p>&nbsp;</p>
-				<p><strong>The "Air Media" application will start in <span id="counter">{{ time }}</span> seconds.</strong></p>
-				<p v-if="force"><a :href="url">Click here</a> if the download is not started.</p>
+				<p><strong>The "Air Media" application will download start in <span id="counter">{{ time }}</span> seconds.</strong></p>
+				<p v-if="force"><a :href="url">Click here</a> if the download is not started yet.</p>
 			</div>			
 			<div class="smallText" v-if="!manual">
-				<p>If you want to download any version manually, <a href="#" @click="manualDownload()">click here</a></p>
+				<p>If you want to download any version manually, <a href="" @click="manualDownload()">click here</a></p>
 			</div>
 			<div v-else>
 				<h4>Choose a Version</h4>
