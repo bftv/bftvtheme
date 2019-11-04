@@ -52,11 +52,11 @@ var airMediaCmp = Vue.extend({
 				this.interval = setInterval(this.incrementTime, 1000);				
 			} else if (chromePlatforms.indexOf(platform) !== -1) {
 				this.chromeOs = true;
-				this.os = "chrome";
+				this.os = "ChromeOS";
 				this.interval = setInterval(this.incrementTime, 1000);				
 			} else if (/Android/.test(userAgent)) {
 				this.andriod = true;
-				this.os = 'android';
+				this.os = 'Android';
 				this.interval = setInterval(this.incrementTime, 1000);
 			} else if (iosPlatforms.indexOf(platform) !== -1) {
 				this.iOs = true;
@@ -78,9 +78,9 @@ var airMediaCmp = Vue.extend({
 				} else if (this.os == "win") {
 					this.url = "https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip";
 					this.download(this.url);
-				} else if (this.os == "chrome") {
+				} else if (this.os == "ChromeOS") {
 					window.location.href ='https://chrome.google.com/webstore/detail/airmedia-sender/ljophmlbljnjodcbogmdogcpclifenpk';
-				} else if (this.os == "android") {
+				} else if (this.os == "Android") {
 					window.location.href='https://play.google.com/store/apps/details?id=com.crestron.airmedia&hl=en_US';
 				} else if (this.os == "iOS") {
 					window.location.href='https://itunes.apple.com/us/app/crestron-airmedia/id685412055';
