@@ -22,7 +22,7 @@
 				<p>&nbsp;</p>
 				<p><strong>Please wait, you will be redirected to a page to download the app.</strong></p>
 			</div>
-			<div class="smallText" v-if="!((manual) || (iOs && andriod && chromeOs))">
+			<div class="smallText" v-if="!manual">
 				<p>If you want to download any version manually, <a href="#" @click="manualDownload()">click here</a></p>
 			</div>
 			<div v-else>
@@ -30,6 +30,9 @@
 				<p>&nbsp;</p>
 				<p><span class="icon icon--link icon--download"> <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip">Air Media - Windows</a></span></p>
 				<p><span class="icon icon--link icon--download"> <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Mac.zip">Air Media - Mac</a></span></p>
+				<p><span class="icon icon--link icon--download"> <a href="https://itunes.apple.com/us/app/crestron-airmedia/id685412055">iOS</a></span></p>
+				<p><span class="icon icon--link icon--download"> <a href="https://play.google.com/store/apps/details?id=com.crestron.airmedia&hl=en_US">Android</a></span></p>
+				<p><span class="icon icon--link icon--download"> <a href="https://chrome.google.com/webstore/detail/airmedia-sender/ljophmlbljnjodcbogmdogcpclifenpk">ChromeOS</a></span></p>
 				<p>&nbsp;</p>
 				<a href="#" @click="manualDownloadOff()">Go back</a>
 			</div>
