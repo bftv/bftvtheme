@@ -22,7 +22,7 @@
 				<p>&nbsp;</p>
 				<p><strong>Please wait, you will be redirected to a page to download the app.</strong></p>
 			</div>
-			<div class="smallText" v-if="!manual && !(iOs && andriod && chromeOs)">
+			<div class="smallText" v-if="!((manual) || (iOs && andriod && chromeOs))">
 				<p>If you want to download any version manually, <a href="#" @click="manualDownload()">click here</a></p>
 			</div>
 			<div v-else>
