@@ -9,13 +9,59 @@
 				<h3>You are using a Windows system</h3>
 				<p>&nbsp;</p>
 				<p><strong>The "Air Media" application download will start in <span id="counter">{{ time }}</span> seconds.</strong></p>
-				<p v-if="force"><a :href="url">Click here</a> if the download is not started.</p>
+				<div v-if="force">
+					<p><a :href="url">Click here</a> if the download is not started.</p>
+					<div class="instruction">
+						<h4>Instruction on How to Connect</h4>
+						<ol>
+							<li>Once the file is downloaded, open it, and then launch the program.</li>
+							<ol type="a">
+								<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
+							</ol>
+							<li>Use the <strong>on-screen code</strong> to <strong>Connect</strong>, then click <strong>Start</strong> when ready to present.</li>
+						</ol>
+						<p>&nbsp;</p>
+						<p><strong>For support, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a> for quickest response.</strong></p>
+						<p>Including the room number in subject line will help expedite the response. If we are not on-site, we can call if you leave us a contact number. You may also email us if instructions are unclear, we appreciate the feedback.</p>
+					</div>
+				</div>
 			</div>
 			<div v-else-if="macOs">
 				<h3>You are using a Mac system</h3>
 				<p>&nbsp;</p>
 				<p><strong>The "Air Media" application will download start in <span id="counter">{{ time }}</span> seconds.</strong></p>
-				<p v-if="force"><a :href="url">Click here</a> if the download is not started yet.</p>
+				<div v-if="force">
+					<p><a :href="url">Click here</a> if the download is not started.</p>
+					<div class="instruction">
+						<h4>Instruction on How to Connect</h4>
+						<ol>
+							<li>The download starts automatically, if not, click the above link to start the download.</li>
+							<ol type="a">
+								<li>If prompted, <strong>Allow</strong> “bftv.ucdavis.edu” to download to your system.</li>
+							</ol>
+							<li>Go to the downloaded file, run it, and then open <strong>Launch Crestron AirMedia</strong>.</li>
+							<ol type="a">
+								<li>If you get a <strong>“can’t be opened”</strong> error, without the Open option:</li>
+								<ol type="i">
+									<li>Click <strong>OK</strong>.</li>
+									<li>Right-click (tap with two fingers or use <strong>control + click</strong>) on program to bring up a menu, then select <strong>Open</strong>.</li>
+									<li>You should get same message, expect now you can select <strong>Open</strong> to continue.</li>
+								</ol>
+								<li>Ignore the <strong>“To enable non-AirPlay audio”</strong> message. You can check to box to stop showing the message.</li>
+							</ol>
+							<li>Use the <strong>AirPlay</strong> <img class="custom-icon" src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/inline-images/airplay.png" /> icon on the top Menu Bar of your Mac after launching the app to select display.</li>
+							<ol type="a">
+								<li>If you do not see the icon, go to <strong>System Preferences > Displays > AirPlay Displays:</strong></li>
+								<li>Check the box for <strong>“Show mirroring options in the menu bar when available”</strong> to see it on your menu bar in the future.</li>
+								<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
+							</ol>
+							<li>Use the <strong>on-screen code</strong> to Connect, then click Start when ready to present.</li>
+						</ol>
+						<p>&nbsp;</p>
+						<p><strong>For support, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a> for quickest response.</strong></p>
+						<p>Including the room number in subject line will help expedite the response. If we are not on-site, we can call if you leave us a contact number. You may also email us if instructions are unclear, we appreciate the feedback.</p>
+					</div>
+				</div>
 			</div>
 			<div v-else-if="(iOs || andriod || chromeOs)">
 				<h3>You are using {{ os }} system</h3>
@@ -28,11 +74,11 @@
 			<div v-else>
 				<h4>Choose a Version</h4>
 				<p>&nbsp;</p>
-				<p><span class="icon icon--link icon--download"> <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip">Air Media - Windows</a></span></p>
-				<p><span class="icon icon--link icon--download"> <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Mac.zip">Air Media - Mac</a></span></p>
-				<p><span class="icon icon--link icon--download"> <a href="https://itunes.apple.com/us/app/crestron-airmedia/id685412055">iOS</a></span></p>
-				<p><span class="icon icon--link icon--download"> <a href="https://play.google.com/store/apps/details?id=com.crestron.airmedia&hl=en_US">Android</a></span></p>
-				<p><span class="icon icon--link icon--download"> <a href="https://chrome.google.com/webstore/detail/airmedia-sender/ljophmlbljnjodcbogmdogcpclifenpk">ChromeOS</a></span></p>
+				<p><span><i class="fab fa-windows"></i>  <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip">Air Media - Windows</a></span></p>
+				<p><span><i class="fab fa-apple"></i>  <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Mac.zip">Air Media - Mac</a></span></p>
+				<p><span><i class="fab fa-app-store-ios"></i>  <a href="https://itunes.apple.com/us/app/crestron-airmedia/id685412055">iOS</a></span></p>
+				<p><span><i class="fab fa-android"></i>  <a href="https://play.google.com/store/apps/details?id=com.crestron.airmedia&hl=en_US">Android</a></span></p>
+				<p><span><i class="fab fa-chrome"></i>  <a href="https://chrome.google.com/webstore/detail/airmedia-sender/ljophmlbljnjodcbogmdogcpclifenpk">ChromeOS</a></span></p>
 				<p>&nbsp;</p>
 				<a href="#" @click="manualDownloadOff()">Go back</a>
 			</div>
@@ -49,5 +95,12 @@
 .smallText {
 	font-size: 14px;
 	margin-top: 3em;
+}
+.instruction {
+	margin-top: 2em;
+	text-align: left;
+}
+.custom-icon {
+	width: 32px;
 }
 </style>
