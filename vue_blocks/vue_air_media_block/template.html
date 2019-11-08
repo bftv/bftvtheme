@@ -8,12 +8,12 @@
 			<div v-if="windows">
 				<h3>You are using a Windows system</h3>
 				<p>&nbsp;</p>
-				<p><strong>The "Air Media" application download will start in <span id="counter">{{ time }}</span> seconds.</strong></p>
+				<p><strong>The "AirMedia" application download will start in <span id="counter">{{ time }}</span> seconds.</strong></p>
 				<div v-if="force">
 					<p><a :href="url">Click here</a> if the download is not started.</p>					
 				</div>
 				<div class="instruction">
-					<h4>Instruction on How to Connect</h4>
+					<h4>Connection instructions for Windows</h4>
 					<ol>
 						<li>Once the file is downloaded, open it, and then launch the program.</li>
 						<ol type="a">
@@ -29,12 +29,12 @@
 			<div v-else-if="macOs">
 				<h3>You are using a Mac system</h3>
 				<p>&nbsp;</p>
-				<p><strong>The "Air Media" application will download start in <span id="counter">{{ time }}</span> seconds.</strong></p>
+				<p><strong>The "AirMedia" application will download start in <span id="counter">{{ time }}</span> seconds.</strong></p>
 				<div v-if="force">
 					<p><a :href="url">Click here</a> if the download is not started.</p>					
 				</div>
 				<div class="instruction">
-					<h4>Instruction on How to Connect</h4>
+					<h4>Connection instructions for macOS</h4>
 					<ol>
 						<li>The download starts automatically, if not, click the above link to start the download.</li>
 						<ol type="a">
@@ -76,15 +76,15 @@
 				<a style="float:right;" href="#" @click="manualDownloadOff()"><-- Go back</a>
 				<p>&nbsp;</p>
 				<ul style="list-style-type: none;">
-					<li><i class="fab fa-windows"></i>  <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip">Air Media - Windows</a></li>
-					<li><i class="fab fa-apple"></i>  <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Mac.zip">Air Media - Mac</a></li>				
+					<li><i class="fab fa-windows"></i>  <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip">AirMedia - Windows</a></li>
+					<li><i class="fab fa-apple"></i>  <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Mac.zip">AirMedia - Mac</a></li>				
 					<li><i class="fab fa-app-store-ios"></i>  <a href="https://itunes.apple.com/us/app/crestron-airmedia/id685412055">iOS</a></li>
 					<li><i class="fab fa-android"></i>  <a href="https://play.google.com/store/apps/details?id=com.crestron.airmedia&hl=en_US">Android</a></li>				
 					<li><i class="fab fa-chrome"></i>  <a href="https://chrome.google.com/webstore/detail/airmedia-sender/ljophmlbljnjodcbogmdogcpclifenpk">ChromeOS</a></li>
 					
 				</ul>
 				<div class="instruction">
-					<h4>Instruction on How to Connect on a Windows Machine</h4>
+					<h4>Connection instructions for Windows</h4>
 					<ol>
 						<li>Once the file is downloaded, open it, and then launch the program.</li>
 						<ol type="a">
@@ -94,7 +94,7 @@
 					</ol>					
 				</div>
 				<div class="instruction">
-					<h4>Instruction on How to Connect on a Mac</h4>
+					<h4>Connection instructions for macOS</h4>
 					<ol>
 						<li>The download starts automatically, if not, click the above link to start the download.</li>
 						<ol type="a">
