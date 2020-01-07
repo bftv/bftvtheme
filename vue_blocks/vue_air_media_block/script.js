@@ -1,3 +1,13 @@
+/* Popup Function */
+var popupWindow = null;
+function centeredPopup(url,w,h,scroll){
+	LeftPosition = (screen.width) ? (screen.width-w)/2 : 0;
+	TopPosition = (screen.height) ? (screen.height-h)/2 : 0;
+	settings = 'height='+h+',width='+w+',top='+TopPosition+',left='+LeftPosition+',scrollbars='+scroll+',resizable'
+	popupWindow = window.open(url,"1207 Emergency Form",settings)
+}
+/* End Popup Function */
+
 /* Main URLs */
 const blockID = document.getElementsByClassName('vue-air-media-block')[0].id;
 /* End Main URLs */
