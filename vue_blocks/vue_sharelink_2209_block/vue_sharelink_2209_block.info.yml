@@ -1,0 +1,17 @@
+name: Sharelink 2209
+machine_name: vue-sharelink-2209-block
+type: pdb
+description: 'Automatically download Share Link App based on OS'
+package: Vue
+core: '8.x'
+module_status: active
+presentation: vue
+template: template.html
+add_css:
+    header:
+        component:
+            'https://use.fontawesome.com/releases/v5.7.2/css/all.css': { minified: true, type: external, attributes: { integrity: sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr, crossorigin: anonymous }}            
+add_js:
+  footer:        
+        'vue-router.js': {}
+        'script.js': {}
