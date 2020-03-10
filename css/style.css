@@ -89,3 +89,8 @@ table[class^="views-table views-view-table cols-4"] caption {
 .red-text {
 	color: red !important;
 }
+
+/* Remove underline from the FAQ lists */
+.list--faq>li:nth-child(odd), .list-wrapper--faq ul>li:nth-child(odd) {
+	text-decoration: none;
+}
