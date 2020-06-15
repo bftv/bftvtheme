@@ -1,0 +1,137 @@
+<div id="device-block" class="news-main">    
+    <router-view></router-view>
+</div>
+
+<template id="device-list-template">
+	<div v-if="!loading">
+		<div v-if="devData">
+			<table>
+				<thead>
+					<tr>
+						<th><a :href="'?sortkey=deviceName&sortdirection='+sortdiropp">Device Name</a></th>
+						<th><a :href="'?sortkey=deviceOsHostname&sortdirection='+sortdiropp">Hostname</a></th>
+						<th><a :href="'?sortkey=os&sortdirection='+sortdiropp">OS</a></th>
+						<th><a :href="'?sortkey=status&sortdirection='+sortdiropp">Status</a></th>
+						<th><a :href="'?sortkey=archiveBytes&sortdirection='+sortdiropp">Data Stored</a></th>
+						<th><a :href="'?sortkey=alertStates&sortdirection='+sortdiropp">Alerts</a></th>
+						<th><a :href="'?sortkey=lastActivity&sortdirection='+sortdiropp">Last Backup Activity</a></th>
+					</tr>
+				</thead>
+				<tbody>					
+					<tr v-for="dev in devData">
+						<td>{{ dev.deviceName }}</td>
+						<td>{{ dev.deviceOsHostname }}</td>
+						<td>
+							<span v-if="dev.os === 'win'">
+								<i class="fab fa-windows"></i>
+							</span>
+							<span v-else-if="dev.os === 'mac'">
+								<i class="fab fa-apple"></i>
+							</span>	
+							<span v-else-if="dev.os === 'linux'">
+								<i class="fab fa-linux"></i>
+							</span>
+						</td>
+						<td>
+							<span v-if="dev.status === 'Active'">
+								<i class="fas fa-toggle-on" style="color: #266041"></i>
+							</span>
+							<span v-else-if="dev.status === 'Deactivated'">
+								<i class="fas fa-toggle-off" style="color: #C10230"></i>
+							</span>
+						</td>
+						<td>
+							<span v-if="dev.archiveBytes !== 'null'">{{ (dev.archiveBytes/1073741824).toFixed(2) }}<small>GB</small></span>
+							<span v-else></span>
+						</td>
+						<td>{{ dev.alertStates }}</td>
+						<td>
+							<span v-if="dev.lastActivity">{{ moment(dev.lastActivity).format('M/DD/YYYY - hh:mm:ssa') }}</span>	
+							<span v-else></span>						
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>	
+	</div>
+	<div v-else style="text-align: center"><i  v-show="loading" class="fa fa-spinner fa-spin fa-4x" style="color: #999"></i></div>
+</template>
+
+<template id="single-dev-template">
+	<div v-if="!loading">	
+		<div class="back-button"><button class="button" @click="goBack()"><-- Go Back to the News List</button></div>
+		<div v-if="newsItem">
+			<div class="node__content">
+				<div v-if="imgsrc" class="image-container">
+					<img :src="imgsrc" width="1280" height="720" :alt="newsItem.relationships.field_sf_primary_image.data.meta.alt" class="image-style-sf-landscape-16x9">
+				</div>
+				<h2>{{ newsItem.attributes.title }}</h2>
+				<footer class="node__meta">
+					<div class="node__submitted meta-info">
+						<div class="byline u-space-bottom">
+							<p class="posted-note">Posted on: {{ moment(newsItem.attributes.created).format('MMMM DD, YYYY') }}</p>
+						</div>
+					</div>
+				</footer>
+				<div class="clearfix text-formatted" v-html="$options.filters.fiximg(newsItem.attributes.body.value)"></div>
+				<div v-if="newsItem.attributes.field_url_to_link_article">
+					<h3 class="heading--auxiliary-customized">Original Article</h3>
+					<a :href="newsItem.attributes.field_url_to_link_article.uri" target="_blank">{{ newsItem.attributes.field_url_to_link_article.uri }}</a>
+				</div>
+				<div v-if="newsItem.relationships.field_bftv_news_document.data.length">	
+					{{ loadNewsDoc(newsItem.relationships.field_bftv_news_document.data[0].id) }}
+					<h3 class="heading--auxiliary-customized">Documents</h3>
+					<a :href="newsdocurl" target="_blank">{{ newsdocname }}</a>						
+				</div>					
+			</div>
+		</div>
+	</div>
+	<div v-else style="text-align: center"><i  v-show="loading" class="fa fa-spinner fa-spin fa-4x" style="color: #999"></i></div>
+</template>	
+
+<style scoped>
+table {
+	
+	overflow-x: auto;
+}
+input, select {
+	height: auto;
+}
+.back-button {
+	text-align: right;
+	padding-bottom: 1rem;
+}
+.addtocart {
+	text-decoration: underline;
+	color: #06c;
+}
+.addtocart:hover {
+	text-decoration: none;
+	color: #1a8cff;
+}
+.cart-button {
+	text-align: right;
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+}
+.pagination-btn, .addtocart {
+	cursor: pointer;
+}
+.pagination-wrapper {
+	text-align: center;
+}
+.row {
+	display: flex;
+	background-color: #eee;
+}
+.column {
+	flex: 33%;
+	padding: 10px;
+}
+.smallText {
+	font-size: 14px;
+	text-align: right;
+	margin-left: 10px;
+}
+</style>
+
