@@ -10,10 +10,10 @@
 					<tr>
 						<th><a :href="'?sortkey=deviceName&sortdirection='+sortdiropp">Device Name</a></th>
 						<th><a :href="'?sortkey=deviceOsHostname&sortdirection='+sortdiropp">Hostname</a></th>
-						<th><a :href="'?sortkey=os&sortdirection='+sortdiropp">OS</a></th>
-						<th><a :href="'?sortkey=status&sortdirection='+sortdiropp">Status</a></th>
+						<th><a :href="'?sortkey=os&sortdirection='+sortdiropp">OS</a></th>						
 						<th><a :href="'?sortkey=archiveBytes&sortdirection='+sortdiropp">Data Stored</a></th>
 						<th><a :href="'?sortkey=alertStates&sortdirection='+sortdiropp">Alerts</a></th>
+						<th><a :href="'?sortkey=completed&sortdirection='+sortdiropp">Completed</a></th>
 						<th><a :href="'?sortkey=lastActivity&sortdirection='+sortdiropp">Last Backup Activity</a></th>
 					</tr>
 				</thead>
@@ -31,20 +31,24 @@
 							<span v-else-if="dev.os === 'linux'">
 								<i class="fab fa-linux"></i>
 							</span>
-						</td>
-						<td>
-							<span v-if="dev.status === 'Active'">
-								<i class="fas fa-toggle-on" style="color: #266041"></i>
-							</span>
-							<span v-else-if="dev.status === 'Deactivated'">
-								<i class="fas fa-toggle-off" style="color: #C10230"></i>
-							</span>
-						</td>
+						</td>						
 						<td>
 							<span v-if="dev.archiveBytes !== 'null'">{{ (dev.archiveBytes/1073741824).toFixed(2) }}<small>GB</small></span>
 							<span v-else></span>
 						</td>
 						<td>{{ dev.alertStates }}</td>
+						<td>
+							<span v-if="dev.backupCompletePercentage !== 'null'">
+								<span v-if="dev.backupCompletePercentage == '100.0'">100%</span>
+								<span v-else>{{ dev.backupCompletePercentage }}%</span>	
+							<span v-else></span>							
+							<!-- <span v-if="dev.status === 'Active'">
+								<i class="fas fa-toggle-on" style="color: #266041"></i>
+							</span>
+							<span v-else-if="dev.status === 'Deactivated'">
+								<i class="fas fa-toggle-off" style="color: #C10230"></i>
+							</span> -->
+						</td>
 						<td>
 							<span v-if="dev.lastActivity">{{ moment(dev.lastActivity).format('M/DD/YYYY - hh:mm:ssa') }}</span>	
 							<span v-else></span>						
