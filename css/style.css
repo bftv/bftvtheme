@@ -94,3 +94,11 @@ table[class^="views-table views-view-table cols-4"] caption {
 .list--faq>li:nth-child(odd), .list-wrapper--faq ul>li:nth-child(odd) {
 	text-decoration: none;
 }
+
+/* Styles for Keycard Form Request */
+#edit-requested-access-check--wrapper .fieldset-wrapper {
+	border: 1px solid #ccc;
+	padding: 2px 10px;
+	height: 16em;
+	overflow-y: scroll;  
+}
