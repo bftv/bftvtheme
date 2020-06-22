@@ -102,3 +102,10 @@ table[class^="views-table views-view-table cols-4"] caption {
 	height: 16em;
 	overflow-y: scroll;  
 }
+
+/* Hide the custom separator block */
+#block-separator, #block-separator-2, #block-separator-3, #block-separator-4 {
+	margin-bottom: 0;
+	padding: 0;
+	visibility: hidden;
+}
