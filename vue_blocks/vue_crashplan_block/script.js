@@ -4,7 +4,7 @@ var sortvalue = url.searchParams.get("sortkey");
 var sortdirection = url.searchParams.get("sortdirection");
 
 /* Get Block ID */
-//MainURL = 'https://crashplan.bftv.ucdavis.edu:4285/api/DeviceBackupReport';
+//MainURL = 'https://crashplan.caes.ucdavis.edu:4285/api/DeviceBackupReport';
 const blockID = document.getElementsByClassName('vue-crashplan-block')[0].id;
 /* End Get Block ID */
  
@@ -20,7 +20,8 @@ var devList = Vue.extend({
 			devData: null,	
 			test: null,
 			moment: moment,
-			MainURL: 'https://crashplan.bftv.ucdavis.edu:4285/api/DeviceBackupReport',
+			InitialURL: 'https://web.bftv.ucdavis.edu/crashplan/index.php',
+			MainURL: 'https://web.bftv.ucdavis.edu/crashplan/reports.json',
 			sortkey: '',
 			sortdir: '',
 			sortdiropp: '',
@@ -30,12 +31,12 @@ var devList = Vue.extend({
     },
 	
 	mounted: function() {		
-		this.activeItem = drupalSettings.pdb.configuration[blockID].ShowActive		
+		/* this.activeItem = drupalSettings.pdb.configuration[blockID].ShowActive		
 		if(this.activeItem == 1){
 			this.MainURL += '?active=true'
-		}
-		
-		this.getDevList(this.MainURL),
+		} */
+		//axios.get('https://web.bftv.ucdavis.edu/crashplan/index.php'),
+		this.getDevList(this.InitialURL, this.MainURL),
 		
 		this.sortkey = sortvalue,
 		this.sortdir = sortdirection
@@ -55,19 +56,36 @@ var devList = Vue.extend({
 	},
 
     methods: {
-        getDevList: async function(url){
+        getDevList: async function(url1, url2){
+				requestOne = axios.get(url1),
+				setTimeout(() => { requestTwo = axios.get(url2); }, 1500);
+				setTimeout(() => {
+					axios.all([requestOne, requestTwo]).then(axios.spread((...responses) => {
+						this.devData = responses[1].data.data,
+						this.loading = false
+					}));
+				}, 2500);
+		}
+		/* getDevList: async function(url){
 				
 			const err = await axios.
 			get(url, {
+				crossDomain: true,
 				auth: {
 					username: 'samtest',
 					password: 'SamTest' // Bad password
+				},
+				headers: {
+					'Access-Control-Allow-Origin': '*',
+					'Access-Control-Allow-Methods': 'GET',
+					'Access-Control-Allow-Headers': 'x-csrf-token,authorization,contenttype,accept,origin,x-requested-with',
+					'Content-Type': 'application/json'
 				}
 			}).then(response => {			
 				this.devData = response.data.data,
 				this.loading = false
 			}).catch(err => err);
-		}
+		} */
 	}
 })
 
