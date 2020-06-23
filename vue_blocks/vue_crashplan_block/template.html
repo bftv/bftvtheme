@@ -8,13 +8,13 @@
 			<table>
 				<thead>
 					<tr>
-						<th><a :href="'?sortkey=deviceName&sortdirection='+sortdiropp">Device Name</a></th>
-						<th><a :href="'?sortkey=deviceOsHostname&sortdirection='+sortdiropp">Hostname</a></th>
-						<th><a :href="'?sortkey=os&sortdirection='+sortdiropp">OS</a></th>						
-						<th><a :href="'?sortkey=archiveBytes&sortdirection='+sortdiropp">Data Stored</a></th>
-						<th><a :href="'?sortkey=alertStates&sortdirection='+sortdiropp">Alerts</a></th>
-						<th><a :href="'?sortkey=completed&sortdirection='+sortdiropp">Completed</a></th>
-						<th><a :href="'?sortkey=lastActivity&sortdirection='+sortdiropp">Last Backup Activity</a></th>
+						<th><a href="#" @click="multisort(devData, ['deviceName'], [sortdir])">Device Name<span v-if="sortkey == 'deviceName'">{{ arrow }}</span></a></th>
+						<th><a href="#" @click="multisort(devData, ['deviceOsHostname'], [sortdir])">Hostname<span v-if="sortkey == 'deviceOsHostname'">{{ arrow }}</span></a></th>
+						<th><a href="#" @click="multisort(devData, ['os'], [sortdir])">OS<span v-if="sortkey == 'os'">{{ arrow }}</span></a></th>						
+						<th><a href="#" @click="multisort(devData, ['archiveBytes'], [sortdir])">Data Stored<span v-if="sortkey == 'archiveBytes'">{{ arrow }}</span></a></th>
+						<th><a href="#" @click="multisort(devData, ['alertStates'], [sortdir])">Alerts<span v-if="sortkey == 'alertStates'">{{ arrow }}</span></a></th>
+						<th><a href="#" @click="multisort(devData, ['backupCompletePercentage'], [sortdir])">Completed<span v-if="sortkey == 'backupCompletePercentage'">{{ arrow }}</span></a></th>
+						<th><a href="#" @click="multisort(devData, ['lastActivity'], [sortdir])">Last Backup Activity<span v-if="sortkey == 'lastActivity'">{{ arrow }}</span></a></th>
 					</tr>
 				</thead>
 				<tbody>					
