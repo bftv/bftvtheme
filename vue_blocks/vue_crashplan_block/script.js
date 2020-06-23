@@ -18,41 +18,18 @@ var devList = Vue.extend({
         return {
             activeItem: false,			
 			devData: null,	
-			test: null,
+			arrow: '',
 			moment: moment,
 			InitialURL: 'https://web.bftv.ucdavis.edu/crashplan/index.php',
-			MainURL: 'https://web.bftv.ucdavis.edu/crashplan/reports.json',
+			MainURL: 'https://web.bftv.ucdavis.edu/crashplan/reports.json',			
+			sortdir: 'ASC',
 			sortkey: '',
-			sortdir: '',
-			sortdiropp: '',
-			delimator: '',
 			loading: true
         }
     },
 	
-	mounted: function() {		
-		/* this.activeItem = drupalSettings.pdb.configuration[blockID].ShowActive		
-		if(this.activeItem == 1){
-			this.MainURL += '?active=true'
-		} */
-		//axios.get('https://web.bftv.ucdavis.edu/crashplan/index.php'),
-		this.getDevList(this.InitialURL, this.MainURL),
-		
-		this.sortkey = sortvalue,
-		this.sortdir = sortdirection
-		
-		if(this.sortkey == null){
-			this.sortkey = 'deviceName'
-		}
-		
-		if(this.sortdir == null){
-			this.sortdir = 'ASC',
-			this.sortdiropp = 'ASC'
-		} else if(this.sortdir == 'ASC') {
-			this.sortdiropp = 'DESC'
-		} else if(this.sortdir == 'DESC'){
-			this.sortdiropp = 'ASC'
-		}
+	mounted: function() {				
+		this.getDevList(this.InitialURL, this.MainURL)
 	},
 
     methods: {
@@ -63,8 +40,61 @@ var devList = Vue.extend({
 					axios.all([requestOne, requestTwo]).then(axios.spread((...responses) => {
 						this.devData = responses[1].data.data,
 						this.loading = false
+						//this.devData = this.multisort(this.devData, ['deviceName'], ['ASC'])
 					}));
 				}, 2500);
+				
+		},
+		multisort: function(arr, columns, order_by) {
+			if(typeof columns == 'undefined') {
+				columns = []
+				for(x=0;x<arr[0].length;x++) {
+					columns.push(x);
+				}
+			}
+
+			if(typeof order_by == 'undefined') {
+				order_by = []
+				for(x=0;x<arr[0].length;x++) {
+					order_by.push('ASC');
+				}
+			}
+
+			function multisort_recursive(a,b,columns,order_by,index) {  
+				var direction = order_by[index] == 'DESC' ? 1 : 0;
+
+				var is_numeric = !isNaN(+a[columns[index]] - +b[columns[index]]);
+
+
+				var x = is_numeric ? +a[columns[index]] : a[columns[index]].toLowerCase();
+				var y = is_numeric ? +b[columns[index]] : b[columns[index]].toLowerCase();
+
+
+
+				if(x < y) {
+						return direction == 0 ? -1 : 1;
+				}
+
+				if(x == y)  {               
+					return columns.length-1 > index ? multisort_recursive(a,b,columns,order_by,index+1) : 0;
+				}
+
+				return direction == 0 ? 1 : -1;
+			}
+			
+			if(this.sortdir == 'ASC'){
+				this.sortdir = 'DESC',
+				this.arrow = '\u25B2';
+				this.sortkey = columns[0];
+			} else {
+				this.sortdir = 'ASC',				
+				this.arrow = '\u25BC';
+				this.sortkey = columns[0];
+			}
+			
+			return arr.sort(function (a,b) {
+				return multisort_recursive(a,b,columns,order_by,0);
+			});
 		}
 		/* getDevList: async function(url){
 				
