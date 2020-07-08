@@ -109,3 +109,11 @@ table[class^="views-table views-view-table cols-4"] caption {
 	padding: 0;
 	visibility: hidden;
 }
+/* Key request form search box fix */
+#views-exposed-form-keycard-form-submissions-page-1 .js-form-item-sid {
+	float: left;
+	margin-right: 10px;
+}
+#views-exposed-form-keycard-form-submissions-page-1 .js-form-item-webform-submission-value .form-select {
+	width: 100%
+}
