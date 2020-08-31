@@ -117,3 +117,8 @@ table[class^="views-table views-view-table cols-4"] caption {
 #views-exposed-form-keycard-form-submissions-page-1 .js-form-item-webform-submission-value .form-select {
 	width: 50%
 }
+
+/* Styles for Keyform Submission Page */
+tr.Submitted, tr.Replacement, tr.Reviewed {
+	background-color: #fcc9d4;
+}
