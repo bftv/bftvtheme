@@ -119,6 +119,9 @@ table[class^="views-table views-view-table cols-4"] caption {
 }
 
 /* Styles for Keyform Submission Page */
-tr.Submitted, tr.Replacement, tr.Reviewed {
+tr.Submitted, tr.Replacement {
 	background-color: #fcc9d4;
+}
+tr.Reviewed {
+	background-color: #ffedd4;
 }
