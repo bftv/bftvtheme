@@ -147,3 +147,7 @@ tr.Reviewed {
 	text-align: center;
 	font-weight: 500;
 }
+
+.form-item-keycard-type {
+	text-align: center;
+}
