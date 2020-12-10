@@ -133,7 +133,8 @@ tr.Reviewed {
 
 [type=radio] + label > img {
 	cursor: pointer;
-	width: 150px;
+	width: 100px;
+	border-radius: 15px;
 }
 
 [type=radio]:checked + label > img {
