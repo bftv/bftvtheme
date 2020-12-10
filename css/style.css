@@ -125,3 +125,17 @@ tr.Submitted, tr.Replacement {
 tr.Reviewed {
 	background-color: #ffedd4;
 }
+
+/* Keycard Form Customization */
+[name=keycard_type] {
+   	display: none;
+}
+
+[type=radio] + label > img {
+	cursor: pointer;
+	width: 150px;
+}
+
+[type=radio]:checked + label > img {
+	outline: 2px solid #3DAE2B;
+}
