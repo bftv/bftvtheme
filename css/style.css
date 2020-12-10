@@ -140,3 +140,10 @@ tr.Reviewed {
 [type=radio]:checked + label > img {
 	box-shadow: 0 0 1pt 3pt #3DAE2B;
 }
+
+.card-txt {
+	display: block;
+	font-size: 14px;
+	text-align: center;
+	font-weight: 500;
+}
