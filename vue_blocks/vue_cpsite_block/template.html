@@ -1,0 +1,21 @@
+<div id="cpsite-block" class="cc-main">    
+    <router-view></router-view>
+</div>
+
+<template id="cpsite">
+	<div v-if="!loading">
+		<div class="cpsite-wrap">			
+			<iframe id="cpsite-frame" ref="cpsiteframe" frameborder="0" style="width: 100%;" :src="iframesrc" :height="height" width="100%"></iframe>
+		</div>
+	</div>
+	<div v-else style="text-align: center"><i  v-show="loading" class="fa fa-spinner fa-spin fa-4x" style="color: #999"></i></div>
+</template>
+
+
+<style scoped>
+.cpsite-wrap {
+	margin:0px;
+	padding:0px;
+	overflow:hidden
+}
+</style>
