@@ -1,12 +1,14 @@
 /* Main URLs */
 mainURL = 'https://caes-cp-reports.caes.ucdavis.edu/cpweb/';
 const blockID = document.getElementsByClassName('vue-cpsite-block')[0].id;
+
 window.onmessage = function(event){
     if (event.data[0] == 'pageHeight') {
 		var h = event.data[1] + 700;
 		document.getElementById('cpsite-frame').height = h+"px";
     }
 };
+
 /* End Main URLs */
 
 
@@ -32,11 +34,23 @@ var cpsiteCmp = Vue.extend({
 		this.loading = false;
 		
 		
-		document.onreadystatechange = () => { 
+		/* document.onreadystatechange = () => { 
 			if (document.readyState == "complete") {			
-				//some code if needed
-				
+				//some code if needed				
+				var yPos = window.scrollY;
+				const iframe = document.getElementById('cpsite-frame');
+				iframe.contentWindow.postMessage(yPos, '*');
+				console.log("hi from vue block "+yPos);
 			}
+		} */
+		
+		document.onscroll = () => { 
+			//if (document.readyState == "complete") {			
+				//some code if needed				
+				var yPos = window.scrollY;
+				const iframe = document.getElementById('cpsite-frame');
+				iframe.contentWindow.postMessage(yPos, '*');
+			//}
 		}
 		
 	},
