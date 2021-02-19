@@ -40,6 +40,7 @@
 		{% if node.field_bftv_location.entity.title.value != 'unknown' %}
 			<h4 class="u-space-bottom--small">Location</h4>
 			{% for item in node.field_bftv_location %}
+			{% if item.entity.title.value != 'unknown' %}
 				<span class="icon icon--location">{{ item.entity.title.value }}</span>
 				{% if item.entity.field_sf_office_hours.value is not empty %}
 					| <span class="icon icon--clock">{{ item.entity.field_sf_office_hours.value  }}</span>
@@ -52,6 +53,7 @@
 				{% if item.entity.field_bftv_fax.value is not empty %}
 					<span>| <b>Fax:</b> {{ item.entity.field_bftv_fax.value  }}</span>
 				{% endif %}<br>
+			{% endif %}
 			{% endfor %}
 		{% endif %}
 	{% endif %}
