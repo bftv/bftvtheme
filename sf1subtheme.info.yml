@@ -3,6 +3,7 @@ type: theme
 description: This is a subtheme of Sitefarm One
 package: SiteFarm
 core: 8.x
+core_version_requirement: ^8 || ^9
 
 base theme: sitefarm_one
 
@@ -16,8 +17,11 @@ regions:
   header: Header
   navigation: Navigation
   quick_links: Quick Links
+  search: Search
+  pre_title: Pre Title
   page_title: Page Title
   pre_content: Pre Content
+  link_grid: Link Grid
   top_content_first: Top Content 1
   top_content_second: Top Content 2
   top_content_third: Top Content 3
