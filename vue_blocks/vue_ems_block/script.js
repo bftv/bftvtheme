@@ -5,6 +5,8 @@ window.onmessage = function(event){
 	console.log(event);
     if (event.data[0] == 'pageHeight') {	   
 	   document.getElementById('ems-frame').height = event.data[1]+"px";
+    } else if (event.data[0] == 'modal') {	   
+	    window.scrollTo(0, 0);
     }
 };
 /* End Main URLs */
