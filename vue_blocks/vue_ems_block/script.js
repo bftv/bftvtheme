@@ -6,7 +6,11 @@ window.onmessage = function(event){
     if (event.data[0] == 'pageHeight') {	   
 	   document.getElementById('ems-frame').height = event.data[1]+"px";
     } else if (event.data[0] == 'modal') {	   
-	    window.scrollTo(0, 0);
+	    window.scrollTo({
+		    top: 100,
+		    left: 0,
+		    behavior: 'smooth'
+	    });
     }
 };
 /* End Main URLs */
