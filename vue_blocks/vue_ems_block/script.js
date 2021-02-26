@@ -2,6 +2,7 @@
 mainURL = 'https://web.bftv.ucdavis.edu/calendar/';
 const blockID = document.getElementsByClassName('vue-ems-block')[0].id;
 window.onmessage = function(event){
+	console.log(event);
     if (event.data[0] == 'pageHeight') {	   
 	   document.getElementById('ems-frame').height = event.data[1]+"px";
     }
