@@ -1,0 +1,76 @@
+<div id="key-report-block" class="cc-main">    
+    <router-view></router-view>
+</div>
+
+<template id="key-report">
+	<div v-if="!loading">
+		<div class="key-wrap">			
+			<iframe id="key-frame" ref="keyframe" frameborder="0" style="width: 100%;" :src="iframesrc" :height="height" width="100%"></iframe>
+		</div>
+	</div>
+	<div v-else style="text-align: center"><i  v-show="loading" class="fa fa-spinner fa-spin fa-4x" style="color: #999"></i></div>
+</template>
+
+
+<style scoped>
+.key-wrap {
+	margin:0px;
+	padding:0px;
+	overflow:hidden
+}
+.smallText {
+	font-size: 14px;
+	margin-top: 3em;
+}
+.instruction {
+	margin-top: 2em;
+	text-align: left;
+}
+.custom-icon {
+	width: 32px;
+}
+.manual-download {
+	text-align: left;
+}
+.float-left {
+	float: left;
+}
+.clear-both {
+	clear: both;
+}
+.btn {
+	display: inline-block;
+	font-weight: 400;
+	text-align: center;
+	vertical-align: middle;
+	user-select: none;
+	padding: .375rem .75rem;
+	font-size: 1rem;
+	line-height: 1.5;
+	border-radius: .25rem;
+	transition: color .15s;
+}
+.btn-help {
+	cursor: pointer;
+	background-color: #f15b24;
+	border: 0;
+	color: #fff;
+	margin-left: 2rem;
+	margin-top: 2rem;
+	font-size: 1.7rem;
+	font-weight: 700;
+}
+.btn-mac {
+	margin-left: 0;
+	margin-right: 1rem;
+	margin-top: 0;
+}
+.btn-help:hover {
+	color: #fff;
+	background-color: #da7a57;
+	border-color: #0062cc;
+}
+.btn-help:focus {
+	background-color: #f15b24;
+}
+</style>
