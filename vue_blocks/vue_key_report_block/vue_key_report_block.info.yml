@@ -1,0 +1,13 @@
+name: Key Report Block
+machine_name: vue-key-report-block
+type: pdb
+description: 'Key Report Management'
+package: Vue
+core: '8.x'
+module_status: active
+presentation: vue
+template: template.html            
+add_js:
+  footer:        
+        'vue-router.js': {}
+        'script.js': {}
