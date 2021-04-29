@@ -151,3 +151,7 @@ tr.Reviewed {
 .form-item-keycard-type {
 	text-align: center;
 }
+
+.services-h3 {
+	line-height: 2;
+}
