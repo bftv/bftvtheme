@@ -19,7 +19,8 @@ window.onmessage = function(event){
 	    commentbox = event.data[6];
 	    sendcomment = event.data[7];
 	    if(event.data[1] == 'quick'){
-		 if(confirm('Are you sure to approve all bookings in this reservation?')){
+		 msg = 'Are you sure to '+action+' all bookings in this reservation?';
+		 if(confirm(msg)){
 			document.getElementById('ems-frame').contentWindow.postMessage(['response', action, type, rid, bid, commentbox, sendcomment], '*');	 
 		 }		 
 	    }
