@@ -11,9 +11,17 @@ window.onmessage = function(event){
 		    behavior: 'smooth'
 	    });
     } else if (event.data[0] == 'confirm') {
+	    btntype = event.data[1];
+	    action = event.data[2];
+	    type = event.data[3];
+	    rid = event.data[4];
+	    bid = event.data[5];
+	    commentbox = event.data[6];
+	    sendcomment = event.data[7];
 	    if(event.data[1] == 'quick'){
-		 confirm('Are you sure to approve all bookings in this reservation?');
-		 document.getElementById('ems-frame').contentWindow.postMessage(['response', 'yes'], '*');
+		 if(confirm('Are you sure to approve all bookings in this reservation?')){
+			document.getElementById('ems-frame').contentWindow.postMessage(['response', action, type, rid, bid, commentbox, sendcomment], '*');	 
+		 }		 
 	    }
     }
 };
