@@ -10,6 +10,11 @@ window.onmessage = function(event){
 		    left: 0,
 		    behavior: 'smooth'
 	    });
+    } else if (event.data[0] == 'confirm') {
+	    if(event.data[1] == 'quick'){
+		 confirm('Are you sure to approve all bookings in this reservation?');
+		 document.getElementById('ems-frame').contentWindow.postMessage(['response', 'yes'], '*');
+	    }
     }
 };
 /* End Main URLs */
