@@ -23,6 +23,16 @@ window.onmessage = function(event){
 		 if(confirm(msg)){
 			document.getElementById('ems-frame').contentWindow.postMessage(['response', action, type, rid, bid, commentbox, sendcomment], '*');	 
 		 }		 
+	    } else if(event.data[1] == 'single'){
+		 msg = 'Are you sure to '+action+' this booking?';
+		 if(confirm(msg)){
+			document.getElementById('ems-frame').contentWindow.postMessage(['response', action, type, rid, bid, commentbox, sendcomment], '*');	 
+		 }		 
+	    } else if(event.data[1] == 'all'){
+		 msg = 'Are you sure to '+action+' all bookings in this reservation?';
+		 if(confirm(msg)){
+			document.getElementById('ems-frame').contentWindow.postMessage(['response', action, type, rid, bid, commentbox, sendcomment], '*');	 
+		 }		 
 	    }
     }
 };
