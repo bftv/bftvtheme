@@ -83,7 +83,7 @@ var airMediaCmp = Vue.extend({
 				clearInterval(this.interval);
 				this.force = true;
 				if(this.os == "mac"){
-					this.url = "https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Mac.zip";
+					this.url = "https://web.bftv.ucdavis.edu/airmedia/1207-RMI-S_AirMedia_169.237.216.129.dmg";
 					this.download(this.url);					
 				} else if (this.os == "win") {
 					this.url = "https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip";
