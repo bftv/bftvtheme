@@ -1,0 +1,21 @@
+<div id="userinfo-block" class="cc-main">    
+    <router-view></router-view>
+</div>
+
+<template id="cpsite">
+	<div v-if="!loading">
+		<div class="userinfo-wrap">			
+			<iframe id="userinfo-frame" ref="userinfoframe" frameborder="0" style="width: 100%;" :src="iframesrc" :height="height" width="100%"></iframe>
+		</div>
+	</div>
+	<div v-else style="text-align: center"><i  v-show="loading" class="fa fa-spinner fa-spin fa-4x" style="color: #999"></i></div>
+</template>
+
+
+<style scoped>
+.userinfo-wrap {
+	margin:0px;
+	padding:0px;
+	overflow:hidden
+}
+</style>
