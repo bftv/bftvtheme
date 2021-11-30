@@ -122,7 +122,7 @@ table[class^="views-table views-view-table cols-4"] caption {
 tr.Submitted, tr.Replacement, tr.Other {
 	background-color: #fcc9d4 !important;
 }
-tr.Reviewed {
+tr.Reviewed, tr.HardKey {
 	background-color: #ffedd4;
 }
 
