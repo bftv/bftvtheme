@@ -60,3 +60,11 @@ function sf1subtheme_theme_suggestions_node_alter(array &$suggestions, array $va
 //    $suggestions[] = 'custom_template_name';
 //  }
 }
+
+/**
+ * Implements hook_theme_suggestions_views_view_alter().
+ */
+function sf1subtheme_theme_suggestions_views_view_alter(array &$suggestions, array $variables) {
+	console.log("working");
+	console.log(var_dump($variables));
+}
