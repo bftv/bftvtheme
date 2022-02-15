@@ -74,8 +74,7 @@ function sf1subtheme_theme_suggestions_alter(array &$suggestions, array $variabl
 	* Venues Grid Twig Template Suggestions
 	*/
 	// Firstly check it's a view
-	echo $hook;
-	if($hook === 'views_view') {
+	if($hook === 'views_view_table') {
 		//echo "Working";
 	}
 }
