@@ -68,3 +68,13 @@ function sf1subtheme_theme_suggestions_views_view_alter(array &$suggestions, arr
 	//console.log("working");
 	//console.log(var_dump($variables));
 }
+function sf1subtheme_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
+
+	/**
+	* Venues Grid Twig Template Suggestions
+	*/
+	// Firstly check it's a view
+	if($hook === 'views_view') {
+	console.log($variables['view']->id());
+	}
+}
