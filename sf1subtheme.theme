@@ -61,20 +61,24 @@ function sf1subtheme_theme_suggestions_node_alter(array &$suggestions, array $va
 //  }
 }
 
-/**
- * Implements hook_theme_suggestions_views_view_alter().
- */
-function sf1subtheme_theme_suggestions_views_view_alter(array &$suggestions, array $variables) {
-	//console.log("working");
-	//console.log(var_dump($variables));
-}
-function sf1subtheme_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
-
-	/**
-	* Venues Grid Twig Template Suggestions
-	*/
-	// Firstly check it's a view
-	if($hook === 'views_view_table') {
-		//echo "Working";
+function sf1subtheme_form_alter(&$form){
+	if($form['#id'] == 'webform-submission-keycard-request-add-form' && isset($_GET['values'])){
+		$base = "http://bftv.local/tools/keycard-request?";
+		$values = base64_decode($_GET['values']);
+		$fullurl = $base.$values;
+		$url_components = parse_url($fullurl);
+		parse_str($url_components['query'], $params);
+		$form['elements']['request_type']['#default_value'] =  $params['request_type'];
+		//var_dump($form['elements']['user_information']['flex_name']);
+		$form['elements']['user_information']['flex_name']['first_name']['#default_value'] =  $params['first_name'];
+		$form['elements']['user_information']['flex_name']['last_name']['#default_value'] =  $params['last_name'];
+		$form['elements']['user_information']['preferred_name']['#default_value'] =  $params['preferred_name'];
+		$form['elements']['user_information']['email_address']['#default_value'] =  $params['email_address'];
+		$form['elements']['authorization_information']['sponsoring_pi_ref']['#default_value'] =  $params['sponsoring_pi_ref'];
+		$form['elements']['authorization_information']['access_requested_ref']['#default_value'] =  $params['access_requested_ref'];
+		$form['elements']['authorization_information']['pi_sig_on_file']['#default_value'] =  $params['pi_sig_on_file'];
+		$form['elements']['other_information']['additional_notes']['#default_value'] =  $params['additional_notes'];
+		$form['elements']['other_information']['edit_link']['#default_value'] =  $params['edit_link'];
+		//echo $fullurl;
 	}
 }
