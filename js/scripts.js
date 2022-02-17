@@ -12,7 +12,7 @@
 })(jQuery, Drupal);
 jQuery(document).ready(function ($) {
 	$('a.actLink').each(function(){ 
-		var base = "http://bftv.local/tools/keycard-request?values=";
+		var base = "https://www.bftv.ucdavis.edu/tools/keycard-request?values=";
 		var oldUrl = $(this).attr("href"); // Get current url
 		oldUrl = oldUrl.substring(oldUrl.indexOf('request_type'));
 		oldUrl = btoa(oldUrl);
