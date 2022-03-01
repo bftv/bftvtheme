@@ -83,10 +83,10 @@ var shareLink = Vue.extend({
 				clearInterval(this.interval);
 				this.force = true;
 				if(this.os == "mac"){
-					this.url = "https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/ShareLink_2211_Mac.zip";
+					this.url = "https://web.bftv.ucdavis.edu/airmedia/ShareLink_2211_.169.237.216.131.dmg";
 					this.download(this.url);					
 				} else if (this.os == "win") {
-					this.url = "https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/ShareLink_2211_Windows.zip";
+					this.url = "https://web.bftv.ucdavis.edu/airmedia/ShareLink_2211_.169.237.216.131.exe";
 					this.download(this.url);
 				} else if (this.os == "ChromeOS") {
 					window.location.href ='https://play.google.com/store/apps/details?id=com.extron.sharelink&hl=en';
