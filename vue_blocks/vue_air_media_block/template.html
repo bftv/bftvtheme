@@ -3,137 +3,260 @@
 </div>
 
 <template id="air-media">
+	
 	<div v-if="!loading">
 		<div class="air-media-wrap">
-			<div v-if="windows">
-				<h3>You are using a Windows system</h3>
-				<p>&nbsp;</p>
-				<p><strong>The "AirMedia" application download will start in <span id="counter">{{ time }}</span> seconds.</strong></p>
-				<div v-if="force">
-					<p><a :href="url">Click here</a> if the download is not started.</p>					
-				</div>
-				<div class="instruction">
-					<h4>Connection instructions for Windows</h4>
-					<div class="float-left">
-						<ol>
-							<li>Once the file is downloaded, open it, and then launch the program.</li>
-							<ol type="a">
-								<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
-							</ol>
-							<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to <strong>Connect</strong>, then click <strong>Start</strong> when ready to present.</li>
-						</ol>
-					</div>
-					<div>
-						<button type="button" class="btn btn-help" onclick="centeredPopup('https://www.bftv.ucdavis.edu/form/1207-av-support','1000','550','yes')"><i class="far fa-life-ring"></i> Contact Support</button>
-					</div>
-					<p class="clear-both">&nbsp;</p>
-					<p><strong>For support, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a> for quickest response.</strong></p>
-					<p>Including the room number in subject line will help expedite the response. If we are not on-site, we can call if you leave us a contact number. You may also email us if instructions are unclear, we appreciate the feedback.</p>
-				</div>
-			</div>
-			<div v-else-if="macOs">
-				<h3>You are using a Mac system</h3>
-				<p>&nbsp;</p>
-				<p><strong>The "AirMedia" application will download start in <span id="counter">{{ time }}</span> seconds.</strong></p>
-				<div v-if="force">
-					<p><a :href="url">Click here</a> if the download is not started.</p>					
-				</div>
-				<div class="instruction">
-					<h4>Connection instructions for macOS</h4>
-					<ol>
-						<li>The download starts automatically, if not, click the above link to start the download.</li>
-						<ol type="a">
-							<li>If prompted, <strong>Allow</strong> “bftv.ucdavis.edu” to download to your system.</li>
-						</ol>
-						<li>Go to the downloaded file, run it, and then open <strong>Launch Crestron AirMedia</strong>.</li>
-						<div style="float: right;">
-							<button type="button" class="btn btn-help btn-mac" onclick="centeredPopup('https://www.bftv.ucdavis.edu/form/1207-av-support','1000','550','yes')"><i class="far fa-life-ring"></i> Contact Support</button>
+			<div v-if="splash">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12 text-right mb-4">
+							<button type="button" class="btn btn-warning btn-lg" onclick="centeredPopup('https://www.bftv.ucdavis.edu/form/av-support?room=1207%20RMI%20South','1000','550','yes')"><i class="fas fa-headset"></i>&nbsp;Contact Support</button>
 						</div>
-						<ol type="a">
-							<li>If you get a <strong>“can’t be opened”</strong> error, without the Open option:</li>
-							<ol type="i">
-								<li>Click <strong>OK</strong>.</li>
-								<li>Right-click (tap with two fingers or use <strong>control + click</strong>) on program to bring up a menu, then select <strong>Open</strong>.</li>
-								<li>You should get same message, expect now you can select <strong>Open</strong> to continue.</li>
-							</ol>
-							<li>Ignore the <strong>“To enable non-AirPlay audio”</strong> message. You can check to box to stop showing the message.</li>
-							<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
-						</ol>
-						<li>Use the <strong>AirPlay</strong> <img class="custom-icon" src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/inline-images/airplay.png" /> icon on the top Menu Bar of your Mac after launching the app to select display.</li>
-						<ol type="a">
-							<li>If you do not see the icon, go to <strong>System Preferences > Displays > AirPlay Displays:</strong></li>
-							<li>Check the box for <strong>“Show mirroring options in the menu bar when available”</strong> to see it on your menu bar in the future.</li>
-							<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
-						</ol>
-						<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to Connect, then click Start when ready to present.</li>
-					</ol>
-					<p class="clear-both">&nbsp;</p>
-					<p><strong>For support, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a> for quickest response.</strong></p>
-					<p>Including the room number in subject line will help expedite the response. If we are not on-site, we can call if you leave us a contact number. You may also email us if instructions are unclear, we appreciate the feedback.</p>
+						<div class="col-md-6">
+							<div class="img-div">
+								<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/ZoomRoom.png" class="splash-img" @click="zoomRoomIns()" />
+								<div class="middle">
+									<div class="text" @click="zoomRoomIns()">Zoom Room Instruction</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="img-div">
+								<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/AirMedia.png" class="splash-img" @click="airMediaIns()" />
+								<div class="middle">
+									<div class="text" @click="airMediaIns()">AirMedia Instruction</div>
+								</div>
+							</div>
+						</div>						
+					</div>
 				</div>
 			</div>
-			<div v-else-if="(iOs || andriod || chromeOs)">
-				<h3>You are using {{ os }} system</h3>
-				<p>&nbsp;</p>
-				<p><strong>Please wait, you will be redirected to a page to download the app.</strong></p>
+			<div v-else-if="airmediainfo">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12"><a href="#" @click="backToSplash()"><i class="fas fa-arrow-left"></i>&nbsp;Go Back</a></div>
+						<div class="col-md-12 text-right"><a class="btn btn-primary btn-lg" :href="url"><i class="fas fa-download"></i>&nbsp;Download</a> <button type="button" class="btn btn-warning btn-lg" onclick="centeredPopup('https://www.bftv.ucdavis.edu/form/av-support?room=1207%20RMI%20South','1000','550','yes')"><i class="fas fa-headset"></i>&nbsp;Contact Support</button></div>
+						<div class="col-md-12">
+							<div v-if="windows">
+								<h3>You are using a Windows system</h3>
+								<div class="instruction">
+									<h4>Connection instructions for Windows</h4>									
+									<ol>
+										<li>Download the file by clicking the download button above.</li>
+										<li>Once the file is downloaded, open it, and then launch the program.</li>
+										<ol type="a">
+											<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
+										</ol>
+										<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to <strong>Connect</strong>, then click <strong>Start</strong> when ready to present.</li>
+									</ol>																								
+								</div>
+							</div>
+							<div v-else-if="macOs">
+								<h3>You are using a Mac system</h3>							
+								<div class="instruction">
+									<h4>Connection instructions for macOS</h4>
+									<ol>
+										<li>The download starts automatically, if not, click the above link to start the download.</li>
+										<ol type="a">
+											<li>If prompted, <strong>Allow</strong> “bftv.ucdavis.edu” to download to your system.</li>
+										</ol>
+										<li>Go to the downloaded file, run it, and then open <strong>Launch Crestron AirMedia</strong>.</li>										
+										<ol type="a">
+											<li>If you get a <strong>“can’t be opened”</strong> error, without the Open option:</li>
+											<ol type="i">
+												<li>Click <strong>OK</strong>.</li>
+												<li>Right-click (tap with two fingers or use <strong>control + click</strong>) on program to bring up a menu, then select <strong>Open</strong>.</li>
+												<li>You should get same message, expect now you can select <strong>Open</strong> to continue.</li>
+											</ol>
+											<li>Ignore the <strong>“To enable non-AirPlay audio”</strong> message. You can check to box to stop showing the message.</li>
+											<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
+										</ol>
+										<li>Use the <strong>AirPlay</strong> <img class="custom-icon" src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/inline-images/airplay.png" /> icon on the top Menu Bar of your Mac after launching the app to select display.</li>
+										<ol type="a">
+											<li>If you do not see the icon, go to <strong>System Preferences > Displays > AirPlay Displays:</strong></li>
+											<li>Check the box for <strong>“Show mirroring options in the menu bar when available”</strong> to see it on your menu bar in the future.</li>
+											<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
+										</ol>
+										<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to Connect, then click Start when ready to present.</li>
+									</ol>									
+								</div>
+							</div>
+							<div v-else-if="(iOs || andriod || chromeOs)">
+								<h3>You are using {{ os }} system</h3>
+								<p>&nbsp;</p>
+								<p>Click <a :href="url">here</a> to download the app.</p>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="smallText" v-if="!manual">
+								<p>If you want to download any version manually, <a href="#" @click="manualDownload()">click here</a></p>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
-			<div class="smallText" v-if="!manual">
-				<p>If you want to download any version manually, <a href="#" @click="manualDownload()">click here</a></p>
+			<div v-else-if="zoomroominfo">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12"><a href="#" @click="backToSplash()"><i class="fas fa-arrow-left"></i>&nbsp;Go Back</a></div>
+						<div class="col-md-12 text-right"><button type="button" class="btn btn-warning btn-lg" onclick="centeredPopup('https://www.bftv.ucdavis.edu/form/av-support?room=1207%20RMI%20South','1000','550','yes')"><i class="fas fa-headset"></i>&nbsp;Contact Support</button></div>
+						<div class="col-md-12">
+						<h2>DTEN Zoom Room Quick Start Guide</h2>
+						<h3>Before You Begin</h3>
+						<p>DTEN is the brand of device we’re using to host the Zoom Room program. For getting set up, think of <strong>1207 RMI South</strong> as just another attendee to your meeting; you are inviting <strong>1207 RMI South</strong> to join you.&nbsp; All features of Zoom Rooms are accessed through Zoom apps and/or applications.&nbsp; This provides a familiar interface regardless of room used or meeting type needed.</p>
+						<h4>Things to do Before Zoom Presentation/Meeting (days preferably):</h4>
+						<ol>
+							<li>Schedule the meeting in Zoom
+							<ol type="a">
+								<li>If you are scheduling via the Zoom website (<a href="https://zoom.ucdavis.edu">https://zoom.ucdavis.edu</a>), <strong>1207 RMI South</strong> can be made an <strong>alternate host</strong> which will become Co-host (needed for some features) once you join the meeting.</li>
+							</ol>
+							</li>
+							<li>Request room from the BFTV Calendar system (https://calendar.bftv.ucdavis.edu), you may include Zoom meeting link.</li>
+						</ol>
+						<h4>Audio Feedback&nbsp;<i class="fas fa-exclamation-triangle red"></i>&nbsp;</h4>
+						<p>To avoid audio feedback, any device <strong>connecting to the meeting</strong> (including presenter’s device) <strong>in 1207 RMI South</strong> should mute microphone &amp; speakers <strong>OR</strong> disconnect Zoom audio.</p>
+						<p>It is <strong>recommended</strong> to use the DTEN Zoom Room audio because the <strong>DTEN</strong> <strong>Zoom Room microphones</strong> have proven to be <strong>exceptional</strong>.</p>
+						<h5>How to Disconnect from Zoom Audio:</h5>
+						<ul>
+							<li>On the <strong>Mute</strong> button, click on the <strong>up-arrow</strong> and <strong>Leave Computer Audio</strong>
+
+							<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/1_0.png" />
+							</li>
+							<li>Or <strong>close</strong> the window that asks you to <strong>Join with Computer Audio</strong>
+							<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/2_0.png" />
+							</li>
+						</ul>
+						<h3>How to start a Zoom Presentation/Meeting:</h3>
+						<ol>
+							<li>Start your computer and connect to WiFi (<strong>eduroam</strong> or <strong>ucd-guest</strong>).</li>
+							<li>Get your content ready.</li>
+							<li>Launch the Zoom software/app or through the <a href="https://zoom.ucdavis.edu">https://zoom.ucdavis.edu</a> website using your UC Davis account.
+							<ol type="a">
+								<li>UC Davis uses the <strong>SSO</strong> feature on Zooms login screen.</li>
+								<li>You will want to make sure you’re logged in, or it will not recognize you as a host of your meeting.</li>
+							</ol>
+							</li>
+							<li><strong>Start/join</strong> your <strong>scheduled</strong> meeting from your chosen computer.
+							<ol type="a">
+								<li><strong>DO NOT</strong> “Join with Computer Audio”, close this window.
+								<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/2_0.png" />
+								</li>
+							</ol>
+							</li>
+							<li><strong>&nbsp;<i class="fas fa-exclamation-triangle red"></i>&nbsp;Ask</strong> others in the room to <strong>Mute</strong> their M<strong>icrophones</strong> and <strong>Speakers</strong> on any device they join to the Zoom meeting.</li>
+							<li>On the Zoom Room screen<strong> Start</strong> the meeting.
+							<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/3_0.png" />
+							</li>
+							<li>&nbsp;<i class="fas fa-exclamation-triangle red"></i>&nbsp;To enable the <strong>Annotation tools</strong> and <strong>Whiteboard</strong> make sure <strong>1207 RMI South</strong> is<strong> </strong>a<strong> co-host</strong>.</li>
+							<li><strong>Share Screen</strong> as you would for any other meeting.
+							<ol type="a">
+								<li><strong>PowerPoint as Virtual Background</strong> is not recommended.</li>
+							</ol>
+							</li>
+						</ol>
+						<h4>How to Start a Whiteboard</h4>
+						<p>Whiteboard must be enabled by the user who scheduled (or started if not scheduled) the meeting.</p>
+						<p>If you would like more saving options and more drawing tools, starting the whiteboard from a laptop/computer will be a better option for you.</p>
+						<p><strong>1207 RMI South</strong> must be a <strong>Co-host</strong>.</p>
+						<p>The whiteboard can only be opened from the Zoom Room while no one is sharing their screen.</p>
+						<ol>
+							<li><strong>On the DTEN</strong>, tap the left screen to bring up the main control menu.
+
+							<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/4_0.png" />
+							</li>
+							<li>Tap on the “Whiteboard” <strong>Pencil</strong> icon.</li>
+							<li>(Optional) Save your work
+							<ol type="a">
+								<li>Tap the <strong>Paper Plane</strong> icon to send/save your white board
+								<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/5_0.png" />
+								</li>
+								<li>Select the participants you would like to send to, email is recommended.
+								<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/6_0.png" />
+								</li>
+							</ol>
+							</li>
+						</ol>
+						<h4>How to Start Annotation Tools in the Zoom Room</h4>
+						<p>Annotation Tools must be enabled by the user who scheduled (or started if not scheduled) the meeting.</p>
+						<p>Weir Room must be a <strong>Co-host</strong>.</p>
+						<ol>
+							<li>Start sharing content from a computer</li>
+							<li><strong>On the DTEN</strong>, tap on the <strong>Pencil</strong> icon in the lower-left corner.
+							<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/7_0.png" />
+							</li>
+							<li>Annotation controls will appear on the left edge of the display.</li>
+							<li>(Optional) Save your work
+							<ol type="a">
+								<li>Tap the <strong>Paper Plane</strong> icon to send/save your white board
+								<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/5_0.png" />
+								</li>
+								<li>Select the participants you would like to send to, email is recommended.
+								<img src="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/media/images/6_0.png" />
+								</li>
+							</ol>
+							</li>
+						</ol>
+						</div>
+					</div>
+				</div>
 			</div>
+			
 			<div v-else class="manual-download">
-				<h4>Choose a Version</h4>
-				<a style="float:right;" href="#" @click="manualDownloadOff()"><-- Go back</a>
-				<p>&nbsp;</p>
-				<ul style="list-style-type: none;">
-					<li><i class="fab fa-windows"></i>  <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip">AirMedia - Windows</a></li>
-					<li><i class="fab fa-apple"></i>  <a href="https://web.bftv.ucdavis.edu/airmedia/1207-RMI-S_AirMedia_169.237.216.129.dmg">AirMedia - Mac</a></li>				
-					<li><i class="fab fa-app-store-ios"></i>  <a href="https://itunes.apple.com/us/app/crestron-airmedia/id685412055">iOS</a></li>
-					<li><i class="fab fa-android"></i>  <a href="https://play.google.com/store/apps/details?id=com.crestron.airmedia&hl=en_US">Android</a></li>				
-					<li><i class="fab fa-chrome"></i>  <a href="https://chrome.google.com/webstore/detail/airmedia-sender/ljophmlbljnjodcbogmdogcpclifenpk">ChromeOS</a></li>
-					
-				</ul>
-				<div class="instruction">
-					<h4>Connection instructions for Windows</h4>
-					<ol>
-						<li>Once the file is downloaded, open it, and then launch the program.</li>
-						<ol type="a">
-							<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
-						</ol>
-						<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to <strong>Connect</strong>, then click <strong>Start</strong> when ready to present.</li>
-					</ol>					
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12"><a href="#" @click="airMediaIns()"><i class="fas fa-arrow-left"></i>&nbsp;Go Back</a></div>
+						<div class="col-md-12 text-right"><button type="button" class="btn btn-warning btn-lg" onclick="centeredPopup('https://www.bftv.ucdavis.edu/form/av-support?room=1207%20RMI%20South','1000','550','yes')"><i class="fas fa-headset"></i>&nbsp;Contact Support</button></div>
+						<div class="col-md-12">
+							<h4>Choose a Version</h4>				
+							<p>&nbsp;</p>
+							<ul style="list-style-type: none;">
+								<li><i class="fab fa-windows"></i>  <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip">AirMedia - Windows</a></li>
+								<li><i class="fab fa-apple"></i>  <a href="https://web.bftv.ucdavis.edu/airmedia/1207-RMI-S_AirMedia_169.237.216.129.dmg">AirMedia - Mac</a></li>				
+								<li><i class="fab fa-app-store-ios"></i>  <a href="https://itunes.apple.com/us/app/crestron-airmedia/id685412055">iOS</a></li>
+								<li><i class="fab fa-android"></i>  <a href="https://play.google.com/store/apps/details?id=com.crestron.airmedia&hl=en_US">Android</a></li>				
+								<li><i class="fab fa-chrome"></i>  <a href="https://chrome.google.com/webstore/detail/airmedia-sender/ljophmlbljnjodcbogmdogcpclifenpk">ChromeOS</a></li>
+								
+							</ul>
+							<div class="instruction">
+								<h4>Connection instructions for Windows</h4>
+								<ol>
+									<li>Once the file is downloaded, open it, and then launch the program.</li>
+									<ol type="a">
+										<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
+									</ol>
+									<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to <strong>Connect</strong>, then click <strong>Start</strong> when ready to present.</li>
+								</ol>					
+							</div>
+							<div class="instruction">
+								<h4>Connection instructions for macOS</h4>
+								<ol>
+									<li>The download starts automatically, if not, click the above link to start the download.</li>
+									<ol type="a">
+										<li>If prompted, <strong>Allow</strong> “bftv.ucdavis.edu” to download to your system.</li>
+									</ol>
+									<li>Go to the downloaded file, run it, and then open <strong>Launch Crestron AirMedia</strong>.</li>
+									<ol type="a">
+										<li>If you get a <strong>“can’t be opened”</strong> error, without the Open option:</li>
+										<ol type="i">
+											<li>Click <strong>OK</strong>.</li>
+											<li>Right-click (tap with two fingers or use <strong>control + click</strong>) on program to bring up a menu, then select <strong>Open</strong>.</li>
+											<li>You should get same message, expect now you can select <strong>Open</strong> to continue.</li>
+										</ol>
+										<li>Ignore the <strong>“To enable non-AirPlay audio”</strong> message. You can check to box to stop showing the message.</li>
+										<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
+									</ol>
+									<li>Use the <strong>AirPlay</strong> <img class="custom-icon" src="http://bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/inline-images/airplay.png" /> icon on the top Menu Bar of your Mac after launching the app to select display.</li>
+									<ol type="a">
+										<li>If you do not see the icon, go to <strong>System Preferences > Displays > AirPlay Displays:</strong></li>
+										<li>Check the box for <strong>“Show mirroring options in the menu bar when available”</strong> to see it on your menu bar in the future.</li>
+										<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
+									</ol>
+									<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to Connect, then click Start when ready to present.</li>
+								</ol>					
+							</div>						
+						</div>
+					</div>
 				</div>
-				<div class="instruction">
-					<h4>Connection instructions for macOS</h4>
-					<ol>
-						<li>The download starts automatically, if not, click the above link to start the download.</li>
-						<ol type="a">
-							<li>If prompted, <strong>Allow</strong> “bftv.ucdavis.edu” to download to your system.</li>
-						</ol>
-						<li>Go to the downloaded file, run it, and then open <strong>Launch Crestron AirMedia</strong>.</li>
-						<ol type="a">
-							<li>If you get a <strong>“can’t be opened”</strong> error, without the Open option:</li>
-							<ol type="i">
-								<li>Click <strong>OK</strong>.</li>
-								<li>Right-click (tap with two fingers or use <strong>control + click</strong>) on program to bring up a menu, then select <strong>Open</strong>.</li>
-								<li>You should get same message, expect now you can select <strong>Open</strong> to continue.</li>
-							</ol>
-							<li>Ignore the <strong>“To enable non-AirPlay audio”</strong> message. You can check to box to stop showing the message.</li>
-							<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
-						</ol>
-						<li>Use the <strong>AirPlay</strong> <img class="custom-icon" src="/sites/g/files/dgvnsk1346/files/inline-images/airplay.png" /> icon on the top Menu Bar of your Mac after launching the app to select display.</li>
-						<ol type="a">
-							<li>If you do not see the icon, go to <strong>System Preferences > Displays > AirPlay Displays:</strong></li>
-							<li>Check the box for <strong>“Show mirroring options in the menu bar when available”</strong> to see it on your menu bar in the future.</li>
-							<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
-						</ol>
-						<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to Connect, then click Start when ready to present.</li>
-					</ol>
-					<p>&nbsp;</p>
-					<p><strong>For support, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a> for quickest response.</strong></p>
-					<p>Including the room number in subject line will help expedite the response. If we are not on-site, we can call if you leave us a contact number. You may also email us if instructions are unclear, we appreciate the feedback.</p>
-				</div>
-				
-				
 			</div>
 		</div>
 	</div>
@@ -143,7 +266,6 @@
 
 <style scoped>
 .air-media-wrap {
-	text-align: center;
 }
 .smallText {
 	font-size: 14px;
@@ -165,39 +287,59 @@
 .clear-both {
 	clear: both;
 }
-.btn {
-	display: inline-block;
-	font-weight: 400;
+.img-div {
+	position: relative;
+}
+.text {
+	background-color: #14447a;
+	color: white;
+	font-size: 16px;
+	padding: 16px 32px;
+}
+.splash-img {		
+	display: block;
+	border-radius: 5px;
+	transition: .5s ease;
+	backface-visibility: hidden;
+}
+.img-div:hover .splash-img {
+	box-shadow: none;
+	opacity: 0.3;
+	cursor: pointer;	
+}
+.middle {
+	transition: .5s ease;
+	opacity: 0;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	-ms-transform: translate(-50%, -50%);
 	text-align: center;
-	vertical-align: middle;
-	user-select: none;
-	padding: .375rem .75rem;
-	font-size: 1rem;
-	line-height: 1.5;
-	border-radius: .25rem;
-	transition: color .15s;
 }
-.btn-help {
+.img-div:hover .middle {
+	opacity: 1;
 	cursor: pointer;
-	background-color: #f15b24;
-	border: 0;
-	color: #fff;
-	margin-left: 2rem;
-	margin-top: 2rem;
-	font-size: 1.7rem;
-	font-weight: 700;
 }
-.btn-mac {
-	margin-left: 0;
-	margin-right: 1rem;
-	margin-top: 0;
+.btn-warning {
+	color: #fff !important;
+	background-color: #f15b24 !important;
 }
-.btn-help:hover {
-	color: #fff;
-	background-color: #da7a57;
-	border-color: #0062cc;
+.btn-warning:hover { 
+	background-color: #da7a57 !important;
 }
-.btn-help:focus {
-	background-color: #f15b24;
+.btn-primary {
+	color: #fff !important;
+	background-color: #14447a !important;
+}
+.btn-primary:hover {
+	background-color: #3c70ab !important;
+}
+img {
+	display: block;
+	margin-bottom: 20px;
+}
+.red {
+	color: red;
 }
 </style>
