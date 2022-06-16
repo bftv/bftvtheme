@@ -55,23 +55,28 @@ var shareLink = Vue.extend({
 			if (macosPlatforms.indexOf(platform) !== -1) {
 				this.macOs = true;
 				this.os = "mac";
-				this.interval = setInterval(this.incrementTime, 1000);
+				//this.interval = setInterval(this.incrementTime, 1000);
+				this.url = "https://web.bftv.ucdavis.edu/airmedia/ShareLink_2211_.169.237.216.131.dmg";
 			} else if (windowsPlatforms.indexOf(platform) !== -1) {
 				this.windows = true;
 				this.os = "win";
-				this.interval = setInterval(this.incrementTime, 1000);				
+				//this.interval = setInterval(this.incrementTime, 1000);
+				this.url = "https://web.bftv.ucdavis.edu/airmedia/ShareLink_2211_.169.237.216.131.exe";				
 			} else if (chromePlatforms.indexOf(platform) !== -1) {
 				this.chromeOs = true;
 				this.os = "ChromeOS";
-				this.interval = setInterval(this.incrementTime, 1000);				
+				//this.interval = setInterval(this.incrementTime, 1000);
+				this.url ='https://play.google.com/store/apps/details?id=com.extron.sharelink&hl=en';				
 			} else if (/Android/.test(userAgent)) {
 				this.andriod = true;
 				this.os = 'Android';
-				this.interval = setInterval(this.incrementTime, 1000);
+				//this.interval = setInterval(this.incrementTime, 1000);
+				this.url ='https://play.google.com/store/apps/details?id=com.extron.sharelink&hl=en';
 			} else if (iosPlatforms.indexOf(platform) !== -1) {
 				this.iOs = true;
 				this.os = 'iOS';
-				this.interval = setInterval(this.incrementTime, 1000);
+				//this.interval = setInterval(this.incrementTime, 1000);
+				this.url ='https://apps.apple.com/us/app/mirrorop-for-extron-sharelink/id959814935';
 			} 
 			
 			/* else if (!os && /Linux/.test(platform)) {
@@ -80,7 +85,7 @@ var shareLink = Vue.extend({
 		},
 		incrementTime: function() {
 			if (this.time == 0){
-				clearInterval(this.interval);
+				/* clearInterval(this.interval);
 				this.force = true;
 				if(this.os == "mac"){
 					this.url = "https://web.bftv.ucdavis.edu/airmedia/ShareLink_2211_.169.237.216.131.dmg";
@@ -94,7 +99,7 @@ var shareLink = Vue.extend({
 					window.location.href='https://play.google.com/store/apps/details?id=com.extron.sharelink&hl=en';
 				} else if (this.os == "iOS") {
 					window.location.href='https://apps.apple.com/us/app/mirrorop-for-extron-sharelink/id959814935';
-				} 
+				}  */
 			} else {
 				this.time = parseInt(this.time) - 1;
 			}
@@ -105,7 +110,7 @@ var shareLink = Vue.extend({
 		},
 		manualDownload: function() {
 			this.loading = true;
-			clearInterval(this.interval);
+			//clearInterval(this.interval);
 			this.windows = false;
 			this.macOs = false;
 			this.chromeOs = false;

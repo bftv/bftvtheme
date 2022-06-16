@@ -5,46 +5,29 @@
 <template id="sharelink">
 	<div v-if="!loading">
 		<div class="sharelink-wrap">
+			<div style="float: left;" v-if="manual"><a href="#" @click="manualDownloadOff()"><i class="fas fa-arrow-left"></i>&nbsp;Go back</a></div><div class="div-btn"><a class="btn btn-dnld" :href="url"><i class="fas fa-download"></i>&nbsp;Download</a> <button type="button" class="btn btn-help" onclick="centeredPopup('https://www.bftv.ucdavis.edu/form/av-support?room=2211RMISouth','1000','550','yes')"><i class="fas fa-headset"></i>&nbsp;Contact Support</button></div>
 			<div v-if="windows">
-				<h3>You are using a Windows system</h3>
-				<p>&nbsp;</p>
-				<p><strong>The "ShareLink Extron" application download will start in <span id="counter">{{ time }}</span> seconds.</strong></p>
-				<div v-if="force">
-					<p><a :href="url">Click here</a> if the download is not started.</p>					
-				</div>
+				<h3>You are using a Windows system</h3>				
 				<div class="instruction">
 					<h4>Connection instructions for Windows</h4>
-					<div class="float-left">
+					<div>
 						<ol>
+							<li>Click the download button to download the ShareLink app.</li>
 							<li>Once the file is downloaded, open it, and then launch the program.</li>
 							<ol type="a">
 								<li>If prompted for a hostname, use <strong>169.237.216.131</strong> and click <strong>Connect</strong></li>
 							</ol>
 							<li>Use the <strong>on-screen code</strong> to <strong>Connect</strong>, then click <strong>Start</strong> when ready to present.</li>
 						</ol>
-					</div>
-					<div>
-						<button type="button" class="btn btn-help" onclick="centeredPopup('https://www.bftv.ucdavis.edu/form/2211-av-support','1000','550','yes')"><i class="far fa-life-ring"></i> Contact Support</button>
-					</div>
-					<p class="clear-both">&nbsp;</p>
-					<p><strong>For support, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a> for quickest response.</strong></p>
-					<p>Including the room number in subject line will help expedite the response. If we are not on-site, we can call if you leave us a contact number. You may also email us if instructions are unclear, we appreciate the feedback.</p>
+					</div>										
 				</div>
 			</div>
 			<div v-else-if="macOs">
-				<h3>You are using a Mac system</h3>
-				<p>&nbsp;</p>
-				<p><strong>The "ShareLink Extron" application will download start in <span id="counter">{{ time }}</span> seconds.</strong></p>
-				<div v-if="force">
-					<p><a :href="url">Click here</a> if the download is not started.</p>					
-				</div>
+				<h3>You are using a Mac system</h3>				
 				<div class="instruction">
 					<h4>Connection instructions for macOS</h4>
 					<ol>
-						<li>The download starts automatically, if not, click the above link to start the download.</li>
-						<div style="float: right;">
-							<button type="button" class="btn btn-help btn-mac" onclick="centeredPopup('https://www.bftv.ucdavis.edu/form/2211-av-support','1000','550','yes')"><i class="far fa-life-ring"></i> Contact Support</button>
-						</div>
+						<li>Click the download button to download the ShareLink app.</li>						
 						<ol type="a">
 							<li>If prompted, <strong>Allow</strong> “bftv.ucdavis.edu” to download to your system.</li>
 						</ol>
@@ -70,23 +53,16 @@
 						</ol>
 						<li>Once the app is launched, click the <strong>&#x25B2; (collapse) icon</strong>, and then click the <strong>&#x25B6; (Play) button</strong></li>
 						<li>Once you are done, click the <strong>&#x25A0; (Stop) button</strong> and you can close the app</li>
-					</ol>
-					<p class="clear-both">&nbsp;</p>
-					<p><strong>For support, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a> for quickest response.</strong></p>
-					<p>Including the room number in subject line will help expedite the response. If we are not on-site, we can call if you leave us a contact number. You may also email us if instructions are unclear, we appreciate the feedback.</p>
+					</ol>					
 				</div>
 			</div>
 			<div v-else-if="(iOs || andriod || chromeOs)">
 				<h3>You are using {{ os }} system</h3>
 				<p>&nbsp;</p>
-				<p><strong>Please wait, you will be redirected to a page to download the app.</strong></p>
-			</div>
-			<div class="smallText" v-if="!manual">
-				<p>If you want to download any version manually, <a href="#" @click="manualDownload()">click here</a></p>
+				<p>Click <a :href="url">here</a> to download the app.</p>
 			</div>
 			<div v-else class="manual-download">
 				<h4>Choose a Version</h4>
-				<a style="float:right;" href="#" @click="manualDownloadOff()"><-- Go back</a>
 				<p>&nbsp;</p>
 				<ul style="list-style-type: none;">
 					<li><i class="fab fa-windows"></i>  <a href="https://web.bftv.ucdavis.edu/airmedia/ShareLink_2211_.169.237.216.131.exe">ShareLink Extron - Windows</a></li>
@@ -135,13 +111,11 @@
 						</ol>
 						<li>Once the app is launched, click the <strong>&#x25B2; (collapse) icon</strong>, and then click the <strong>&#x25B6; (Play) button</strong></li>
 						<li>Once you are done, click the <strong>&#x25A0; (Stop) button</strong> and you can close the app</li>
-					</ol>
-					<p>&nbsp;</p>
-					<p><strong>For support, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a> for quickest response.</strong></p>
-					<p>Including the room number in subject line will help expedite the response. If we are not on-site, we can call if you leave us a contact number. You may also email us if instructions are unclear, we appreciate the feedback.</p>
-				</div>
-				
-				
+					</ol>					
+				</div>				
+			</div>
+			<div class="smallText" v-if="!manual">
+				<p>If you want to download any version manually, <a href="#" @click="manualDownload()">click here</a></p>
 			</div>
 		</div>
 	</div>
@@ -151,7 +125,6 @@
 
 <style scoped>
 .sharelink-wrap {
-	text-align: center;
 }
 .smallText {
 	font-size: 14px;
@@ -173,6 +146,10 @@
 .clear-both {
 	clear: both;
 }
+.div-btn {
+	text-align: right;
+	margin-right: 10px;
+}
 .btn {
 	display: inline-block;
 	font-weight: 400;
@@ -187,25 +164,42 @@
 }
 .btn-help {
 	cursor: pointer;
-	background-color: #f15b24;
+	background-color: #F18A00;
 	border: 0;
 	color: #fff;
-	margin-left: 2rem;
-	margin-top: 2rem;
-	font-size: 1.7rem;
+	margin-left: 1rem;
+	font-size: 1.3rem;
 	font-weight: 700;
+}
+.btn-help:hover {
+	color: #fff;
+	background-color: #FFDC00;
+	border-color: #0062cc;
+}
+.btn-help:focus {
+	background-color: #F18A00;
+}
+.btn-dnld {
+	cursor: pointer;
+	background-color: #003A5D;
+	border: 0;
+	color: #fff;
+	margin-left: 1rem;
+	font-size: 1.3rem;
+	font-weight: 700;
+	padding: 0.6rem 0.75rem;
+}
+.btn-dnld:hover {
+	color: #fff;
+	background-color: #008EAA;
+	border-color: #008EAA;
+}
+.btn-dnld:focus {
+	background-color: #003A5D;
 }
 .btn-mac {
 	margin-left: 0;
 	margin-right: 1rem;
 	margin-top: 0;
-}
-.btn-help:hover {
-	color: #fff;
-	background-color: #da7a57;
-	border-color: #0062cc;
-}
-.btn-help:focus {
-	background-color: #f15b24;
 }
 </style>
