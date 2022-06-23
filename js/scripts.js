@@ -20,5 +20,14 @@ jQuery(document).ready(function ($) {
 		var newUrl = base+oldUrl;//oldUrl.replace("http://", "https://"); // Create new url
 		$(this).attr("href", newUrl); // Set herf value
 	});
+	
+	$('.daterangepickertest').daterangepicker({
+		"autoApply": true 
+	});
+	$(document).ajaxComplete(function() {
+		$('.daterangepickertest').daterangepicker({
+			"autoApply": true 
+		});
+	});
 });
 
