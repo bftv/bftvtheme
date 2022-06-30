@@ -21,12 +21,44 @@ jQuery(document).ready(function ($) {
 		$(this).attr("href", newUrl); // Set herf value
 	});
 	
-	$('.daterangepickertest').daterangepicker({
+	/* $('.daterangepickertest').daterangepicker({
+		autoUpdateInput: false,
+		locale: {
+			cancelLabel: 'Clear'
+		}
 		"autoApply": true 
-	});
+	});*/
 	$(document).ajaxComplete(function() {
+		$(function(){
+			$('.daterangepickertest').daterangepicker({
+				autoUpdateInput: false,
+				locale: {
+					cancelLabel: 'Clear'
+				},
+				"autoApply": true 
+			});
+			$('.daterangepickertest').on('apply.daterangepicker', function(ev, picker) {
+				$(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+			});
+			$('.daterangepickertest').on('cancel.daterangepicker', function(ev, picker) {
+				$(this).val('');
+			});
+		});
+	}); 
+	
+	$(function(){
 		$('.daterangepickertest').daterangepicker({
+			autoUpdateInput: false,
+			locale: {
+				cancelLabel: 'Clear'
+			},
 			"autoApply": true 
+		});
+		$('.daterangepickertest').on('apply.daterangepicker', function(ev, picker) {
+			$(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+		});
+		$('.daterangepickertest').on('cancel.daterangepicker', function(ev, picker) {
+			$(this).val('');
 		});
 	});
 });
