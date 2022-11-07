@@ -1,0 +1,16 @@
+name: Key Management Portal Block
+machine_name: vue-keymgmt-block
+type: pdb
+description: 'Embed Key Management Portal into SiteFarm'
+package: Vue
+core: '8.x'
+module_status: active
+presentation: vue
+template: template.html
+add_css:
+    header:
+
+add_js:
+  footer:
+        'vue-router.js': {}
+        'script.js': {}

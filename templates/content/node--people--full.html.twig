@@ -23,7 +23,7 @@
 	      {{- "," }} {{ content.field_sf_credentials }}
 	  {% endif %}
   {% endset %}
-  <h1 class="u-space-bottom--small">{{ fullname |striptags }}</h1>
+  <h1 class="u-space-bottom--small">{{ fullname|striptags|raw }}</h1>
   <h2 class="person-position-title">{{ content.field_sf_position_title }}</h2>
   <h3 class="u-space-bottom--small">{{ content.field_bftv_departments }}</h3>
 
@@ -108,6 +108,6 @@
   'field_bftv_purch_reimb',
   'field_sf_address'
   ) }}
-  
+
 </div>
 {% endblock %}

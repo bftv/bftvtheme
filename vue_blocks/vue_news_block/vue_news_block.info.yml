@@ -1,0 +1,49 @@
+name: Vue News Block
+machine_name: vue-news-block
+type: pdb
+description: 'Getting news from news.bftv.ucdavis.edu and rendering it on this website'
+package: Vue
+core: '8.x'
+module_status: active
+presentation: vue
+component: true
+template: template.html
+add_css:
+    header:
+        component:
+#            'https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.css': {type: external, minified: true}
+            'https://use.fontawesome.com/releases/v5.7.2/css/all.css': { minified: true, type: external, attributes: { integrity: sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr, crossorigin: anonymous }}
+#            'styles.css': {}
+add_js:
+  footer:
+        'moment.min.js': {}
+        'https://unpkg.com/axios/dist/axios.min.js': {type: external}
+        'vue-router.js': {}
+        'script.js': {}
+configuration:
+  itemsPerPage:
+    type: textfield
+    title: 'News items per page'
+    default_value: 10
+  ShowListing:
+    type: checkbox
+    title: 'Show only titles without blurb'
+    default_value: false
+  Department:
+    type: select
+    title: 'Choose a department'
+    options:
+      bftv: 'BFTV Cluster (includes all departments)'
+      bae: 'Biological and Agricultural Engineering'
+      fst: 'Food Science and Technology'
+      ven: 'Viticulture and Enology'
+      txc: 'Textiles and Clothing'
+    default_value: bftv
+  DiffPage:
+    type: checkbox
+    title: 'Is it on a different page? (other than the main news page.)'
+    default_value: false
+  MainNewsPage:
+    type: textfield
+    title: 'What is the path of the main news page (e.g. /department/news)?'
+    default_value: '/about/news-events/department-news'

@@ -1,0 +1,38 @@
+.back-button {
+	text-align: right;
+	padding-bottom: 1rem;
+}
+.image-container {
+	max-height: 500px;
+	overflow: hidden;
+}
+.posted-note {
+	font-size: 16px;
+	color: #666;
+}
+.news-title:hover {
+	color: #000;
+	cursor: pointer;
+	text-decoration: underline;
+}
+.thumbnail:hover {
+	cursor: pointer;
+}
+.heading--auxiliary-customized {
+	font-size: 1.4375rem;
+	line-height: 1.13043;
+	margin: .75em 0 .25em;
+	margin-bottom: .5em;
+	color: #667e99;
+	font-style: italic;
+	font-weight: 700;
+}
+.inline-img {
+	float: right;
+	clear: both;
+	margin-left: 1rem;
+	margin-bottom: 1rem;
+}
+.more-link {
+	text-align: right;
+}

@@ -107,7 +107,7 @@
 	  {% endif %}
     {% endset %}
     {% if node.type.entity.label == 'People' %}
-	    <h3{{ title_attributes.addClass('vm-teaser__title') }}><a href="{{ url }}" rel="bookmark">{{ fullname |striptags }}</a></h3>
+	    <h3{{ title_attributes.addClass('vm-teaser__title') }}><a href="{{ url }}" rel="bookmark">{{ fullname|striptags|raw }}</a></h3>
 	{% endif %}
 	{{ title_suffix }}
 
