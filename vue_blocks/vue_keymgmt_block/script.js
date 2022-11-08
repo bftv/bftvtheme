@@ -3,6 +3,7 @@ mainURL = 'https://web.bftv.ucdavis.edu/keycardmgmt/';
 const blockID = document.getElementsByClassName('vue-keymgmt-block')[0].id;
 window.onmessage = function(event){
     if (event.data[0] == 'pageHeight') {
+		console.log(event.data);
 	   document.getElementById('keymgmt-frame').height = event.data[1]+"px";
     }
 };
