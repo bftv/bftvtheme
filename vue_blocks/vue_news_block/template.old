@@ -1,0 +1,4 @@
+
+<div v-if="imgsrc" class="image-container">
+	<img :src="imgsrc" width="1280" height="720" :alt="newsItem.relationships.field_sf_primary_image.data.meta.alt" class="image-style-sf-landscape-16x9">
+</div

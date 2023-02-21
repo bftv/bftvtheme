@@ -43,10 +43,8 @@
 	<div v-if="!loading">
 		<div class="back-button"><button class="button" @click="goBack()"><-- Go Back to the News List</button></div>
 		<div v-if="newsItem">
-			<div class="node__content">
-				<div v-if="imgsrc" class="image-container">
-					<img :src="imgsrc" width="1280" height="720" :alt="newsItem.relationships.field_sf_primary_image.data.meta.alt" class="image-style-sf-landscape-16x9">
-				</div>
+			<div class="node__content">				
+				<div v-if="imgsrc" class="image-container-bg" :style="'background-image: url('+imgsrc+')'"></div>
 				<h2>{{ newsItem.attributes.title }}</h2>
 				<footer class="node__meta">
 					<div class="node__submitted meta-info">
@@ -79,6 +77,11 @@
 .image-container {
 	max-height: 500px;
 	overflow: hidden;
+}
+.image-container-bg {
+	height: 500px;
+	background-size: cover;
+	background-position: 50% 50%;
 }
 .posted-note {
 	font-size: 16px;
