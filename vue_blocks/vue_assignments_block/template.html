@@ -1,0 +1,900 @@
+<div id="assignment-block" class="assignment-main">
+    <router-view></router-view>
+</div>
+<template id="nav-template">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><router-link :to="{name: 'staff-list'}" class="nav-link" @click="loader()">Staff List</router-link></li>
+                    <li class="nav-item"><router-link :to="{name: 'faculty-list'}" class="nav-link" @click="loader()">Faculty List</router-link></li>
+                    <li v-if="accesslevel2" class="nav-item"><router-link :to="{name: 'users-list'}" class="nav-link" @click="loader()">User Management</router-link></li>
+                    <li v-if="accesslevel2" class="nav-item"><router-link :to="{name: 'sync-data'}" class="nav-link" @click="loader()">Sync Data</router-link></li>
+                </ul>
+            </div>
+            <span class="navbar-text user-info">
+                <span class="font-italic user-data-name">{{ username }} </span><span class="user-data-role font-italic secondary-color">({{ curlRole }})</span>
+            </span>
+        </div>
+    </nav>
+</template>
+
+<template id="list-pi-template">
+    <div class="container-fluid">
+        <the-navigation></the-navigation>
+        <div v-if="loading" id="loading" class="mt-3">
+            <div class="spinner-border text-secondary loader" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <div>
+            <div v-if="screenmsg" class="mt-5">
+                <div :class="'alert alert--'+screenmsgtype">
+                    <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="code == 401">Please <a href="/assignments">click here</a> to refresh the page.</span><span v-if="screenmsgtype == 'error'">If the problem persists, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a>.</span>
+                </div>
+            </div>
+            <div v-if="!hidebody" class="mt-5">
+                <div class="row">
+                    <div class="col-md-4 offset-md-4">
+                        <div class="input-group mb-3">
+                            <input type="search" name="searchbox" id="searchbox" class="form-control" placeholder="Search by name" style="width: 50% !important;" v-model="searchValue" @input="expandAll()" aria-label="Search by name" aria-describedby="btnclearsearch" />
+                            <button class="btn btn-search" type="button" id="btnclearsearch" @click="clearSearch">x</button>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="listData" class="accordion" id="accordion-dep">
+                    <div class="accordion-item" v-if="checkDept('Biological and Agricultural Engineering')">
+                        <h3 class="accordion-header" id="heading-bae">
+                            <button class="accordion-button btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-bae" aria-expanded="false" aria-controls="collapse-bae">
+                                BAE
+                            </button>
+                        </h3>
+                        <div id="collapse-bae" class="accordion-collapse collapse" aria-labelledby="heading-bae">
+                            <div class="accordion-body">
+                                <div class='table-responsive mt-2'>
+                                    <table class='table table-bordered table-hover table-striped'>
+                                        <thead class='thead-light'>
+                                            <tr>
+                                                <th>PI</th>
+                                                <th>Account Manager</th>
+                                                <th>Purchasing & Reimbursement</th>
+                                                <th>Advising</th>
+                                                <th>HR</th>
+                                                <th>Academic Personal</th>
+                                                <th>IT Support</th>
+                                                <th>Payroll</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="person in listBAE">
+                                                <td><a :href="person.link">{{ person.firstname }} {{ person.lastname }}</a> <a v-if="accesslevel1" href="" @click="sendPI(person)" class="fa-single-edit" data-bs-toggle="modal" data-bs-target="#modal-faculty"><i class="fa-solid fa-pen-to-square fa-xs"></i></a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.account_manager).link">{{ filterStaff(listStaff, 'uuid', person.account_manager).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.purchasing_reimburse).link">{{ filterStaff(listStaff, 'uuid', person.purchasing_reimburse).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.advising).link">{{ filterStaff(listStaff, 'uuid', person.advising).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.hr).link">{{ filterStaff(listStaff, 'uuid', person.hr).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.academic_personal).link">{{ filterStaff(listStaff, 'uuid', person.academic_personal).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.it_support).link">{{ filterStaff(listStaff, 'uuid', person.it_support).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.payroll).link">{{ filterStaff(listStaff, 'uuid', person.payroll).name }}</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item" v-if="checkDept('BFTV Cluster')">
+                        <h3 class="accordion-header" id="heading-bftv">
+                            <button class="accordion-button btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-bftv" aria-expanded="false" aria-controls="collapse-bftv">
+                                BFTV
+                            </button>
+                        </h3>
+                        <div id="collapse-bftv" class="accordion-collapse collapse" aria-labelledby="heading-bftv">
+                            <div class="accordion-body">
+                                <div class='table-responsive mt-2'>
+                                    <table class='table table-bordered table-hover table-striped'>
+                                        <thead class='thead-light'>
+                                            <tr>
+                                                <th>PI</th>
+                                                <th>Account Manager</th>
+                                                <th>Purchasing & Reimbursement</th>
+                                                <th>Advising</th>
+                                                <th>HR</th>
+                                                <th>Academic Personal</th>
+                                                <th>IT Support</th>
+                                                <th>Payroll</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="person in listBFTV">
+                                                <td><a :href="person.link">{{ person.firstname }} {{ person.lastname }}</a> <a v-if="accesslevel1" href="" @click="sendPI(person)" class="fa-single-edit" data-bs-toggle="modal" data-bs-target="#modal-faculty"><i class="fa-solid fa-pen-to-square fa-xs"></i></a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.account_manager).link">{{ filterStaff(listStaff, 'uuid', person.account_manager).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.purchasing_reimburse).link">{{ filterStaff(listStaff, 'uuid', person.purchasing_reimburse).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.advising).link">{{ filterStaff(listStaff, 'uuid', person.advising).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.hr).link">{{ filterStaff(listStaff, 'uuid', person.hr).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.academic_personal).link">{{ filterStaff(listStaff, 'uuid', person.academic_personal).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.it_support).link">{{ filterStaff(listStaff, 'uuid', person.it_support).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.payroll).link">{{ filterStaff(listStaff, 'uuid', person.payroll).name }}</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item" v-if="checkDept('Food Science and Technology')">
+                        <h3 class="accordion-header" id="heading-fst">
+                            <button class="accordion-button btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-fst" aria-expanded="false" aria-controls="collapse-fst">
+                                FST
+                            </button>
+                        </h3>
+                        <div id="collapse-fst" class="accordion-collapse collapse" aria-labelledby="heading-fst">
+                            <div class="accordion-body">
+                                <div class='table-responsive mt-2'>
+                                    <table class='table table-bordered table-hover table-striped'>
+                                        <thead class='thead-light'>
+                                            <tr>
+                                                <th>PI</th>
+                                                <th>Account Manager</th>
+                                                <th>Purchasing & Reimbursement</th>
+                                                <th>Advising</th>
+                                                <th>HR</th>
+                                                <th>Academic Personal</th>
+                                                <th>IT Support</th>
+                                                <th>Payroll</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="person in listFST">
+                                                <td><a :href="person.link">{{ person.firstname }} {{ person.lastname }}</a> <a v-if="accesslevel1" href="" @click="sendPI(person)" class="fa-single-edit" data-bs-toggle="modal" data-bs-target="#modal-faculty"><i class="fa-solid fa-pen-to-square fa-xs"></i></a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.account_manager).link">{{ filterStaff(listStaff, 'uuid', person.account_manager).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.purchasing_reimburse).link">{{ filterStaff(listStaff, 'uuid', person.purchasing_reimburse).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.advising).link">{{ filterStaff(listStaff, 'uuid', person.advising).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.hr).link">{{ filterStaff(listStaff, 'uuid', person.hr).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.academic_personal).link">{{ filterStaff(listStaff, 'uuid', person.academic_personal).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.it_support).link">{{ filterStaff(listStaff, 'uuid', person.it_support).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.payroll).link">{{ filterStaff(listStaff, 'uuid', person.payroll).name }}</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item" v-if="checkDept('Viticulture and Enology')">
+                        <h3 class="accordion-header" id="heading-ven">
+                            <button class="accordion-button btn-link collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-ven" aria-expanded="false" aria-controls="collapse-ven">
+                                VEN
+                            </button>
+                        </h3>
+                        <div id="collapse-ven" class="accordion-collapse collapse" aria-labelledby="heading-ven">
+                            <div class="accordion-body">
+                                <div class='table-responsive mt-2'>
+                                    <table class='table table-bordered table-hover table-striped'>
+                                        <thead class='thead-light'>
+                                            <tr>
+                                                <th>PI</th>
+                                                <th>Account Manager</th>
+                                                <th>Purchasing & Reimbursement</th>
+                                                <th>Advising</th>
+                                                <th>HR</th>
+                                                <th>Academic Personal</th>
+                                                <th>IT Support</th>
+                                                <th>Payroll</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="person in listVEN">
+                                                <td><a :href="person.link">{{ person.firstname }} {{ person.lastname }}</a> <a v-if="accesslevel1" href="" @click="sendPI(person)" class="fa-single-edit" data-bs-toggle="modal" data-bs-target="#modal-faculty"><i class="fa-solid fa-pen-to-square fa-xs"></i></a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.account_manager).link">{{ filterStaff(listStaff, 'uuid', person.account_manager).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.purchasing_reimburse).link">{{ filterStaff(listStaff, 'uuid', person.purchasing_reimburse).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.advising).link">{{ filterStaff(listStaff, 'uuid', person.advising).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.hr).link">{{ filterStaff(listStaff, 'uuid', person.hr).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.academic_personal).link">{{ filterStaff(listStaff, 'uuid', person.academic_personal).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.it_support).link">{{ filterStaff(listStaff, 'uuid', person.it_support).name }}</a></td>
+                                                <td><a :href="filterStaff(listStaff, 'uuid', person.payroll).link">{{ filterStaff(listStaff, 'uuid', person.payroll).name }}</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+            <div v-if="accesslevel1" class="modal fade" id="modal-faculty" tabindex="-1" aria-labelledby="modal-faculty-label" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title fs-5" id="modal-faculty-label">Edit Assignments for {{ selectedRecord.name }}</h3>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="post" @submit.prevent="updatePi">
+                            <div class="modal-body">
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        Account Manager
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select name="am_drop" id="am_drop">
+                                            <option>-- select an option --</option>
+                                            <option v-for="person in listAM" :value="person.uuid" :selected="compareAssignee(person.uuid, 'am', 'selected')">{{ person.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        Purchasing & Reimbursement
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select name="purchasing_drop" id="purchasing_drop">
+                                            <option>-- select an option --</option>
+                                            <option v-for="person in listPurchasing" :value="person.uuid" :selected="compareAssignee(person.uuid, 'purchaser', 'selected')">{{ person.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        Advising
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select name="advising_drop" id="advising_drop">
+                                            <option>-- select an option --</option>
+                                            <option v-for="person in listAdvising" :value="person.uuid" :selected="compareAssignee(person.uuid, 'advising', 'selected')">{{ person.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        HR
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select name="hr_drop" id="hr_drop">
+                                            <option>-- select an option --</option>
+                                            <option v-for="person in listHR" :value="person.uuid" :selected="compareAssignee(person.uuid, 'hr', 'selected')">{{ person.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        Academic Personal
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select name="ap_drop" id="ap_drop">
+                                            <option>-- select an option --</option>
+                                            <option v-for="person in listAP" :value="person.uuid" :selected="compareAssignee(person.uuid, 'ap', 'selected')">{{ person.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        IT Support
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select name="it_drop" id="it_drop">
+                                            <option>-- select an option --</option>
+                                            <option v-for="person in listIT" :value="person.uuid" :selected="compareAssignee(person.uuid, 'it', 'selected')">{{ person.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        Payroll
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select name="payroll_drop" id="payroll_drop">
+                                            <option>-- select an option --</option>
+                                            <option v-for="person in listPay" :value="person.uuid" :selected="compareAssignee(person.uuid, 'pay', 'selected')">{{ person.name }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <input type="hidden" name="fullname" id="fullname" :value="selectedRecord.name" />
+                                <input type="hidden" name="uuid" id="uuid" :value="selectedRecord.uuid" />
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+
+<template id="list-staff-template">
+    <div class="container-fluid">
+
+        <the-navigation></the-navigation>
+        <div v-if="loading" id="loading" class="mt-3">
+            <div class="spinner-border text-secondary loader" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <div>
+            <div v-if="screenmsg" class="mt-5">
+                <div :class="'alert alert--'+screenmsgtype">
+                    <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="code == 401">Please <a href="/assignments">click here</a> to refresh the page. </span><span v-if="screenmsgtype == 'error'">If the problem persists, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a>.</span>
+                </div>
+            </div>
+            <div v-if="!hidebody" class="mt-5">
+                <h5 class="p-1">Account Managers</h5>
+                <div class="accordion" id="accordion-am">
+                    <div class="accordion-item" v-for="person in listAM">
+                        <h3 class="accordion-header" :id="'heading-am-'+person.uuid">
+                            <button class="accordion-button btn-link collapsed" type="button" @click="checkSelectedBoxes(person.uuid, 'am')" data-bs-toggle="collapse" :data-bs-target="'#collapse-am-'+person.uuid" aria-expanded="false" :aria-controls="'collapse-am-'+person.uuid">
+                                {{ person.name }}
+                            </button>
+                        </h3>
+                        <div :id="'collapse-am-'+person.uuid" class="accordion-collapse collapse" :aria-labelledby="'heading-am-'+person.uuid" data-bs-parent="#accordion-am">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-4 offset-md-4">
+                                        <div class="input-group mb-3">
+                                            <input type="search" name="searchbox" id="searchbox" class="form-control" placeholder="Search by name" style="width: 50% !important;" v-model="searchValue" aria-label="Search by name" aria-describedby="btnclearsearch" />
+                                            <button class="btn btn-search" type="button" id="btnclearsearch" @click="clearSearch">x</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"><h6>BAE</h6></div>
+                                    <div class="col-md-4"><h6>FST</h6></div>
+                                    <div class="col-md-4"><h6>VEN</h6></div>
+                                </div>
+                                <form method="post" :name="'form-am-'+person.uuid" @submit.prevent="updateStaff" :disabled="inputValidate('editor')">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listBAE" class="col">
+                                                <input type="checkbox" :id="'pi-am-'+pi.uuid+'-'+person.uuid" name="bae-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-am-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.account_manager)">({{ filterStaff(listStaff, 'uuid', pi.account_manager).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listFST" class="col">
+                                                <input type="checkbox" :id="'pi-am-'+pi.uuid+'-'+person.uuid" name="fst-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-am-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.account_manager)">({{ filterStaff(listStaff, 'uuid', pi.account_manager).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listVEN" class="col">
+                                                <input type="checkbox" :id="'pi-am-'+pi.uuid+'-'+person.uuid" name="ven-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-am-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.account_manager)">({{ filterStaff(listStaff, 'uuid', pi.account_manager).name }})</small></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-12 text-end">
+                                            <input type="hidden" name="assigned_person" id="assigned_person" :value="person.uuid" />
+                                            <input type="hidden" name="assigned_person_name" id="assigned_person_name" :value="person.name" />
+                                            <button type="submit" class="btn btn-primary">Update {{ person.name }}'s Assignments</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="p-1">Purchasers and Reimbursement</h5>
+                <div class="accordion" id="accordion-pr">
+                    <div class="accordion-item" v-for="person in listPurchasing">
+                        <h3 class="accordion-header" :id="'heading-pr-'+person.uuid">
+                            <button class="accordion-button btn-link collapsed" type="button" @click="checkSelectedBoxes(person.uuid, 'pr')" data-bs-toggle="collapse" :data-bs-target="'#collapse-pr-'+person.uuid" aria-expanded="false" :aria-controls="'collapse-pr-'+person.uuid">
+                                {{ person.name }}
+                            </button>
+                        </h3>
+                        <div :id="'collapse-pr-'+person.uuid" class="accordion-collapse collapse" :aria-labelledby="'heading-pr-'+person.uuid" data-bs-parent="#accordion-pr">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-4 offset-md-4">
+                                        <div class="input-group mb-3">
+                                            <input type="search" name="searchbox" id="searchbox" class="form-control" placeholder="Search by name" style="width: 50% !important;" v-model="searchValue" aria-label="Search by name" aria-describedby="btnclearsearch" />
+                                            <button class="btn btn-search" type="button" id="btnclearsearch" @click="clearSearch">x</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"><h6>BAE</h6></div>
+                                    <div class="col-md-4"><h6>FST</h6></div>
+                                    <div class="col-md-4"><h6>VEN</h6></div>
+                                </div>
+                                <form method="post" :name="'form-pr-'+person.uuid" @submit.prevent="updateStaff" :disabled="inputValidate('editor')">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listBAE" class="col">
+                                                <input type="checkbox" :id="'pi-pr-'+pi.uuid+'-'+person.uuid" name="bae-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-pr-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.purchasing_reimburse)">({{ filterStaff(listStaff, 'uuid', pi.purchasing_reimburse).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listFST" class="col">
+                                                <input type="checkbox" :id="'pi-pr-'+pi.uuid+'-'+person.uuid" name="fst-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-pr-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.purchasing_reimburse)">({{ filterStaff(listStaff, 'uuid', pi.purchasing_reimburse).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listVEN" class="col">
+                                                <input type="checkbox" :id="'pi-pr-'+pi.uuid+'-'+person.uuid" name="ven-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-pr-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.purchasing_reimburse)">({{ filterStaff(listStaff, 'uuid', pi.purchasing_reimburse).name }})</small></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-12 text-end">
+                                            <input type="hidden" name="assigned_person" id="assigned_person" :value="person.uuid" />
+                                            <input type="hidden" name="assigned_person_name" id="assigned_person_name" :value="person.name" />
+                                            <button type="submit" class="btn btn-primary">Update {{ person.name }}'s Assignments</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="p-1">Advising</h5>
+                <div class="accordion" id="accordion-advising">
+                    <div class="accordion-item" v-for="person in listAdvising">
+                        <h3 class="accordion-header" :id="'heading-ad-'+person.uuid">
+                            <button class="accordion-button btn-link collapsed" type="button" @click="checkSelectedBoxes(person.uuid, 'adv')" data-bs-toggle="collapse" :data-bs-target="'#collapse-adv-'+person.uuid" aria-expanded="false" :aria-controls="'collapse-ad-'+person.uuid">
+                                {{ person.name }}
+                            </button>
+                        </h3>
+                        <div :id="'collapse-adv-'+person.uuid" class="accordion-collapse collapse" :aria-labelledby="'heading-ad-'+person.uuid" data-bs-parent="#accordion-advising">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-4 offset-md-4">
+                                        <div class="input-group mb-3">
+                                            <input type="search" name="searchbox" id="searchbox" class="form-control" placeholder="Search by name" style="width: 50% !important;" v-model="searchValue" aria-label="Search by name" aria-describedby="btnclearsearch" />
+                                            <button class="btn btn-search" type="button" id="btnclearsearch" @click="clearSearch">x</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"><h6>BAE</h6></div>
+                                    <div class="col-md-4"><h6>FST</h6></div>
+                                    <div class="col-md-4"><h6>VEN</h6></div>
+                                </div>
+                                <form method="post" :name="'form-adv-'+person.uuid" @submit.prevent="updateStaff" :disabled="inputValidate('editor')">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listBAE" class="col">
+                                                <input type="checkbox" :id="'pi-ad-'+pi.uuid+'-'+person.uuid" name="bae-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-ad-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.advising)">({{ filterStaff(listStaff, 'uuid', pi.advising).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listFST" class="col">
+                                                <input type="checkbox" :id="'pi-ad-'+pi.uuid+'-'+person.uuid" name="fst-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-ad-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.advising)">({{ filterStaff(listStaff, 'uuid', pi.advising).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listVEN" class="col">
+                                                <input type="checkbox" :id="'pi-ad-'+pi.uuid+'-'+person.uuid" name="ven-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-ad-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.advising)">({{ filterStaff(listStaff, 'uuid', pi.advising).name }})</small></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-12 text-end">
+                                            <input type="hidden" name="assigned_person" id="assigned_person" :value="person.uuid" />
+                                            <input type="hidden" name="assigned_person_name" id="assigned_person_name" :value="person.name" />
+                                            <button type="submit" class="btn btn-primary">Update {{ person.name }}'s Assignments</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="p-1">HR</h5>
+                <div class="accordion" id="accordion-hr">
+                    <div class="accordion-item" v-for="person in listHR">
+                        <h3 class="accordion-header" :id="'heading-hr-'+person.uuid">
+                            <button class="accordion-button btn-link collapsed" type="button" @click="checkSelectedBoxes(person.uuid, 'hr')" data-bs-toggle="collapse" :data-bs-target="'#collapse-hr-'+person.uuid" aria-expanded="false" :aria-controls="'collapse-hr-'+person.uuid">
+                                {{ person.name }}
+                            </button>
+                        </h3>
+                        <div :id="'collapse-hr-'+person.uuid" class="accordion-collapse collapse" :aria-labelledby="'heading-hr-'+person.uuid" data-bs-parent="#accordion-hr">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-4 offset-md-4">
+                                        <div class="input-group mb-3">
+                                            <input type="search" name="searchbox" id="searchbox" class="form-control" placeholder="Search by name" style="width: 50% !important;" v-model="searchValue" aria-label="Search by name" aria-describedby="btnclearsearch" />
+                                            <button class="btn btn-search" type="button" id="btnclearsearch" @click="clearSearch">x</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"><h6>BAE</h6></div>
+                                    <div class="col-md-4"><h6>FST</h6></div>
+                                    <div class="col-md-4"><h6>VEN</h6></div>
+                                </div>
+                                <form method="post" :name="'form-hr-'+person.uuid" @submit.prevent="updateStaff" :disabled="inputValidate('editor')">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listBAE" class="col">
+                                                <input type="checkbox" :id="'pi-hr-'+pi.uuid+'-'+person.uuid" name="bae-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-hr-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.hr)">({{ filterStaff(listStaff, 'uuid', pi.hr).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listFST" class="col">
+                                                <input type="checkbox" :id="'pi-hr-'+pi.uuid+'-'+person.uuid" name="fst-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-hr-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.hr)">({{ filterStaff(listStaff, 'uuid', pi.hr).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listVEN" class="col">
+                                                <input type="checkbox" :id="'pi-hr-'+pi.uuid+'-'+person.uuid" name="ven-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-hr-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.hr)">({{ filterStaff(listStaff, 'uuid', pi.hr).name }})</small></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-12 text-end">
+                                            <input type="hidden" name="assigned_person" id="assigned_person" :value="person.uuid" />
+                                            <input type="hidden" name="assigned_person_name" id="assigned_person_name" :value="person.name" />
+                                            <button type="submit" class="btn btn-primary">Update {{ person.name }}'s Assignments</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="p-1">Academic Personals</h5>
+                <div class="accordion" id="accordion-ap">
+                    <div class="accordion-item" v-for="person in listAP">
+                        <h3 class="accordion-header" :id="'heading-ap-'+person.uuid">
+                            <button class="accordion-button btn-link collapsed" type="button" @click="checkSelectedBoxes(person.uuid, 'ap')" data-bs-toggle="collapse" :data-bs-target="'#collapse-ap-'+person.uuid" aria-expanded="false" :aria-controls="'collapse-ap-'+person.uuid">
+                                {{ person.name }}
+                            </button>
+                        </h3>
+                        <div :id="'collapse-ap-'+person.uuid" class="accordion-collapse collapse" :aria-labelledby="'heading-ap-'+person.uuid" data-bs-parent="#accordion-ap">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-4 offset-md-4">
+                                        <div class="input-group mb-3">
+                                            <input type="search" name="searchbox" id="searchbox" class="form-control" placeholder="Search by name" style="width: 50% !important;" v-model="searchValue" aria-label="Search by name" aria-describedby="btnclearsearch" />
+                                            <button class="btn btn-search" type="button" id="btnclearsearch" @click="clearSearch">x</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"><h6>BAE</h6></div>
+                                    <div class="col-md-4"><h6>FST</h6></div>
+                                    <div class="col-md-4"><h6>VEN</h6></div>
+                                </div>
+                                <form method="post" :name="'form-ap-'+person.uuid" @submit.prevent="updateStaff" :disabled="inputValidate('editor')">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listBAE" class="col">
+                                                <input type="checkbox" :id="'pi-ap-'+pi.uuid+'-'+person.uuid" name="bae-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-ap-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.academic_personal)">({{ filterStaff(listStaff, 'uuid', pi.academic_personal).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listFST" class="col">
+                                                <input type="checkbox" :id="'pi-ap-'+pi.uuid+'-'+person.uuid" name="fst-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-ap-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.academic_personal)">({{ filterStaff(listStaff, 'uuid', pi.academic_personal).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listVEN" class="col">
+                                                <input type="checkbox" :id="'pi-ap-'+pi.uuid+'-'+person.uuid" name="ven-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-ap-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.academic_personal)">({{ filterStaff(listStaff, 'uuid', pi.academic_personal).name }})</small></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-12 text-end">
+                                            <input type="hidden" name="assigned_person" id="assigned_person" :value="person.uuid" />
+                                            <input type="hidden" name="assigned_person_name" id="assigned_person_name" :value="person.name" />
+                                            <button type="submit" class="btn btn-primary">Update {{ person.name }}'s Assignments</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="p-1">IT Support</h5>
+                <div class="accordion" id="accordion-it">
+                    <div class="accordion-item" v-for="person in listIT">
+                        <h3 class="accordion-header" :id="'heading-it-'+person.uuid">
+                            <button class="accordion-button btn-link collapsed" type="button" @click="checkSelectedBoxes(person.uuid, 'it')" data-bs-toggle="collapse" :data-bs-target="'#collapse-it-'+person.uuid" aria-expanded="false" :aria-controls="'collapse-it-'+person.uuid">
+                                {{ person.name }}
+                            </button>
+                        </h3>
+                        <div :id="'collapse-it-'+person.uuid" class="accordion-collapse collapse" :aria-labelledby="'heading-it-'+person.uuid" data-bs-parent="#accordion-it">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-4 offset-md-4">
+                                        <div class="input-group mb-3">
+                                            <input type="search" name="searchbox" id="searchbox" class="form-control" placeholder="Search by name" style="width: 50% !important;" v-model="searchValue" aria-label="Search by name" aria-describedby="btnclearsearch" />
+                                            <button class="btn btn-search" type="button" id="btnclearsearch" @click="clearSearch">x</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"><h6>BAE</h6></div>
+                                    <div class="col-md-4"><h6>FST</h6></div>
+                                    <div class="col-md-4"><h6>VEN</h6></div>
+                                </div>
+                                <form method="post" :name="'form-it-'+person.uuid" @submit.prevent="updateStaff" :disabled="inputValidate('editor')">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listBAE" class="col">
+                                                <input type="checkbox" :id="'pi-it-'+pi.uuid+'-'+person.uuid" name="bae-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-it-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.it_support)">({{ filterStaff(listStaff, 'uuid', pi.it_support).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listFST" class="col">
+                                                <input type="checkbox" :id="'pi-it-'+pi.uuid+'-'+person.uuid" name="fst-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-it-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.it_support)">({{ filterStaff(listStaff, 'uuid', pi.it_support).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listVEN" class="col">
+                                                <input type="checkbox" :id="'pi-it-'+pi.uuid+'-'+person.uuid" name="ven-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-it-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.it_support)">({{ filterStaff(listStaff, 'uuid', pi.it_support).name }})</small></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-12 text-end">
+                                            <input type="hidden" name="assigned_person" id="assigned_person" :value="person.uuid" />
+                                            <input type="hidden" name="assigned_person_name" id="assigned_person_name" :value="person.name" />
+                                            <button type="submit" class="btn btn-primary">Update {{ person.name }}'s Assignments</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="p-1">Payroll</h5>
+                <div class="accordion" id="accordion-pay">
+                    <div class="accordion-item" v-for="person in listPay">
+                        <h3 class="accordion-header" :id="'heading-pay-'+person.uuid">
+                            <button class="accordion-button btn-link collapsed" type="button" @click="checkSelectedBoxes(person.uuid, 'pay')" data-bs-toggle="collapse" :data-bs-target="'#collapse-pay-'+person.uuid" aria-expanded="false" :aria-controls="'collapse-pay-'+person.uuid">
+                                {{ person.name }}
+                            </button>
+                        </h3>
+                        <div :id="'collapse-pay-'+person.uuid" class="accordion-collapse collapse" :aria-labelledby="'heading-pay-'+person.uuid" data-bs-parent="#accordion-pay">
+                            <div class="accordion-body">
+                                <div class="row">
+                                    <div class="col-md-4 offset-md-4">
+                                        <div class="input-group mb-3">
+                                            <input type="search" name="searchbox" id="searchbox" class="form-control" placeholder="Search by name" style="width: 50% !important;" v-model="searchValue" aria-label="Search by name" aria-describedby="btnclearsearch" />
+                                            <button class="btn btn-search" type="button" id="btnclearsearch" @click="clearSearch">x</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4"><h6>BAE</h6></div>
+                                    <div class="col-md-4"><h6>FST</h6></div>
+                                    <div class="col-md-4"><h6>VEN</h6></div>
+                                </div>
+                                <form method="post" :name="'form-pay-'+person.uuid" @submit.prevent="updateStaff" :disabled="inputValidate('editor')">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listBAE" class="col">
+                                                <input type="checkbox" :id="'pi-pay-'+pi.uuid+'-'+person.uuid" name="bae-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-pay-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.payroll)">({{ filterStaff(listStaff, 'uuid', pi.payroll).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listFST" class="col">
+                                                <input type="checkbox" :id="'pi-pay-'+pi.uuid+'-'+person.uuid" name="fst-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-pay-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.payroll)">({{ filterStaff(listStaff, 'uuid', pi.payroll).name }})</small></label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div v-for="pi in listVEN" class="col">
+                                                <input type="checkbox" :id="'pi-pay-'+pi.uuid+'-'+person.uuid" name="ven-pis[]" :value="pi.uuid" @click="selectedSearch" :checked="boxChecked(pi.uuid)" :disabled="inputValidate('editor')">
+                                                <label class="radio-check-label" :for="'pi-pay-'+pi.uuid+'-'+person.uuid">{{ pi.name }} <small class="color-gray" v-if="filterStaff(listStaff, 'uuid', pi.payroll)">({{ filterStaff(listStaff, 'uuid', pi.payroll).name }})</small></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-12 text-end">
+                                            <input type="hidden" name="assigned_person" id="assigned_person" :value="person.uuid" />
+                                            <input type="hidden" name="assigned_person_name" id="assigned_person_name" :value="person.name" />
+                                            <button type="submit" class="btn btn-primary">Update {{ person.name }}'s Assignments</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="list-users-template">
+    <div class="container-fluid">
+        <the-navigation></the-navigation>
+        <div v-if="loading" id="loading" class="mt-3">
+            <div class="spinner-border text-secondary loader" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <div v-if="accesslevel2">
+            <div v-if="screenmsg" class="mt-5">
+                <div :class="'alert alert--'+screenmsgtype">
+                    <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="code == 401">Please <a href="/assignments">click here</a> to refresh the page.</span><span v-if="screenmsgtype == 'error'">If the problem persists, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a>.</span>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-12 text-end">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-add-user">+ Add a User</button>
+                </div>
+            </div>
+            <div v-if="!hidebody" class='table-responsive mt-2'>
+                <table class='table table-bordered table-hover table-striped'>
+                    <thead class='thead-light'>
+                        <tr>
+                            <th>Name</th>
+                            <th>Login ID</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="person in listData">
+                            <td>{{ person.firstname }} {{ person.lastname }}</td>
+                            <td>{{ person.loginid }}</td>
+                            <td class="text-capitalize">{{ person.role }}</td>
+                            <td>{{ person.status == 1 ? 'Enabled' : 'Disabled' }}</td>
+                            <td><a v-if="accesslevel2" href="" @click="sendPI(person)" data-bs-toggle="modal" data-bs-target="#modal-user"><i class="fa-solid fa-pen-to-square"></i></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Modal Add -->
+            <div class="modal fade" id="modal-add-user" tabindex="-1" aria-labelledby="modal-add-user-label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title fs-5" id="modal-add-user-label">Add a New User</h3>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="post" @submit.prevent="addUser">
+                            <div class="modal-body">
+                                <div class="row m-2">
+                                    <div class="col-md-12">
+                                        <input type="text" name="usrloginid" id="usrloginid" placeholder="UCD LoginID" required>
+                                    </div>
+                                    <div class="col-md-12 mt-1">
+                                        <input type="email" name="useremail" id="useremail" placeholder="@ucdavis.edu" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Add</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Edit -->
+            <div class="modal fade" id="modal-user" tabindex="-1" aria-labelledby="modal-user-label" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title fs-5" id="modal-user-label">Edit User {{ selectedRecord.firstname }} {{ selectedRecord.lastname }}</h3>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form method="post" @submit.prevent="updateUser">
+                            <div class="modal-body">
+                                <div class="row m-2">
+                                    <div class="col-md-10 text-end">
+                                        <button type="submit" class="btn btn-primary btn-sm" name="refresh-user">Refresh from UC Directory</button>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        First Name
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" name="userfname" id="userfname" :value="selectedRecord.firstname" disabled>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        Last Name
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" name="userlname" id="userlname" :value="selectedRecord.lastname" disabled>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        Login ID
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" name="loginid" id="loginid" :value="selectedRecord.loginid" disabled>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        E-mail
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" name="email" id="email" :value="selectedRecord.email" disabled>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-4 fw-bold text-end">
+                                        Role
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select name="role" id="role">
+                                            <option>-- select an option --</option>
+                                            <option value="admin" :selected="selectedRecord.role == 'admin' ? 'selected' : ''">Admin</option>
+                                            <option value="editor" :selected="selectedRecord.role == 'editor' ? 'selected' : ''">Editor</option>
+                                            <option value="viewer" :selected="selectedRecord.role == 'viewer' ? 'selected' : ''">Viewer</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-md-6 offset-md-4">
+                                        <input type="checkbox" id="status_check" name="status_check" :value="selectedRecord.status" :checked="selectedRecord.status == 1 ? 'checked' : ''" />
+                                        <label class="radio-check-label" for="status_check">Enable User</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <input type="hidden" name="fullname" id="fullname" :value="selectedRecord.firstname+' '+selectedRecord.lastname" />
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary btn-sm" name="save-user">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="sync-data-template">
+    <div class="container-fluid">
+        <the-navigation></the-navigation>
+        <div v-if="loading" id="loading" class="mt-3">
+            <div class="spinner-border text-secondary loader" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <div v-if="accesslevel2">
+            <div v-if="screenmsg" class="mt-5">
+                <div :class="'alert alert--'+screenmsgtype">
+                    <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="code == 401">Please <a href="/assignments">click here</a> to refresh the page.</span><span v-if="screenmsgtype == 'error'">If the problem persists, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a>.</span>
+                </div>
+            </div>
+            <div v-if="!hidebody" class='mt-2'>
+                <div class="alert alert--info">
+                    <p>The data is synced automatically every midnight. If needed, you can manually sync it here.</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-2 offset-md-4 text-center">
+                        <button type="button" class="btn btn-primary" id="syncPi" @click="syncData('pi')">Sync PI List</button>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <button type="button" class="btn btn-primary" id="syncStaff" @click="syncData('staff')">Sync Staff List</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

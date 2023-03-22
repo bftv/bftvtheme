@@ -3,11 +3,11 @@
 /**
  * @file
  * Functions to support theming in the SiteFarm One subtheme.
- */ 
+ */
 /**
  * Implements hook_preprocess_html() for html.html.twig.
  */
- 
+
 function sf1subtheme_preprocess_html(array &$variables) {
   // Add class to html tag
 
@@ -37,6 +37,11 @@ function sf1subtheme_preprocess_block(array &$variables) {
   // Add a custom class to a block
 
 //  $variables['attributes']['class'][] = 'my-custom-class';
+//$uid = \Drupal::currentUser();
+if($variables['elements']['#id'] == 'assignmentsblock'){
+
+}
+
 }
 
 /**
@@ -48,6 +53,94 @@ function sf1subtheme_preprocess_node(array &$variables) {
 //  if ($variables['view_mode'] == 'teaser') {
 //    $variables['attributes']['class'][] = 'my-custom-class';
 //  }
+
+	$contentType = $variables['node']->getType();
+	if($contentType == 'people'){
+		$personUUID = $variables['node']->uuid();
+		$functional_area = $variables['node']->get('field_bftv_functional_area')->getValue();
+		$fa_sub_area = $variables['node']->get('field_bftv_fa_sub')->getValue();
+		$is_pi  = $variables['node']->get('field_bftv_pi')->getValue();
+		$assignee = $variables['node']->get('field_bftv_pi_resposibility')->getValue();
+		//2486 = am
+		//2851 = pr
+		//2491 = adv
+		//2501 = hr => 3986 = hr (fa-sub)
+		//5981 = ap
+		//2476 = it
+		//3976 = pay (fa-sub)
+		$variables['#attached']['drupalSettings']['singleAssignments'] = [
+			'uuid' => $personUUID,
+			'fa' => $functional_area,
+			'faSub' => $fa_sub_area,
+			'isPi' => $is_pi,
+			'assignee' => $assignee
+		];
+	}
+
+	$node = \Drupal::routeMatch()->getParameter('node');
+	if ($node) { // check we have a node object.
+		if ($node->id() == 6198) { // look for a specific node id.
+			$uid = \Drupal::currentUser()->id();
+			$role = \Drupal::currentUser()->getRoles();
+			$cas = \Drupal::service('cas.user_manager')->getCasUsernameForAccount($uid);
+
+			if($cas){
+				//curl to webservice
+				//$token = Drupal\Component\Utility\Crypt::hashBase64(\Drupal::service('session')->getId());
+				$email = \Drupal::currentUser()->getEmail();
+				$token = \Drupal::service('session')->getId();
+				$token = base64_encode($token);
+				$ch = curl_init();
+				$url = 'https://web.bftv.ucdavis.edu/assignments/connector.php';
+				$data = array('loginid' => $cas, 'token' => $token, 'email' => $email);
+				$data = json_encode($data);
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+				curl_setopt($ch, CURLOPT_URL,$url);
+				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+				curl_setopt($ch, CURLOPT_REFERER, 'https://bftv.ucdavis.edu/assignments');
+
+				$chresult = curl_exec($ch);
+				$cherror = curl_error($ch);
+				if($cherror){
+					echo "Curl was not successfull. ".$cherror;
+				} else {
+					$chresult = json_decode($chresult, true);
+					$curlCode = $chresult['response'];
+					if($chresult['userrole']){
+						$curlRole = $chresult['userrole'];
+					} else {
+						$curlRole = 'anonymous';
+					}
+				}
+				curl_close($ch);
+			} else {
+				$cas = 'anonymous';
+				$token = 'none';
+			}
+
+			if(in_array('site_manager', $role) || in_array('site_builder', $role)){
+				$role = 'admin';
+			} elseif(in_array('contributer', $role) || in_array('editor', $role)){
+				$role = 'editor';
+			} elseif(in_array('anonymous', $role)){
+				$role = 'anonymous';
+			}
+
+			//expose to JS
+			$variables['#attached']['drupalSettings']['assignments'] = [
+				'username' => $cas,
+				'role' => $role,
+				'token' => $token,
+				'curlCode' => $curlCode,
+				'curlRole' => $curlRole
+			];
+			//var_dump($variables['#attached']['drupalSettings']['assignments']);
+		}
+	}
 }
 
 /**
@@ -81,4 +174,21 @@ function sf1subtheme_form_alter(&$form){
 		$form['elements']['other_information']['edit_link']['#default_value'] =  $params['edit_link'];
 		//echo $fullurl;
 	}
+}
+
+function sf1subtheme_page_attachments_alter(array &$page) {
+	/* $node = \Drupal::routeMatch()->getParameter('node');
+	if (!is_null($node) && $node->getType() == 'page') {
+	  //@TODO: remove the appropriate library items from $page['#attached']['library']
+	} */
+	//var_dump($page['#attached']['library']);
+	/* $node = \Drupal::routeMatch()->getParameter('node');
+	if ($node) { // check we have a node object.
+		if ($node->id() == 6198) { // look for a specific node id.
+			//attach the library.
+			$page['#attached']['library'][] = 'sf1subtheme/bootstrap-cdn';
+			//var_dump($variables['elements']['#attached']);
+		}
+	}
+	var_dump($page['#attached']['library']); */
 }

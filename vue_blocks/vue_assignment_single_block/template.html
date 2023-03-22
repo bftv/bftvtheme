@@ -1,0 +1,66 @@
+<div id="single-assignment-block" class="cc-main">
+    <router-view></router-view>
+</div>
+
+<template id="single-assignment-template">
+	<div v-if="!loading">
+		<div v-if="!hidebody">
+			<div v-if="mode == 'pi' || mode == 'dual'" style="margin-bottom: 3rem;">
+				<h2 class="panel__title">Assignments</h2>
+				<table>
+					<thead>
+						<tr>
+                            <th>Account Manager</th>
+                            <th>Purchasing & Reimbursement</th>
+                            <th>Advising</th>
+                            <th>HR</th>
+                            <th>Academic Personnel</th>
+							<th>IT Support</th>
+                            <th>Payroll</th>
+                        </tr>
+					</thead>
+					<tbody>
+						<tr v-if="infoPi">
+                            <td><a v-if="infoPi.account_manager"  :href="getLink(infoPi.account_manager)">{{ infoPi.account_manager.name }}</a></td>
+                            <td><a v-if="infoPi.purchasing_reimburse"  :href="getLink(infoPi.purchasing_reimburse)">{{ infoPi.purchasing_reimburse.name }}</a></td>
+                            <td><a v-if="infoPi.advising" :href="getLink(infoPi.advising)">{{ infoPi.advising.name }}</a></td>
+                            <td><a v-if="infoPi.hr"  :href="getLink(infoPi.hr)">{{ infoPi.hr.name }}</a></td>
+                            <td><a v-if="infoPi.academic_personal"  :href="getLink(infoPi.academic_personal)">{{ infoPi.academic_personal.name }}</a></td>
+							<td><a v-if="infoPi.it_support"  :href="getLink(infoPi.it_support)">{{ infoPi.it_support.name }}</a></td>
+                            <td><a v-if="infoPi.payroll"  :href="getLink(infoPi.payroll)">{{ infoPi.payroll.name }}</a></td>
+                        </tr>
+					</tbody>
+				</table>
+			</div>
+			<div v-if="mode == 'staff' || mode == 'dual'">
+				<h2 class="panel__title">Supported PIs</h2>
+				<table v-if="infoStaff">
+					<thead>
+						<tr>
+							<th>PI</th>
+							<th>Department</th>
+							<th>Supported Area</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="person in infoStaff">
+                            <td><a :href="person.link">{{ person.name }}</a></td>
+							<td>{{ person.department }}</td>
+							<td>{{ person.a_type }}</td>
+                        </tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div v-else style="text-align: center"><i  v-show="loading" class="fa fa-spinner fa-spin fa-4x" style="color: #999"></i></div>
+</template>
+
+
+<style scoped>
+.sa-wrap {
+	margin:0px;
+	padding:0px;
+	overflow:hidden
+}
+</style>
