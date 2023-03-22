@@ -102,7 +102,7 @@ var singleAssignmentsComp = Vue.extend({
             }
         },
 		urlBuilder: function(){
-			if(this.fa_sub.length > 0){
+			if((this.fa_sub.length > 0) && (this.fa_sub[0].target_id == 3986 || this.fa_sub[0].target_id == 3976)){
 				if(this.fa_sub[0].target_id == 3986){
 					url = '&col=3986'
 				} else if(this.fa_sub[0].target_id == 3976){
