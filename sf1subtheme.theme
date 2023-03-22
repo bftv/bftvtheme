@@ -79,7 +79,7 @@ function sf1subtheme_preprocess_node(array &$variables) {
 
 	$node = \Drupal::routeMatch()->getParameter('node');
 	if ($node) { // check we have a node object.
-		if ($node->id() == 6198) { // look for a specific node id.
+		if ($node->id() == 6198 || $node->id() == 6356) { // look for a specific node id. 6356 for live
 			$uid = \Drupal::currentUser()->id();
 			$role = \Drupal::currentUser()->getRoles();
 			$cas = \Drupal::service('cas.user_manager')->getCasUsernameForAccount($uid);
