@@ -108,7 +108,7 @@ function sf1subtheme_preprocess_node(array &$variables) {
 				if($cherror){
 					echo "Curl was not successfull. ".$cherror;
 				} else {
-					$chresult = json_decode($chresult, true);
+					$chresult = json_decode($chresult, true);var_dump($chresult);
 					$curlCode = $chresult['response'];
 					if($chresult['userrole']){
 						$curlRole = $chresult['userrole'];
