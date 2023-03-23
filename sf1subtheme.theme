@@ -101,7 +101,7 @@ function sf1subtheme_preprocess_node(array &$variables) {
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-				curl_setopt($ch, CURLOPT_REFERER, 'https://bftv.ucdavis.edu/assignments');
+				curl_setopt($ch, CURLOPT_REFERER, 'https://www.bftv.ucdavis.edu/assignments');
 
 				$chresult = curl_exec($ch);
 				$cherror = curl_error($ch);
