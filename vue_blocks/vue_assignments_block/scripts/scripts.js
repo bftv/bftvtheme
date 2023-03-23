@@ -22,7 +22,7 @@ axios.interceptors.response.use(
                     popupWindow.close();
                     originalRequest._retry = true;
                     //return axios(originalRequest);
-                    this.location.reload();
+                    //this.location.reload();
                 } else if (e.data == "Authentication failed."){
                     popupWindow.close();
                     originalRequest._retry = false;
