@@ -20,9 +20,9 @@ axios.interceptors.response.use(
                 // e.data hold the message from child
                 if(e.data == "Authenticated."){
                     popupWindow.close();
-                    originalRequest._retry = true;
+                    originalRequest._retry = false;
                     //return axios(originalRequest);
-                    //this.location.reload();
+                    this.location.reload();
                 } else if (e.data == "Authentication failed."){
                     popupWindow.close();
                     originalRequest._retry = false;
