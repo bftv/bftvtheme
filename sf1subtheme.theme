@@ -48,13 +48,7 @@ if($variables['elements']['#id'] == 'assignmentsblock'){
  * Implements hook_preprocess_node() for node.html.twig.
  */
 function sf1subtheme_preprocess_node(array &$variables) {
-  // Add a class to all Teaser view modes
-
-//  if ($variables['view_mode'] == 'teaser') {
-//    $variables['attributes']['class'][] = 'my-custom-class';
-//  }
-
-	$contentType = $variables['node']->getType();
+ 	$contentType = $variables['node']->getType();
 	if($contentType == 'people'){
 		$personUUID = $variables['node']->uuid();
 		$functional_area = $variables['node']->get('field_bftv_functional_area')->getValue();
@@ -85,41 +79,15 @@ function sf1subtheme_preprocess_node(array &$variables) {
 			$cas = \Drupal::service('cas.user_manager')->getCasUsernameForAccount($uid);
 
 			if($cas){
-				//curl to webservice
 				//$token = Drupal\Component\Utility\Crypt::hashBase64(\Drupal::service('session')->getId());
 				$email = \Drupal::currentUser()->getEmail();
 				$token = \Drupal::service('session')->getId();
 				$token = base64_encode($token);
-				$ch = curl_init();
-				$url = 'https://web.bftv.ucdavis.edu/assignments/connector.php';
-				$data = array('loginid' => $cas, 'token' => $token, 'email' => $email);
-				$data = json_encode($data);
-				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-				curl_setopt($ch, CURLOPT_URL,$url);
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-				curl_setopt($ch, CURLOPT_REFERER, 'https://www.bftv.ucdavis.edu/assignments');
 
-				$chresult = curl_exec($ch);
-				$cherror = curl_error($ch);
-				if($cherror){
-					echo "Curl was not successfull. ".$cherror;
-				} else {
-					$chresult = json_decode($chresult, true);
-					$curlCode = $chresult['response'];
-					if($chresult['userrole']){
-						$curlRole = $chresult['userrole'];
-					} else {
-						$curlRole = 'anonymous';
-					}
-				}
-				curl_close($ch);
 			} else {
 				$cas = 'anonymous';
 				$token = 'none';
+				$email = 'none';
 			}
 
 			if(in_array('site_manager', $role) || in_array('site_builder', $role)){
@@ -133,10 +101,9 @@ function sf1subtheme_preprocess_node(array &$variables) {
 			//expose to JS
 			$variables['#attached']['drupalSettings']['assignments'] = [
 				'username' => $cas,
+				'useremail' => $email,
 				'role' => $role,
-				'token' => $token,
-				'curlCode' => $curlCode,
-				'curlRole' => $curlRole
+				'token' => $token
 			];
 			//var_dump($variables['#attached']['drupalSettings']['assignments']);
 		}

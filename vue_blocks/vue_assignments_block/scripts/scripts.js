@@ -20,7 +20,7 @@ axios.interceptors.response.use(
                 // e.data hold the message from child
                 if(e.data == "Authenticated."){
                     popupWindow.close();
-                    originalRequest._retry = false;
+                    originalRequest._retry = true;
                     //return axios(originalRequest);
                     this.location.reload();
                 } else if (e.data == "Authentication failed."){
@@ -40,13 +40,40 @@ var navmixin = {
     data: function() {
         return {
             username: drupalSettings.assignments.username,
+            email: drupalSettings.assignments.useremail,
             role: drupalSettings.assignments.role,
             token: drupalSettings.assignments.token,
-            curlCode: drupalSettings.assignments.curlCode,
-            curlRole: drupalSettings.assignments.curlRole,
+            curlCode: '',//drupalSettings.assignments.curlCode,
+            curlRole: '',//drupalSettings.assignments.curlRole,
             accesslevel1: false,
             accesslevel2: false,
         }
+    },
+    beforeMount: function(){
+        axios.post('https://web.bftv.ucdavis.edu/assignments/connector.php', {
+            crossDomain: true,
+            loginid: this.username,
+            token: this.token,
+            email: this.email,
+            headers: {
+                'Content-Type': 'application/json'
+                }
+        }).then(response => {
+            this.curlCode = response.data.response
+            if(this.curlCode == 1 || this.curlCode == 3){
+                this.curlRole = response.data.userrole
+                if(this.curlRole == 'admin'){
+                    this.accesslevel1 = true;
+                    this.accesslevel2 = true;
+                } else if(this.curlRole == 'editor'){
+                    this.accesslevel1 = true;
+                }
+            } else {
+                this.curlRole = 'anonymous'
+            }
+        }).catch(error => {
+            console.log(error)
+        });
     }
 }
 var mixin = {
@@ -499,15 +526,6 @@ const listPI = Vue.extend({
     mixins: [navmixin, mixin, listmixin],
     template: '#list-pi-template',
 
-    beforeMount: function(){
-        if(this.curlRole == 'admin'){
-            this.accesslevel1 = true;
-            this.accesslevel2 = true;
-        } else if(this.curlRole == 'editor'){
-            this.accesslevel1 = true;
-        }
-    },
-
     mounted: function(){
         url = 'https://web.bftv.ucdavis.edu/assignments/data-get.php',
         this.getDataList(url, 'people')
@@ -522,18 +540,6 @@ const listStaff = Vue.extend({
     mixins: [navmixin, mixin, listmixin],
     template: '#list-staff-template',
 
-    beforeMount: function(){
-        if(this.curlCode == 1){
-            location.reload();
-        }
-        if(this.curlRole == 'admin'){
-            this.accesslevel1 = true;
-            this.accesslevel2 = true;
-        } else if(this.curlRole == 'editor'){
-            this.accesslevel1 = true;
-        }
-    },
-
     mounted: function(){
         url = 'https://web.bftv.ucdavis.edu/assignments/data-get.php',
         this.getDataList(url, 'people')
@@ -544,15 +550,6 @@ const listUsers = Vue.extend({
     mixins: [navmixin, mixin],
     template: '#list-users-template',
 
-    beforeMount: function(){
-        if(this.curlRole == 'admin'){
-            this.accesslevel1 = true;
-            this.accesslevel2 = true;
-        } else if(this.curlRole == 'editor'){
-            this.accesslevel1 = true;
-        }
-    },
-
     mounted: function(){
         url = 'https://web.bftv.ucdavis.edu/assignments/users-get.php',
         this.getDataList(url, 'users')
@@ -562,15 +559,6 @@ const listUsers = Vue.extend({
 const syncData = Vue.extend({
     mixins: [navmixin, mixin],
     template: '#sync-data-template',
-
-    beforeMount: function(){
-        if(this.curlRole == 'admin'){
-            this.accesslevel1 = true;
-            this.accesslevel2 = true;
-        } else if(this.curlRole == 'editor'){
-            this.accesslevel1 = true;
-        }
-    },
 
     mounted: function(){
         this.loading = false
@@ -640,16 +628,7 @@ var router = new VueRouter({
 /* Components */
 Vue.component('the-navigation', {
     mixins: [navmixin],
-    template: '#nav-template',
-
-    beforeMount: function(){
-        if(this.curlRole == 'admin'){
-            this.accesslevel1 = true;
-            this.accesslevel2 = true;
-        } else if(this.curlRole == 'editor'){
-            this.accesslevel1 = true;
-        }
-    }
+    template: '#nav-template'
 });
 /* End Components */
 

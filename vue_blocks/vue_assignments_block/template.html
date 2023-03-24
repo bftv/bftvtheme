@@ -24,7 +24,7 @@
 
 <template id="list-pi-template">
     <div class="container-fluid">
-        <the-navigation></the-navigation>
+        <the-navigation :username="username">{{username}}</the-navigation>
         <div v-if="loading" id="loading" class="mt-3">
             <div class="spinner-border text-secondary loader" role="status">
                 <span class="sr-only">Loading...</span>
