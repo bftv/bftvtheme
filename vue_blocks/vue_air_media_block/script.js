@@ -15,11 +15,11 @@ const blockID = document.getElementsByClassName('vue-air-media-block')[0].id;
 
 /* Components */
 
-var airMediaCmp = Vue.extend({
+var airMediaCmp = {
     template: '#air-media',
 
     data: function() {
-        return {            
+        return {
 			loading: true,
 			splash: false,
 			windows: false,
@@ -36,11 +36,11 @@ var airMediaCmp = Vue.extend({
 			interval: null,
 			os: "",
 			url: ""
-			
+
         }
     },
-	
-	mounted: function() {		
+
+	mounted: function() {
 		this.getOS();
 		this.loading = false;
 		this.splash = true;
@@ -48,7 +48,7 @@ var airMediaCmp = Vue.extend({
 	},
 
     methods: {
-        
+
 		getOS: function(){
 			userAgent = window.navigator.userAgent,
 			platform = window.navigator.platform,
@@ -56,7 +56,7 @@ var airMediaCmp = Vue.extend({
 			windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
 			iosPlatforms = ['iPhone', 'iPad', 'iPod'],
 			chromePlatforms = ['CrOS'];
-			
+
 			if (macosPlatforms.indexOf(platform) !== -1) {
 				this.macOs = true;
 				this.os = "mac";
@@ -66,12 +66,12 @@ var airMediaCmp = Vue.extend({
 				this.windows = true;
 				this.os = "win";
 				//this.interval = setInterval(this.incrementTime, 1000);
-				this.url = "https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip";				
+				this.url = "https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip";
 			} else if (chromePlatforms.indexOf(platform) !== -1) {
 				this.chromeOs = true;
 				this.os = "ChromeOS";
 				//this.interval = setInterval(this.incrementTime, 1000);
-				this.url = 'https://chrome.google.com/webstore/detail/airmedia-sender/ljophmlbljnjodcbogmdogcpclifenpk';				
+				this.url = 'https://chrome.google.com/webstore/detail/airmedia-sender/ljophmlbljnjodcbogmdogcpclifenpk';
 			} else if (/Android/.test(userAgent)) {
 				this.andriod = true;
 				this.os = 'Android';
@@ -82,8 +82,8 @@ var airMediaCmp = Vue.extend({
 				this.os = 'iOS';
 				//this.interval = setInterval(this.incrementTime, 1000);
 				this.url = 'https://itunes.apple.com/us/app/crestron-airmedia/id685412055';
-			} 
-			
+			}
+
 			/* else if (!os && /Linux/.test(platform)) {
 				os = 'Linux';
 			} */
@@ -94,7 +94,7 @@ var airMediaCmp = Vue.extend({
 				this.force = true;
 				if(this.os == "mac"){
 					this.url = "https://web.bftv.ucdavis.edu/airmedia/1207-RMI-S_AirMedia_169.237.216.129.dmg";
-					this.download(this.url);					
+					this.download(this.url);
 				} else if (this.os == "win") {
 					this.url = "https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip";
 					this.download(this.url);
@@ -109,7 +109,7 @@ var airMediaCmp = Vue.extend({
 				this.time = parseInt(this.time) - 1;
 			}
 		},
-		download: function(url) {			
+		download: function(url) {
 			window.location.href = url;
 			this.info = true;
 		},
@@ -153,20 +153,21 @@ var airMediaCmp = Vue.extend({
 			location.reload();
 		},
 	},
-})
+}
 
 
 /* End Components */
 
 /* Router */
 
-var router = new VueRouter({
-	//mode: 'history',	
-	
+var router = VueRouter.createRouter({
+	//mode: 'history',
+	history: VueRouter.createWebHashHistory(),
+
 	routes: [
-		{ 
-			path: '*', 
-			component: airMediaCmp 
+		{
+			path: '/:pathMatch(.*)*',
+			component: airMediaCmp
 		}
 	]
 });
@@ -175,9 +176,9 @@ var router = new VueRouter({
 
 /* Initialize */
 
-new Vue({
-	el: '#air-media-block',
-	router
-})
+Vue.createApp(
+	//el: '#air-media-block',
+	//router
+).use(router).mount('#air-media-block')
 
 /* End Initialize */

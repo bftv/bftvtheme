@@ -11,7 +11,7 @@ window.onmessage = function(event){
 
 /* Components */
 
-var keymgmtCmp = Vue.extend({
+var keymgmtCmp = {
     template: '#keymgmt',
 
     data: function() {
@@ -38,22 +38,22 @@ var keymgmtCmp = Vue.extend({
 			}
 		},
 	}
-})
+}
 
 
 /* End Components */
 
 /* Router */
 
-var router = new VueRouter({
-	mode: 'history',
+var router = VueRouter.createRouter({
+	history: VueRouter.createWebHashHistory(),
 	scrollBehavior() {
 		return { x: 0, y: 0 };
 	},
 
 	routes: [
 		{
-			path: '*',
+			path: '/:pathMatch(.*)*',
 			component: keymgmtCmp,
 			props: true
 		}
@@ -65,8 +65,8 @@ var router = new VueRouter({
 /* Initialize */
 
 new Vue({
-	el: '#keymgmt-status-block',
-	router
-})
+	//el: '#keymgmt-status-block',
+	//router
+}).use(router).mount('#keymgmt-status-block')
 
 /* End Initialize */

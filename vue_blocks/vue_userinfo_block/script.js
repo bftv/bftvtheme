@@ -4,11 +4,11 @@ const blockID = document.getElementsByClassName('vue-userinfo-block')[0].id;
 /* End Main URLs */
 
 /* Components */
-var userinfoCmp = Vue.extend({
+var userinfoCmp = {
     template: '#userinfo',
 
     data: function() {
-        return {            
+        return {
 			loading: true,
 			iframeurl: '',
 			iframesrc: '',
@@ -16,33 +16,33 @@ var userinfoCmp = Vue.extend({
 			height: '1000px'
         }
     },
-	
-	mounted: function() {		
-		this.getURL();		
-		this.loading = false;		
+
+	mounted: function() {
+		this.getURL();
+		this.loading = false;
 	},
 
-    methods: {        
-		getURL: function(){						
+    methods: {
+		getURL: function(){
 			this.iframesrc = mainURL
 		},
 	}
-})
+}
 
 
 /* End Components */
 
 /* Router */
 
-var router = new VueRouter({
-	mode: 'history',
+var router = VueRouter.createRouter({
+	history: VueRouter.createWebHashHistory(),
 	scrollBehavior() {
 		return { x: 0, y: 0 };
-	},	
-	
+	},
+
 	routes: [
-		{ 
-			path: '*', 
+		{
+			path: '/:pathMatch(.*)*',
 			component: userinfoCmp,
 			props: true
 		}
@@ -53,9 +53,9 @@ var router = new VueRouter({
 
 /* Initialize */
 
-new Vue({
-	el: '#userinfo-block',
-	router
-})
+Vue.createApp({
+	//el: '#userinfo-block',
+	//router
+}).use(router).mount('#userinfo-block')
 
 /* End Initialize */

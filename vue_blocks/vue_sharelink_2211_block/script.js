@@ -4,7 +4,7 @@ function centeredPopup(url,w,h,scroll){
 	LeftPosition = (screen.width) ? (screen.width-w)/2 : 0;
 	TopPosition = (screen.height) ? (screen.height-h)/2 : 0;
 	settings = 'height='+h+',width='+w+',top='+TopPosition+',left='+LeftPosition+',scrollbars='+scroll+',resizable'
-	popupWindow = window.open(url,"1207 Emergency Form",settings)
+	popupWindow = window.open(url,"2211 Emergency Form",settings)
 }
 /* End Popup Function */
 
@@ -15,11 +15,11 @@ const blockID = document.getElementsByClassName('vue-sharelink-2211-block')[0].i
 
 /* Components */
 
-var shareLink = Vue.extend({
+var shareLink = {
     template: '#sharelink',
 
     data: function() {
-        return {            
+        return {
 			loading: true,
 			windows: false,
 			macOs: false,
@@ -33,17 +33,17 @@ var shareLink = Vue.extend({
 			interval: null,
 			os: "",
 			url: ""
-			
+
         }
     },
-	
-	mounted: function() {		
+
+	mounted: function() {
 		this.getOS();
 		this.loading = false;
 	},
 
     methods: {
-        
+
 		getOS: function(){
 			userAgent = window.navigator.userAgent,
 			platform = window.navigator.platform,
@@ -51,7 +51,7 @@ var shareLink = Vue.extend({
 			windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
 			iosPlatforms = ['iPhone', 'iPad', 'iPod'],
 			chromePlatforms = ['CrOS'];
-			
+
 			if (macosPlatforms.indexOf(platform) !== -1) {
 				this.macOs = true;
 				this.os = "mac";
@@ -61,12 +61,12 @@ var shareLink = Vue.extend({
 				this.windows = true;
 				this.os = "win";
 				//this.interval = setInterval(this.incrementTime, 1000);
-				this.url = "https://web.bftv.ucdavis.edu/airmedia/ShareLink_2211_.169.237.216.131.exe";				
+				this.url = "https://web.bftv.ucdavis.edu/airmedia/ShareLink_2211_.169.237.216.131.exe";
 			} else if (chromePlatforms.indexOf(platform) !== -1) {
 				this.chromeOs = true;
 				this.os = "ChromeOS";
 				//this.interval = setInterval(this.incrementTime, 1000);
-				this.url ='https://play.google.com/store/apps/details?id=com.extron.sharelink&hl=en';				
+				this.url ='https://play.google.com/store/apps/details?id=com.extron.sharelink&hl=en';
 			} else if (/Android/.test(userAgent)) {
 				this.andriod = true;
 				this.os = 'Android';
@@ -77,8 +77,8 @@ var shareLink = Vue.extend({
 				this.os = 'iOS';
 				//this.interval = setInterval(this.incrementTime, 1000);
 				this.url ='https://apps.apple.com/us/app/mirrorop-for-extron-sharelink/id959814935';
-			} 
-			
+			}
+
 			/* else if (!os && /Linux/.test(platform)) {
 				os = 'Linux';
 			} */
@@ -89,7 +89,7 @@ var shareLink = Vue.extend({
 				this.force = true;
 				if(this.os == "mac"){
 					this.url = "https://web.bftv.ucdavis.edu/airmedia/ShareLink_2211_.169.237.216.131.dmg";
-					this.download(this.url);					
+					this.download(this.url);
 				} else if (this.os == "win") {
 					this.url = "https://web.bftv.ucdavis.edu/airmedia/ShareLink_2211_.169.237.216.131.exe";
 					this.download(this.url);
@@ -104,7 +104,7 @@ var shareLink = Vue.extend({
 				this.time = parseInt(this.time) - 1;
 			}
 		},
-		download: function(url) {			
+		download: function(url) {
 			window.location.href = url;
 			this.info = true;
 		},
@@ -124,20 +124,20 @@ var shareLink = Vue.extend({
 			location.reload();
 		},
 	},
-})
+}
 
 
 /* End Components */
 
 /* Router */
 
-var router = new VueRouter({
-	mode: 'history',	
-	
+var router = VueRouter.createRouter({
+	history: VueRouter.createWebHashHistory(),
+
 	routes: [
-		{ 
-			path: '*', 
-			component: shareLink 
+		{
+			path: '/:pathMatch(.*)*',
+			component: shareLink
 		}
 	]
 });
@@ -146,9 +146,9 @@ var router = new VueRouter({
 
 /* Initialize */
 
-new Vue({
-	el: '#sharelink-block',
-	router
-})
+Vue.createApp(
+	//el: '#sharelink-block',
+	//router
+).use(router).mount('#sharelink-block')
 
 /* End Initialize */

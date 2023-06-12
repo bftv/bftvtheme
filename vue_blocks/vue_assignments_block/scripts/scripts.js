@@ -522,7 +522,7 @@ var listmixin = {
 }
 /* End Global Functions */
 
-const listPI = Vue.extend({
+const listPI = {
     mixins: [navmixin, mixin, listmixin],
     template: '#list-pi-template',
 
@@ -534,9 +534,9 @@ const listPI = Vue.extend({
     methods: {
 
     }
-})
+}
 
-const listStaff = Vue.extend({
+const listStaff = {
     mixins: [navmixin, mixin, listmixin],
     template: '#list-staff-template',
 
@@ -544,9 +544,9 @@ const listStaff = Vue.extend({
         url = 'https://web.bftv.ucdavis.edu/assignments/data-get.php',
         this.getDataList(url, 'people')
     },
-})
+}
 
-const listUsers = Vue.extend({
+const listUsers = {
     mixins: [navmixin, mixin],
     template: '#list-users-template',
 
@@ -554,9 +554,9 @@ const listUsers = Vue.extend({
         url = 'https://web.bftv.ucdavis.edu/assignments/users-get.php',
         this.getDataList(url, 'users')
     },
-})
+}
 
-const syncData = Vue.extend({
+const syncData = {
     mixins: [navmixin, mixin],
     template: '#sync-data-template',
 
@@ -586,18 +586,18 @@ const syncData = Vue.extend({
             });
         }
     }
-})
+}
 
 
 /* Router */
-var router = new VueRouter({
-	history: true,
+var router = VueRouter.createRouter({
+	history: VueRouter.createWebHashHistory(),
     //mode: 'history',
     linkExactActiveClass: "active",
 
 	routes: [
 		{
-			path: '*',
+			path: '/:pathMatch(.*)*',
 			component: listStaff,
             props: true
 		},
@@ -626,15 +626,20 @@ var router = new VueRouter({
 /* End Router */
 
 /* Components */
-Vue.component('the-navigation', {
+const TheNavigation = {
     mixins: [navmixin],
-    template: '#nav-template'
-});
+    template: '#nav-template',
+    methods: {
+        loader() {
+          this.loading = true;
+        }
+      }
+};
 /* End Components */
 
 /* Initialize */
-new Vue({
-	el: '#assignment-block',
-	router
-})
+const app = Vue.createApp({});
+app.component('the-navigation', TheNavigation);
+app.use(router).mount('#assignment-block');
+
 /* End Initialize */

@@ -9,10 +9,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item"><router-link :to="{name: 'staff-list'}" class="nav-link" @click="loader()">Staff List</router-link></li>
-                    <li class="nav-item"><router-link :to="{name: 'faculty-list'}" class="nav-link" @click="loader()">Faculty List</router-link></li>
-                    <li v-if="accesslevel2" class="nav-item"><router-link :to="{name: 'users-list'}" class="nav-link" @click="loader()">User Management</router-link></li>
-                    <li v-if="accesslevel2" class="nav-item"><router-link :to="{name: 'sync-data'}" class="nav-link" @click="loader()">Sync Data</router-link></li>
+                    <li class="nav-item"><router-link :to="{name: 'staff-list'}" class="nav-link" @click="loader">Staff List</router-link></li>
+                    <li class="nav-item"><router-link :to="{name: 'faculty-list'}" class="nav-link" @click="loader">Faculty List</router-link></li>
+                    <li v-if="accesslevel2" class="nav-item"><router-link :to="{name: 'users-list'}" class="nav-link" @click="loader">User Management</router-link></li>
+                    <li v-if="accesslevel2" class="nav-item"><router-link :to="{name: 'sync-data'}" class="nav-link" @click="loader">Sync Data</router-link></li>
                 </ul>
             </div>
             <span class="navbar-text user-info">

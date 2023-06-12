@@ -2,9 +2,9 @@
 mainURL = 'https://web.bftv.ucdavis.edu/calendar/';
 const blockID = document.getElementsByClassName('vue-ems-block')[0].id;
 window.onmessage = function(event){
-    if (event.data[0] == 'pageHeight') {	   
+    if (event.data[0] == 'pageHeight') {
 	   document.getElementById('ems-frame').height = event.data[1]+"px";
-    } else if (event.data[0] == 'modal') {	   
+    } else if (event.data[0] == 'modal') {
 	    window.scrollTo({
 		    top: 100,
 		    left: 0,
@@ -21,18 +21,18 @@ window.onmessage = function(event){
 	    if(event.data[1] == 'quick'){
 		 msg = 'Are you sure to '+action+' all bookings in this reservation?';
 		 if(confirm(msg)){
-			document.getElementById('ems-frame').contentWindow.postMessage(['response', action, type, rid, bid, commentbox, sendcomment], '*');	 
-		 }		 
+			document.getElementById('ems-frame').contentWindow.postMessage(['response', action, type, rid, bid, commentbox, sendcomment], '*');
+		 }
 	    } else if(event.data[1] == 'single'){
 		 msg = 'Are you sure to '+action+' this booking?';
 		 if(confirm(msg)){
-			document.getElementById('ems-frame').contentWindow.postMessage(['response', action, type, rid, bid, commentbox, sendcomment], '*');	 
-		 }		 
+			document.getElementById('ems-frame').contentWindow.postMessage(['response', action, type, rid, bid, commentbox, sendcomment], '*');
+		 }
 	    } else if(event.data[1] == 'all'){
 		 msg = 'Are you sure to '+action+' all bookings in this reservation?';
 		 if(confirm(msg)){
-			document.getElementById('ems-frame').contentWindow.postMessage(['response', action, type, rid, bid, commentbox, sendcomment], '*');	 
-		 }		 
+			document.getElementById('ems-frame').contentWindow.postMessage(['response', action, type, rid, bid, commentbox, sendcomment], '*');
+		 }
 	    }
     }
 };
@@ -41,44 +41,44 @@ window.onmessage = function(event){
 
 /* Components */
 
-var emsCmp = Vue.extend({
+var emsCmp = {
     template: '#ems',
 
     data: function() {
-        return {            
+        return {
 			loading: true,
 			iframeurl: '',
 			iframesrc: '',
 			elframe: '',
 			height: '1000px',
 			test: '2'
-			
+
         }
     },
-	
-	mounted: function() {		
+
+	mounted: function() {
 		this.getURL();
 		this.loading = false;
-		
-		
-		document.onreadystatechange = () => { 
-			if (document.readyState == "complete") {			
+
+
+		document.onreadystatechange = () => {
+			if (document.readyState == "complete") {
 				//some code if needed
-				
+
 			}
 		}
-		
+
 	},
 
     methods: {
-        
-		getURL: function(){			
-			this.iframeurl = this.$route.query.rid;			
+
+		getURL: function(){
+			this.iframeurl = this.$route.query.rid;
 			if(this.iframeurl){
-				this.iframesrc = mainURL+'index.php?reservation='+this.iframeurl				
+				this.iframesrc = mainURL+'index.php?reservation='+this.iframeurl
 			} else {
 				this.iframesrc = mainURL
-			}			
+			}
 		},
 		getCookie: function(name){
 			matches = document.cookie.match(new RegExp(
@@ -87,22 +87,22 @@ var emsCmp = Vue.extend({
 			return matches ? decodeURIComponent(matches[1]) : undefined;
 		},
 	}
-})
+}
 
 
 /* End Components */
 
 /* Router */
 
-var router = new VueRouter({
-	mode: 'history',
+var router = VueRouter.createRouter({
+	history: VueRouter.createWebHashHistory(),
 	scrollBehavior() {
 		return { x: 0, y: 0 };
-	},	
-	
+	},
+
 	routes: [
-		{ 
-			path: '*', 
+		{
+			path: '/:pathMatch(.*)*',
 			component: emsCmp,
 			props: true
 		}
@@ -113,9 +113,9 @@ var router = new VueRouter({
 
 /* Initialize */
 
-new Vue({
-	el: '#ems-block',
-	router
-})
+Vue.createApp({
+	//el: '#ems-block',
+	//router
+}).use(router).mount('#ems-block')
 
 /* End Initialize */

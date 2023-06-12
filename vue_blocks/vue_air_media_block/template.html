@@ -1,9 +1,8 @@
-<div id="air-media-block" class="cc-main">    
+<div id="air-media-block" class="cc-main">
     <router-view></router-view>
 </div>
 
 <template id="air-media">
-	
 	<div v-if="!loading">
 		<div class="air-media-wrap">
 			<div v-if="splash">
@@ -27,7 +26,7 @@
 									<div class="text" @click="airMediaIns()">AirMedia Instruction</div>
 								</div>
 							</div>
-						</div>						
+						</div>
 					</div>
 				</div>
 			</div>
@@ -40,7 +39,7 @@
 							<div v-if="windows">
 								<h3>You are using a Windows system</h3>
 								<div class="instruction">
-									<h4>Connection instructions for Windows</h4>									
+									<h4>Connection instructions for Windows</h4>
 									<ol>
 										<li>Download the file by clicking the download button above.</li>
 										<li>Once the file is downloaded, open it, and then launch the program.</li>
@@ -48,11 +47,11 @@
 											<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
 										</ol>
 										<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to <strong>Connect</strong>, then click <strong>Start</strong> when ready to present.</li>
-									</ol>																								
+									</ol>
 								</div>
 							</div>
 							<div v-else-if="macOs">
-								<h3>You are using a Mac system</h3>							
+								<h3>You are using a Mac system</h3>
 								<div class="instruction">
 									<h4>Connection instructions for macOS</h4>
 									<ol>
@@ -60,7 +59,7 @@
 										<ol type="a">
 											<li>If prompted, <strong>Allow</strong> “bftv.ucdavis.edu” to download to your system.</li>
 										</ol>
-										<li>Go to the downloaded file, run it, and then open <strong>Launch Crestron AirMedia</strong>.</li>										
+										<li>Go to the downloaded file, run it, and then open <strong>Launch Crestron AirMedia</strong>.</li>
 										<ol type="a">
 											<li>If you get a <strong>“can’t be opened”</strong> error, without the Open option:</li>
 											<ol type="i">
@@ -78,7 +77,7 @@
 											<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
 										</ol>
 										<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to Connect, then click Start when ready to present.</li>
-									</ol>									
+									</ol>
 								</div>
 							</div>
 							<div v-else-if="(iOs || andriod || chromeOs)">
@@ -200,22 +199,22 @@
 					</div>
 				</div>
 			</div>
-			
+
 			<div v-else class="manual-download">
 				<div class="container-fluid">
 					<div class="row">
 						<div class="col-md-12"><a href="#" @click="airMediaIns()"><i class="fas fa-arrow-left"></i>&nbsp;Go Back</a></div>
 						<div class="col-md-12 text-right"><button type="button" class="btn btn-warning btn-lg" onclick="centeredPopup('https://www.bftv.ucdavis.edu/form/av-support?room=1207RMISouth','1000','550','yes')"><i class="fas fa-headset"></i>&nbsp;Contact Support</button></div>
 						<div class="col-md-12">
-							<h4>Choose a Version</h4>				
+							<h4>Choose a Version</h4>
 							<p>&nbsp;</p>
 							<ul style="list-style-type: none;">
 								<li><i class="fab fa-windows"></i>  <a href="https://www.bftv.ucdavis.edu/sites/g/files/dgvnsk1346/files/files/page/AirMedia_Windows.zip">AirMedia - Windows</a></li>
-								<li><i class="fab fa-apple"></i>  <a href="https://web.bftv.ucdavis.edu/airmedia/1207-RMI-S_AirMedia_169.237.216.129.dmg">AirMedia - Mac</a></li>				
+								<li><i class="fab fa-apple"></i>  <a href="https://web.bftv.ucdavis.edu/airmedia/1207-RMI-S_AirMedia_169.237.216.129.dmg">AirMedia - Mac</a></li>
 								<li><i class="fab fa-app-store-ios"></i>  <a href="https://itunes.apple.com/us/app/crestron-airmedia/id685412055">iOS</a></li>
-								<li><i class="fab fa-android"></i>  <a href="https://play.google.com/store/apps/details?id=com.crestron.airmedia&hl=en_US">Android</a></li>				
+								<li><i class="fab fa-android"></i>  <a href="https://play.google.com/store/apps/details?id=com.crestron.airmedia&hl=en_US">Android</a></li>
 								<li><i class="fab fa-chrome"></i>  <a href="https://chrome.google.com/webstore/detail/airmedia-sender/ljophmlbljnjodcbogmdogcpclifenpk">ChromeOS</a></li>
-								
+
 							</ul>
 							<div class="instruction">
 								<h4>Connection instructions for Windows</h4>
@@ -225,7 +224,7 @@
 										<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
 									</ol>
 									<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to <strong>Connect</strong>, then click <strong>Start</strong> when ready to present.</li>
-								</ol>					
+								</ol>
 							</div>
 							<div class="instruction">
 								<h4>Connection instructions for macOS</h4>
@@ -252,8 +251,8 @@
 										<li>If prompted for a hostname, use <strong>169.237.216.129</strong> and click <strong>Connect</strong></li>
 									</ol>
 									<li>Use the <strong>4-digit code</strong> diplayed on the projector screen to Connect, then click Start when ready to present.</li>
-								</ol>					
-							</div>						
+								</ol>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -265,8 +264,6 @@
 
 
 <style scoped>
-.air-media-wrap {
-}
 .smallText {
 	font-size: 14px;
 	margin-top: 3em;
@@ -296,7 +293,7 @@
 	font-size: 16px;
 	padding: 16px 32px;
 }
-.splash-img {		
+.splash-img {
 	display: block;
 	border-radius: 5px;
 	transition: .5s ease;
@@ -305,7 +302,7 @@
 .img-div:hover .splash-img {
 	box-shadow: none;
 	opacity: 0.3;
-	cursor: pointer;	
+	cursor: pointer;
 }
 .middle {
 	transition: .5s ease;
@@ -325,7 +322,7 @@
 	color: #fff !important;
 	background-color: #F18A00 !important;
 }
-.btn-warning:hover { 
+.btn-warning:hover {
 	background-color: #FFDC00 !important;
 }
 .btn-primary {

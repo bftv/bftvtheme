@@ -7,21 +7,21 @@ const blockID = document.getElementsByClassName('vue-news-block')[0].id;
 
 /* Global Filters */
 
-Vue.filter('imgstriptruncate', function (text, stop, clamp) {
+/* Vue.filter('imgstriptruncate', function (text, stop, clamp) {
 	var content = text.slice(0, stop) + (stop < text.length ? clamp || '...' : '');
 	return content.replace(/<img[^>"']*((("[^"]*")|('[^']*'))[^"'>]*)*>/g,"");
 });
 Vue.filter('fiximg', function (text) {
 	var content = text;
 	return content.replace(new RegExp('src="/sites', 'g'), 'class="inline-img" src="'+newsSiteURL+'/sites');
-});
+}); */
 
 /* End Global Filters */
 
 
 /* Components */
 
-var newsList = Vue.extend({
+var newsList = {
     template: '#news-list-template',
 
     data: function() {
@@ -61,7 +61,7 @@ var newsList = Vue.extend({
 		findthumbnail: function(imgid) {
 			for(var i=0; i < this.thumbnails.length; i++){
 				if(this.thumbnails[i].id == imgid){
-					return newsSiteURL+"/sites/g/files/dgvnsk1131/files/styles/sf_thumbnail/public"+this.thumbnails[i].attributes.uri.value.substr(8)+"?"
+					return newsSiteURL+"/sites/g/files/dgvnsk1131/files/styles/sf_thumbnail/public"+this.thumbnails[i].attributes.uri.value.substr(8)+"?h=1"
 				}
 			}
 		},
@@ -84,11 +84,15 @@ var newsList = Vue.extend({
 			else if (path == 'txc'){
 				return '&filter[category][condition][path]=field_fbtv_news_for.id&filter[category][condition][operator]=%3D&filter[category][condition][value]=4eed687e-715b-405f-b5fb-1a32039ec0f3&include=field_sf_primary_image'
 			}
+		},
+		imgStripTruncate: function(text, stop, clamp) {
+			let content = text.slice(0, stop) + (stop < text.length ? clamp || '...' : '');
+			return content.replace(/<img[^>"']*((("[^"]*")|('[^']*'))[^"'>]*)*>/g, '');
 		}
 	},
-})
+}
 
-var singleNews = Vue.extend({
+var singleNews = {
     template: '#single-news-template',
 
     data: function(){
@@ -124,18 +128,23 @@ var singleNews = Vue.extend({
 		},
 		goBack: function(){
 			router.go(-1)
+		},
+		fixImg: function(text) {
+			let content = text;
+			return content.replace(new RegExp('src="/sites', 'g'), 'class="inline-img" src="'+newsSiteURL+'/sites');
 		}
     }
-})
+}
 
 
 /* End Components */
 
 /* Router */
 
-var router = new VueRouter({
+var router = VueRouter.createRouter({
+	history: VueRouter.createWebHistory(),
 	if(gDiffPage){
-		mode: 'history'
+		history: VueRouter.createWebHashHistory()
 	},
 
 	scrollBehavior() {
@@ -144,7 +153,7 @@ var router = new VueRouter({
 
 	routes: [
 		{
-			path: '*',
+			path: '/:pathMatch(.*)*',
 			component: newsList
 		},
 		{
@@ -159,9 +168,14 @@ var router = new VueRouter({
 
 /* Initialize */
 
-new Vue({
-	el: '#news-block',
-	router
-})
+/* Vue.createApp({
+	//el: '#news-block',
+	//router
+}).use(router).mount('#news-block') */
+
+const app = Vue.createApp({});
+
+
+app.use(router).mount('#news-block');
 
 /* End Initialize */

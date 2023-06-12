@@ -4,7 +4,7 @@ const blockID = document.getElementsByClassName('vue-single-assignment-block')[0
 /* End Main URLs */
 
 /* Components */
-var singleAssignmentsComp = Vue.extend({
+var singleAssignmentsComp = {
     template: '#single-assignment-template',
 
     data: function() {
@@ -120,22 +120,22 @@ var singleAssignmentsComp = Vue.extend({
 			return url;
 		}
 	}
-})
+}
 
 
 /* End Components */
 
 /* Router */
 
-var router = new VueRouter({
-	mode: 'history',
+var router = VueRouter.createRouter({
+	history: VueRouter.createWebHashHistory(),
 	scrollBehavior() {
 		return { x: 0, y: 0 };
 	},
 
 	routes: [
 		{
-			path: '*',
+			path: '/:pathMatch(.*)*',
 			component: singleAssignmentsComp,
 			props: true
 		}
@@ -146,9 +146,9 @@ var router = new VueRouter({
 
 /* Initialize */
 
-new Vue({
-	el: '#single-assignment-block',
-	router
-})
+Vue.createApp({
+	//el: '#single-assignment-block',
+	//router
+}).use(router).mount('#single-assignment-block')
 
 /* End Initialize */

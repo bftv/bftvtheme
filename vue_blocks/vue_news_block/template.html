@@ -26,8 +26,8 @@
 						</footer>
 						<div v-if="!listShow">
 							<div v-if="news.attributes.body" class="vm-teaser__summary">
-								<div v-if="news.attributes.body.value" v-html="$options.filters.imgstriptruncate(news.attributes.body.value, 300)"></div>
-								<div v-else-if="news.attributes.body.summary" v-html="$options.filters.imgstriptruncate(news.attributes.body.summary, 600)"></div>
+								<div v-if="news.attributes.body.value" v-html="imgStripTruncate(news.attributes.body.value, 300)"></div>
+								<div v-else-if="news.attributes.body.summary" v-html="imgStripTruncate(news.attributes.body.summary, 600)"></div>
 							</div>
 						</div>
 					</div>
@@ -43,7 +43,7 @@
 	<div v-if="!loading">
 		<div class="back-button"><button class="button" @click="goBack()"><-- Go Back to the News List</button></div>
 		<div v-if="newsItem">
-			<div class="node__content">				
+			<div class="node__content">
 				<div v-if="imgsrc" class="image-container-bg" :style="'background-image: url('+imgsrc+')'"></div>
 				<h2>{{ newsItem.attributes.title }}</h2>
 				<footer class="node__meta">
@@ -53,7 +53,7 @@
 						</div>
 					</div>
 				</footer>
-				<div class="clearfix text-formatted" v-html="$options.filters.fiximg(newsItem.attributes.body.value)"></div>
+				<div class="clearfix text-formatted" v-html="fixImg(newsItem.attributes.body.value)"></div>
 				<div v-if="newsItem.attributes.field_url_to_link_article">
 					<h3 class="heading--auxiliary-customized">Original Article</h3>
 					<a :href="newsItem.attributes.field_url_to_link_article.uri" target="_blank">{{ newsItem.attributes.field_url_to_link_article.uri }}</a>
