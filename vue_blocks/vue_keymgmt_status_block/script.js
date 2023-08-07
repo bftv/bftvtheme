@@ -64,7 +64,7 @@ var router = VueRouter.createRouter({
 
 /* Initialize */
 
-new Vue({
+Vue.createApp({
 	//el: '#keymgmt-status-block',
 	//router
 }).use(router).mount('#keymgmt-status-block')
