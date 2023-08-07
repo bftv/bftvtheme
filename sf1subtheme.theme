@@ -73,7 +73,9 @@ function sf1subtheme_preprocess_node(array &$variables) {
 
 	$node = \Drupal::routeMatch()->getParameter('node');
 	if ($node) { // check we have a node object.
-		if ($node->id() == 6198 || $node->id() == 6356 || $node->id() == 6381) { // look for a specific node id. 6356 for live. 6381 is the dev for GSR mgmt.
+		// 6198/6356 = dev assignment / live assignment
+		// 6381/6421 = dev gsr / live gsr
+		if ($node->id() == 6198 || $node->id() == 6356 || $node->id() == 6381 || $node->id() == 6421) {
 			$uid = \Drupal::currentUser()->id();
 			$role = \Drupal::currentUser()->getRoles();
 			$cas = \Drupal::service('cas.user_manager')->getCasUsernameForAccount($uid);
