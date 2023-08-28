@@ -28,7 +28,7 @@ hr {
     color: #999;
 }
 .l-content {
-    container-type: unset;
+    container-type: unset !important;
 }
 
 /*------Loader------*/
