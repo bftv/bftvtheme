@@ -27,6 +27,10 @@ hr {
 .color-gray {
     color: #999;
 }
+.l-content {
+    container-type: unset;
+}
+
 
 /*------Loader------*/
 #loading {
