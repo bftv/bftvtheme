@@ -117,6 +117,8 @@ var mixin = {
                             this.filterObjectByKeyValue("status", "pending");
                         } else if (section == 'completed'){
                             this.filterObjectByKeyValue("status", "completed");
+                        } else if (section == 'rejected'){
+                            this.filterObjectByKeyValue("status", "rejected");
                         }
                     }
                 } else if(type == 'users'){
@@ -388,7 +390,8 @@ var mixin = {
                 this.screenmsg = response.data.message,
                 this.screenmsgtype = "success",
                 this.screenmsgicon = this.successicon,
-                this.listData = response.data.updated_data.data
+                this.listData = response.data.updated_data.data,
+                this.filterObjectByKeyValue("status", "new")
             }).catch(error => {console.log(error);
                 this.screenmsg = error.response.data.message,
                 this.screenmsgtype = "error",
@@ -399,7 +402,44 @@ var mixin = {
                 this.loading = false;
             });
             window.scrollTo(0, 150);
-        }
+        },
+        rejectApp(e) {
+            e.preventDefault();
+            this.loading = true;
+            modal = bootstrap.Modal.getInstance(document.getElementById('modalRejectApp'));
+            sid = document.getElementById('sid').value;
+            reason = document.getElementById('rejectreason').value;
+            axios.post('https://web.bftv.ucdavis.edu/gsr/data-reject.php', {
+                crossDomain: true,
+                myid: this.username,
+                token: this.token,
+                sid: sid,
+                reason: reason,
+                headers: {
+                    'Content-Type': 'application/json'
+                  }
+            }).then(response => {
+                this.screenmsg = response.data.message,
+                this.screenmsgtype = "success",
+                this.screenmsgicon = this.successicon,
+                this.listData = response.data.updated_data.data,
+                this.filterObjectByKeyValue("status", "new")
+            }).catch(error => {
+                this.screenmsg = error.response.data.message,
+                this.screenmsgtype = "error",
+                this.screenmsgicon = this.erroricon,
+                this.code = error.response.data.status
+            }).finally(() => {
+                modal.hide();
+                this.loading = false;
+            });
+            window.scrollTo(0, 400);
+        },
+    },
+    computed: {
+        hasApplicants() {
+          return Object.keys(this.listData).length > 0;
+        },
     }
 }
 /* End Global Functions */
@@ -449,6 +489,21 @@ const comApps = {
     },
 }
 
+const rejApps = {
+    mixins: [navmixin, mixin],
+    template: '#data-template',
+
+    mounted: function(){
+        url = 'https://web.bftv.ucdavis.edu/gsr/data-get.php',
+        this.getDataList(url, 'data', 'rejected')
+        this.$nextTick(() => {
+            if (typeof $ !== 'undefined') {
+              $(this.$refs.appEditModal).on('hidden.bs.modal', this.unsetSelectedRecord);
+            }
+        });
+    },
+}
+
 const listUsers = {
     mixins: [navmixin, mixin],
     template: '#list-users-template',
@@ -486,12 +541,18 @@ var router = VueRouter.createRouter({
             component: comApps
         },
         {
+            path: '/rej-apps',
+            name: 'rej-apps',
+            component: rejApps
+        },
+        {
             path: '/users-list',
             name: 'users-list',
             component: listUsers
         },
         {
 			path: '/:pathMatch(.*)*',
+            name: 'new-apps',
 			component: newApps,
             props: true
 		},

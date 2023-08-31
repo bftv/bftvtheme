@@ -165,3 +165,12 @@ tr.Reviewed, tr.HardKey {
 	font-size: 0.8rem;
 	color: red;
 }
+
+/* Styles for GSR Form */
+.salarytable {
+	overflow-x: scroll;
+    font-size: 0.7rem;
+}
+.salarytable tbody td:first-child {
+    min-width: 200px !important;
+}

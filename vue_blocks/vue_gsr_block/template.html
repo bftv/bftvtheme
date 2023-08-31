@@ -12,6 +12,7 @@
                     <li class="nav-item"><router-link :to="{name: 'new-apps'}" class="nav-link" @click="loader">New</router-link></li>
                     <li class="nav-item"><router-link :to="{name: 'pen-apps'}" class="nav-link" @click="loader">Pending</router-link></li>
                     <li class="nav-item"><router-link :to="{name: 'com-apps'}" class="nav-link" @click="loader">Completed</router-link></li>
+                    <li class="nav-item"><router-link :to="{name: 'rej-apps'}" class="nav-link" @click="loader">Rejected</router-link></li>
                     <li v-if="accesslevel2" class="nav-item"><router-link :to="{name: 'users-list'}" class="nav-link" @click="loader">User Management</router-link></li>
                 </ul>
             </div>
@@ -39,7 +40,7 @@
             <div v-if="!hidebody" class="mt-5">
                 <div class="row">
                     <div class="col-md-12">
-                        <div v-if="listData" class='table-responsive mt-2'>
+                        <div v-if="hasApplicants" class='table-responsive mt-2'>
                             <table class='table table-bordered table-hover table-striped'>
                                 <thead class='thead-light'>
                                     <tr>
@@ -60,14 +61,45 @@
                                         <td><a :href="'mailto:'+applicant.gsr_email">{{ applicant.gsr_fname }} {{ applicant.gsr_lname }}</a></td>
                                         <td><a :href="'mailto:'+applicant.pi_email">{{ applicant.pi_fname }} {{ applicant.pi_lname }}</a><br/><span class="text-muted fs-6">{{ applicant.pi_dept }}</span></td>
                                         <td>{{ convertDateFormat(applicant.start_date, 'date') }} - {{ convertDateFormat(applicant.end_date, 'date') }}</td>
-                                        <td><a href="" @click="selectRecord(applicant)" data-bs-toggle="modal" data-bs-target="#modal-applicant"><i class="fa-solid fa-pen-to-square"></i></a></td>
+                                        <td><a href="" @click="selectRecord(applicant)" data-bs-toggle="modal" data-bs-target="#modal-applicant"><i class="fa-solid fa-pen-to-square"></i></a><span v-if="applicant.status === 'new' || applicant.status === 'reviewed'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)"data-bs-target="#modalRejectApp"><i class="fa-solid fa-circle-xmark" title="Reject this application."></i></a></span></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+                        <div v-else>
+                            <div class="alert alert--info">There is currently no record in this section.</div>
+                        </div>
                     </div>
                 </div>
             </div>
+            <!--Reject App Modal-->
+            <div class="modal fade" id="modalRejectApp">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <!-- Modal body -->
+                        <form method="post" @submit.prevent="rejectApp">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <p>Are you sure you want to reject the application# <strong><span id="modalRejectAppNO">{{ selectedRecord.sid }}</span></strong> for <strong>{{ selectedRecord.gsr_fname }} {{ selectedRecord.gsr_lname }}</strong>?</p>
+                                    </div>
+                                    <div class="col-md-12 mt-3">
+                                        <input type="text" id="rejectreason" name="rejectreason" placeholder="Optional Reason" />
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal footer -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" @click="unsetSelectedRecord()">No</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Yes</button>
+                                <input type="hidden" name="mode" value="rejectapp" />
+                                <input type="hidden" name="sid" id="modalRejectAppsid" :value="selectedRecord.sid" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--Edit Modal-->
             <div class="modal fade" id="modal-applicant" tabindex="-1" aria-labelledby="modal-applicant-label" aria-hidden="true" ref="appEditModal" data-bs-backdrop="static">
                 <div class="modal-dialog modal-xl">
                     <div class="modal-content">
@@ -82,21 +114,21 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <label for="pi_fname" class="input-label required" id="pi_fname-title">PI First Name</label>
-                                            <input type="text" id="pi_fname" name="pi_fname" :value="selectedRecord.pi_fname" @input="updateField('pi_fname', $event)" required>
+                                            <input type="text" id="pi_fname" name="pi_fname" :value="selectedRecord.pi_fname" @input="updateField('pi_fname', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="pi_lname" class="input-label required" id="pi_lname-title">PI Last Name</label>
-                                            <input type="text" id="pi_lname" name="pi_lname" :value="selectedRecord.pi_lname" @input="updateField('pi_lname', $event)" required>
+                                            <input type="text" id="pi_lname" name="pi_lname" :value="selectedRecord.pi_lname" @input="updateField('pi_lname', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                     </div>
                                     <div class="row mt-4">
                                         <div class="col-md-6">
                                             <label for="pi_title" class="input-label required" id="pi_title-title">PI Title</label>
-                                            <input type="text" id="pi_title" name="pi_title" :value="selectedRecord.pi_title" @input="updateField('pi_title', $event)" required>
+                                            <input type="text" id="pi_title" name="pi_title" :value="selectedRecord.pi_title" @input="updateField('pi_title', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="pi_email" class="input-label required" id="pi_email-title">PI E-mail</label>
-                                            <input type="email" id="pi_email" name="pi_email" :value="selectedRecord.pi_email" @input="updateField('pi_email', $event)" required>
+                                            <input type="email" id="pi_email" name="pi_email" :value="selectedRecord.pi_email" @input="updateField('pi_email', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                     </div>
                                     <div class="row mt-4">
@@ -104,11 +136,11 @@
                                             <label class="radio-check-main-label required" id="pi_dept-title">Department</label>
                                         </div>
                                         <div class="col-md-12 mt-2">
-                                            <input type="radio" id="pi_dept_bae" name="pi_dept" value="Biological and Agricultural Engineering (BAE)" v-model="selectedRecord.pi_dept">
+                                            <input type="radio" id="pi_dept_bae" name="pi_dept" value="Biological and Agricultural Engineering (BAE)" v-model="selectedRecord.pi_dept" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                             <label class="radio-check-label" for="pi_dept_bae">Biological and Agricultural Engineering (BAE)</label>
-                                            <input type="radio" id="pi_dept_fst" name="pi_dept" value="Food Science and Technology (FST)" v-model="selectedRecord.pi_dept">
+                                            <input type="radio" id="pi_dept_fst" name="pi_dept" value="Food Science and Technology (FST)" v-model="selectedRecord.pi_dept" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                             <label class="radio-check-label" for="pi_dept_fst">Food Science and Technology (FST)</label>
-                                            <input type="radio" id="pi_dept_ven" name="pi_dept" value="Viticulture & Enology (VEN)" v-model="selectedRecord.pi_dept">
+                                            <input type="radio" id="pi_dept_ven" name="pi_dept" value="Viticulture & Enology (VEN)" v-model="selectedRecord.pi_dept" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                             <label class="radio-check-label" for="pi_dept_ven">Viticulture & Enology (VEN)</label>
                                         </div>
                                     </div>
@@ -118,21 +150,21 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <label for="gsr_fname" class="input-label required" id="gsr_fname-title">First Name</label>
-                                            <input type="text" id="gsr_fname" name="gsr_fname" :value="selectedRecord.gsr_fname" @input="updateField('gsr_fname', $event)" required>
+                                            <input type="text" id="gsr_fname" name="gsr_fname" :value="selectedRecord.gsr_fname" @input="updateField('gsr_fname', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="gsr_lname" class="input-label required" id="gsr_lname-title">Last Name</label>
-                                            <input type="text" id="gsr_lname" name="gsr_lname" :value="selectedRecord.gsr_lname" @input="updateField('gsr_lname', $event)" required>
+                                            <input type="text" id="gsr_lname" name="gsr_lname" :value="selectedRecord.gsr_lname" @input="updateField('gsr_lname', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                     </div>
                                     <div class="row mt-4">
                                         <div class="col-md-6">
                                             <label for="gsr_email" class="input-label required" id="gsr_email-title">E-mail</label>
-                                            <input type="email" id="gsr_email" name="gsr_email" :value="selectedRecord.gsr_email" @input="updateField('gsr_email', $event)" required>
+                                            <input type="email" id="gsr_email" name="gsr_email" :value="selectedRecord.gsr_email" @input="updateField('gsr_email', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label for="worksite" class="input-label" id="worksite-title">Worksite</label>
-                                            <input type="text" id="worksite" name="worksite" :value="selectedRecord.worksite" @input="updateField('worksite', $event)">
+                                            <input type="text" id="worksite" name="worksite" :value="selectedRecord.worksite" @input="updateField('worksite', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                         </div>
                                     </div>
                                 </fieldset>
@@ -144,52 +176,52 @@
                                                 <label class="radio-check-main-label required" id="pi_dept-title">Appointment Type</label>
                                             </div>
                                             <div>
-                                                <input type="radio" id="appt_type_new" name="appt_type" value="New" v-model="selectedRecord.appt_type">
+                                                <input type="radio" id="appt_type_new" name="appt_type" value="New" v-model="selectedRecord.appt_type" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class="radio-check-label" for="appt_type_new">New</label>
-                                                <input type="radio" id="appt_type_extension" name="appt_type" value="Extension" v-model="selectedRecord.appt_type">
+                                                <input type="radio" id="appt_type_extension" name="appt_type" value="Extension" v-model="selectedRecord.appt_type" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class="radio-check-label" for="appt_type_extension">Extension</label>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="fte_percentage" class="input-label required" id="fte_percentage-title">FTE Percentage</label>
-                                            <input type="text" id="fte_percentage" name="fte_percentage" :value="selectedRecord.fte_percentage" @input="updateField('fte_percentage', $event)" required>
+                                            <input type="text" id="fte_percentage" name="fte_percentage" :value="selectedRecord.fte_percentage" @input="updateField('fte_percentage', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="step" class="input-label required" id="step-title">Step</label>
-                                            <input type="text" id="step" name="step" :value="selectedRecord.step" @input="updateField('step', $event)" required>
+                                            <input type="text" id="step" name="step" :value="selectedRecord.step" @input="updateField('step', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                     </div>
                                     <div class="row mt-4">
                                         <div class="col-md-4">
                                             <label for="account" class="input-label required" id="account-title">Account</label>
-                                            <input type="text" id="account" name="account" :value="selectedRecord.account" @input="updateField('account', $event)" required>
+                                            <input type="text" id="account" name="account" :value="selectedRecord.account" @input="updateField('account', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="start_date" class="input-label required" id="start_date-title">Start Date</label>
-                                            <input type="date" id="start_date" name="start_date" :value="selectedRecord.start_date" @input="updateField('start_date', $event)" required>
+                                            <input type="date" id="start_date" name="start_date" :value="selectedRecord.start_date" @input="updateField('start_date', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="end_date" class="input-label required" id="end_date-title">End Date</label>
-                                            <input type="date" id="end_date" name="end_date" :value="selectedRecord.end_date" @input="updateField('end_date', $event)" required>
+                                            <input type="date" id="end_date" name="end_date" :value="selectedRecord.end_date" @input="updateField('end_date', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                     </div>
                                     <div class="row mt-4">
                                         <div class="col-md-4">
                                             <label for="grant_name" class="input-label required" id="grant_name-title">Research Grant Name</label>
-                                            <input type="text" id="grant_name" name="grant_name" :value="selectedRecord.grant_name" @input="updateField('grant_name', $event)" required>
+                                            <input type="text" id="grant_name" name="grant_name" :value="selectedRecord.grant_name" @input="updateField('grant_name', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                         <div class="col-md-4">
                                             <label for="fund_agency" class="input-label required" id="fund_agency-title">Funding Agency</label>
-                                            <input type="text" id="fund_agency" name="fund_agency" :value="selectedRecord.fund_agency" @input="updateField('fund_agency', $event)" required>
+                                            <input type="text" id="fund_agency" name="fund_agency" :value="selectedRecord.fund_agency" @input="updateField('fund_agency', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                         <div class="col-md-4">
                                             <div>
                                                 <label class="radio-check-main-label required" id="training_grant-title">Is this a training grant?</label>
                                             </div>
                                             <div>
-                                                <input type="radio" id="training_grant_yes" name="training_grant" value="Yes" v-model="selectedRecord.training_grant">
+                                                <input type="radio" id="training_grant_yes" name="training_grant" value="Yes" v-model="selectedRecord.training_grant" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class="radio-check-label" for="training_grant_yes">Yes</label>
-                                                <input type="radio" id="training_grant_no" name="training_grant" value="No" v-model="selectedRecord.training_grant">
+                                                <input type="radio" id="training_grant_no" name="training_grant" value="No" v-model="selectedRecord.training_grant" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class="radio-check-label" for="training_grant_no">No</label>
                                             </div>
                                         </div>
@@ -200,13 +232,13 @@
                                                 <label class="radio-check-main-label required" id="grad_group-title">Student Grad Group</label>
                                             </div>
                                             <div>
-                                                <input type="radio" id="grad_group_gbse" name="grad_group" value="GBSE" v-model="selectedRecord.grad_group">
+                                                <input type="radio" id="grad_group_gbse" name="grad_group" value="GBSE" v-model="selectedRecord.grad_group" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class="radio-check-label" for="grad_group_gbse">GBSE</label>
-                                                <input type="radio" id="grad_group_gfsc" name="grad_group" value="GFSC" v-model="selectedRecord.grad_group">
+                                                <input type="radio" id="grad_group_gfsc" name="grad_group" value="GFSC" v-model="selectedRecord.grad_group" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class="radio-check-label" for="grad_group_gfsc">GFSC</label>
-                                                <input type="radio" id="grad_group_gven" name="grad_group" value="GVEN" v-model="selectedRecord.grad_group">
+                                                <input type="radio" id="grad_group_gven" name="grad_group" value="GVEN" v-model="selectedRecord.grad_group" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class="radio-check-label" for="grad_group_gven">GVEN</label>
-                                                <input type="radio" id="grad_group_other" name="grad_group" value="Other" v-model="selectedRecord.grad_group">
+                                                <input type="radio" id="grad_group_other" name="grad_group" value="Other" v-model="selectedRecord.grad_group" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class="radio-check-label" for="grad_group_other">Other</label>
                                             </div>
                                             <div>
@@ -221,24 +253,24 @@
                                                 </label>
                                             </div>
                                             <div>
-                                                <input type="checkbox" id="additional_funding_none" name="additional_funding[]" value="None" v-model="selectedFunding">
+                                                <input type="checkbox" id="additional_funding_none" name="additional_funding[]" value="None" v-model="selectedFunding" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class='radio-check-label' for='additional_funding_none'>None</label>
-                                                <input type="checkbox" id="additional_funding_ext_fel" name="additional_funding[]" value="External Fellowship" v-model="selectedFunding">
+                                                <input type="checkbox" id="additional_funding_ext_fel" name="additional_funding[]" value="External Fellowship" v-model="selectedFunding" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class='radio-check-label' for='additional_funding_ext_fel'>External Fellowship</label>
-                                                <input type="checkbox" id="additional_funding_int_fel" name="additional_funding[]" value="Internal Fellowship" v-model="selectedFunding">
+                                                <input type="checkbox" id="additional_funding_int_fel" name="additional_funding[]" value="Internal Fellowship" v-model="selectedFunding" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class='radio-check-label' for='additional_funding_int_fel'>Internal Fellowship</label>
-                                                <input type="checkbox" id="additional_funding_taship" name="additional_funding[]" value="TAship" v-model="selectedFunding">
+                                                <input type="checkbox" id="additional_funding_taship" name="additional_funding[]" value="TAship" v-model="selectedFunding" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class='radio-check-label' for='additional_funding_taship'>TAship</label>
-                                                <input type="checkbox" id="additional_funding_other" name="additional_funding[]" value="Other" v-model="otherAdditionalFunding":checked="otherAdditionalFunding">
+                                                <input type="checkbox" id="additional_funding_other" name="additional_funding[]" value="Other" v-model="otherAdditionalFunding":checked="otherAdditionalFunding" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                                 <label class='radio-check-label' for='additional_funding_other'>Other</label>
                                             </div>
                                             <div v-if="otherAdditionalFunding" class="mt-2">
-                                                <input v-if="otherAdditionalFunding" type="text" id="additional_funding_other_text" name="additional_funding_other_text" :value="otherAdditionalFundingText">
+                                                <input v-if="otherAdditionalFunding" type="text" id="additional_funding_other_text" name="additional_funding_other_text" :value="otherAdditionalFundingText" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                             </div>
                                         </div>
                                         <div class="col-md-4" v-if="selectedFunding.includes('TAship')">
                                             <label for="ta_percentage" class="input-label" id="ta_percentage-title">TAShip Percentage</label>
-                                            <input v-if="selectedFunding.includes('TAship')" type="text" id="ta_percentage" name="ta_percentage" :value="selectedRecord.ta_percentage" @input="updateField('ta_percentage', $event)">
+                                            <input v-if="selectedFunding.includes('TAship')" type="text" id="ta_percentage" name="ta_percentage" :value="selectedRecord.ta_percentage" @input="updateField('ta_percentage', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                         </div>
                                     </div>
                                 </fieldset>
@@ -267,9 +299,9 @@
                                     <legend  class="w-auto">Admin Use</legend>
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <input type="checkbox" id="approved_am" name="approved_am" value="1" v-model="approvedAM" :checked="approvedAM">
+                                            <input type="checkbox" id="approved_am" name="approved_am" value="1" v-model="approvedAM" :checked="approvedAM" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                             <label class='radio-check-label' for='approved_am'>Approved by Account Management Team</label>
-                                            <input type="checkbox" id="approved_advising" name="approved_advising" value="1" v-model="approvedAdvising" :checked="approvedAdvising">
+                                            <input type="checkbox" id="approved_advising" name="approved_advising" value="1" v-model="approvedAdvising" :checked="approvedAdvising" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                             <label class='radio-check-label' for='approved_advising'>Approved by Advising Section</label>
                                         </div>
                                     </div>
@@ -279,8 +311,8 @@
                                 <input type="hidden" name="fullname" id="fullname" :value="selectedRecord.gsr_fname+' '+selectedRecord.gsr_lname" />
                                 <input type="hidden" name="sid" id="sid" :value="selectedRecord.sid" />
                                 <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" @click="unsetSelectedRecord()">Close</button>
-                                <button v-if="!viewermode" type="submit" class="btn btn-primary btn-sm" name="save-app" :disabled="!approvedAM && !approvedAdvising">Save</button>
-                                <button v-if="!viewermode" type="submit" class="btn btn-primary btn-sm" name="docusign-app" :disabled="!approvedAM || !approvedAdvising">Save & Initiate DocuSign</button>
+                                <button v-if="!viewermode &&  selectedRecord.status !== 'completed' && selectedRecord.status !== 'rejected'" type="submit" class="btn btn-primary btn-sm" name="save-app" :disabled="!approvedAM && !approvedAdvising">Save</button>
+                                <button v-if="!viewermode &&  selectedRecord.status !== 'completed' && selectedRecord.status !== 'rejected'" type="submit" class="btn btn-primary btn-sm" name="docusign-app" :disabled="!approvedAM || !approvedAdvising">Save & Initiate DocuSign</button>
                             </div>
                         </form>
                     </div>
