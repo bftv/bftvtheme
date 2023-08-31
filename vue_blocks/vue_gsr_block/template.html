@@ -211,8 +211,8 @@
                                             <input type="text" id="grant_name" name="grant_name" :value="selectedRecord.grant_name" @input="updateField('grant_name', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                         <div class="col-md-4">
-                                            <label for="fund_agency" class="input-label required" id="fund_agency-title">Funding Agency</label>
-                                            <input type="text" id="fund_agency" name="fund_agency" :value="selectedRecord.fund_agency" @input="updateField('fund_agency', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
+                                            <label for="fund_agency" class="input-label" id="fund_agency-title">Funding Agency</label>
+                                            <input type="text" id="fund_agency" name="fund_agency" :value="selectedRecord.fund_agency" @input="updateField('fund_agency', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                         </div>
                                         <div class="col-md-4">
                                             <div>
@@ -311,8 +311,8 @@
                                 <input type="hidden" name="fullname" id="fullname" :value="selectedRecord.gsr_fname+' '+selectedRecord.gsr_lname" />
                                 <input type="hidden" name="sid" id="sid" :value="selectedRecord.sid" />
                                 <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" @click="unsetSelectedRecord()">Close</button>
-                                <button v-if="!viewermode &&  selectedRecord.status !== 'completed' && selectedRecord.status !== 'rejected'" type="submit" class="btn btn-primary btn-sm" name="save-app" :disabled="!approvedAM && !approvedAdvising">Save</button>
-                                <button v-if="!viewermode &&  selectedRecord.status !== 'completed' && selectedRecord.status !== 'rejected'" type="submit" class="btn btn-primary btn-sm" name="docusign-app" :disabled="!approvedAM || !approvedAdvising">Save & Initiate DocuSign</button>
+                                <button v-if="!viewermode &&  selectedRecord.status !== 'pending' &&  selectedRecord.status !== 'completed' && selectedRecord.status !== 'rejected'" type="submit" class="btn btn-primary btn-sm" name="save-app" :disabled="!approvedAM && !approvedAdvising">Save</button>
+                                <button v-if="!viewermode &&  selectedRecord.status !== 'pending' &&  selectedRecord.status !== 'completed' && selectedRecord.status !== 'rejected'" type="submit" class="btn btn-primary btn-sm" name="docusign-app" :disabled="!approvedAM || !approvedAdvising">Save & Initiate DocuSign</button>
                             </div>
                         </form>
                     </div>
