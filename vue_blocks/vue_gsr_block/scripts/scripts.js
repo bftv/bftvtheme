@@ -40,6 +40,8 @@ var navmixin = {
             token: drupalSettings.assignments.token,
             curlCode: '',
             curlRole: '',
+            authenticated: '',
+            authText: '',
             accesslevel1: false,
             accesslevel2: false,
             viewermode: false,
@@ -57,7 +59,9 @@ var navmixin = {
         }).then(response => {
             this.curlCode = response.data.response
             if(this.curlCode == 1 || this.curlCode == 3){
-                this.curlRole = response.data.userrole
+                this.curlRole = response.data.userrole,
+                this.authenticated = response.data.authenticated,
+                this.check_auth()
                 if(this.curlRole == 'admin'){
                     this.accesslevel1 = true;
                     this.accesslevel2 = true;
@@ -74,6 +78,15 @@ var navmixin = {
         }).catch(error => {
             console.log(error)
         });
+    },
+    methods: {
+        check_auth(){
+            if(this.authenticated){
+                this.authText = 'Authenticated'
+            } else {
+                this.authText = 'not authenticated'
+            }
+        }
     }
 }
 var mixin = {
@@ -331,8 +344,9 @@ var mixin = {
             ac = document.getElementById('account').value;
             sd = document.getElementById('start_date').value;
             ed = document.getElementById('end_date').value;
-            gn = document.getElementById('grant_name').value;
-            fa = document.getElementById('fund_agency').value;
+            //gn = document.getElementById('grant_name').value;
+            //fa = document.getElementById('fund_agency').value;
+            jd = document.getElementById('job_description').value;
             tg = document.querySelector('input[name="training_grant"]:checked').value;
             if(document.querySelector('input[name="grad_group"]:checked').value == 'Other'){
                 sgg = document.getElementById('grad_group_other_text').value;
@@ -381,7 +395,7 @@ var mixin = {
                 mode: action,
                 sid: sid, pi_fname: pfn, pi_lname: pln, pi_title: pt, pi_email: pe, pi_dept: pd,
                 gsr_fname: gfn, gsr_lname: gln, gsr_fullname: apfname, gsr_email: ge, worksite: gw,
-                appt_type: apt, fte_percentage: fte, step: st, account: ac, start_date: sd, end_date: ed, grant_name: gn, fund_agency: fa, training_grant: tg, grad_group: sgg,
+                appt_type: apt, fte_percentage: fte, step: st, account: ac, start_date: sd, end_date: ed, job_description: jd, training_grant: tg, grad_group: sgg,
                 additional_funding: selectedadf, ta_percentage: tap, approved_am: apam, approved_ad: apad,
                 headers: {
                     'Content-Type': 'application/json'

@@ -18,6 +18,7 @@
             </div>
             <span class="navbar-text user-info">
                 <span class="font-italic user-data-name">{{ username }} </span><span class="user-data-role font-italic secondary-color"> ({{ curlRole }})</span>
+                <span class="authentication">{{ authText }}</span>
             </span>
         </div>
     </nav>
@@ -187,7 +188,7 @@
                                             <input type="text" id="fte_percentage" name="fte_percentage" :value="selectedRecord.fte_percentage" @input="updateField('fte_percentage', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                         <div class="col-md-4">
-                                            <label for="step" class="input-label required" id="step-title">Step</label>
+                                            <label for="step" class="input-label required" id="step-title">Salary Point</label>
                                             <input type="text" id="step" name="step" :value="selectedRecord.step" @input="updateField('step', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                                         </div>
                                     </div>
@@ -206,15 +207,13 @@
                                         </div>
                                     </div>
                                     <div class="row mt-4">
-                                        <div class="col-md-4">
-                                            <label for="grant_name" class="input-label required" id="grant_name-title">Research Grant Name</label>
-                                            <input type="text" id="grant_name" name="grant_name" :value="selectedRecord.grant_name" @input="updateField('grant_name', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
+                                        <div class="col-md-12">
+                                            <label for="job_description" class="input-label required" id="job_description-title">Job Description</label>
+                                            <textarea id="job_description" name="job_description" rows="7" :value="selectedRecord.job_description" @input="updateField('job_description', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required></textarea>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label for="fund_agency" class="input-label" id="fund_agency-title">Funding Agency</label>
-                                            <input type="text" id="fund_agency" name="fund_agency" :value="selectedRecord.fund_agency" @input="updateField('fund_agency', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
-                                        </div>
-                                        <div class="col-md-4">
+                                    </div>
+                                    <div class="row mt-4">
+                                        <div class="col-md-6">
                                             <div>
                                                 <label class="radio-check-main-label required" id="training_grant-title">Is this a training grant?</label>
                                             </div>
@@ -225,9 +224,7 @@
                                                 <label class="radio-check-label" for="training_grant_no">No</label>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row mt-4">
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <div>
                                                 <label class="radio-check-main-label required" id="grad_group-title">Student Grad Group</label>
                                             </div>

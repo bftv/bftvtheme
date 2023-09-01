@@ -138,6 +138,12 @@ svg.color-rec-svg rect.red {
 .bg-danger {
 	background-color: #C10230;
 }
+.authentication {
+    display: block;
+    font-size: small;
+    padding-top: 3px;
+    color: #F18A00;/*3DAE2B green*/
+}
 
 /*-----Headings-----*/
 h3:first-child {
