@@ -271,6 +271,19 @@
                                         </div>
                                     </div>
                                 </fieldset>
+                                <fieldset class="form-group mt-2">
+                                    <legend  class="w-auto">Advising Use Only</legend>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="salary" class="input-label required" id="salary-title">Proposed Salary</label>
+                                            <input type="text" id="salary" name="salary" :value="selectedRecord.salary" @input="updateField('salary', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected' || selectedRecord.status === 'pi_approved'" :required="selectedRecord.status === 'reviewed'">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="gsr_address" class="input-label" id="gsr_address-title">GSR Address</label>
+                                            <textarea id="gsr_address" name="gsr_address" rows="3" :value="selectedRecord.gsr_address" @input="updateField('gsr_address', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected' || selectedRecord.status === 'pi_approved'"></textarea>
+                                        </div>
+                                    </div>
+                                </fieldset>
                                 <fieldset class="form-group mt-2" v-if="selectedRecord.comments">
                                     <legend  class="w-auto">User Comment</legend>
                                     <div class="row">
@@ -300,6 +313,8 @@
                                             <label class='radio-check-label' for='approved_am'>Approved by Account Management Team</label>
                                             <input type="checkbox" id="approved_advising" name="approved_advising" value="1" v-model="approvedAdvising" :checked="approvedAdvising" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                                             <label class='radio-check-label' for='approved_advising'>Approved by Advising Section</label>
+                                            <input type="checkbox" id="approved_pi" name="approved_pi" value="1" v-model="approvedPI" :checked="approvedPI" :disabled="selectedRecord.status !== 'reviewed' || selectedRecord.sent_preview !== '1'">
+                                            <label class='radio-check-label' for='approved_pi'>PI Approved</label>
                                         </div>
                                     </div>
                                 </fieldset>
@@ -309,7 +324,9 @@
                                 <input type="hidden" name="sid" id="sid" :value="selectedRecord.sid" />
                                 <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" @click="unsetSelectedRecord()">Close</button>
                                 <button v-if="!viewermode &&  selectedRecord.status !== 'pending' &&  selectedRecord.status !== 'completed' && selectedRecord.status !== 'rejected'" type="submit" class="btn btn-primary btn-sm" name="save-app" :disabled="!approvedAM && !approvedAdvising">Save</button>
-                                <button v-if="!viewermode &&  selectedRecord.status !== 'pending' &&  selectedRecord.status !== 'completed' && selectedRecord.status !== 'rejected'" type="submit" class="btn btn-primary btn-sm" name="docusign-app" :disabled="!approvedAM || !approvedAdvising">Save & Initiate DocuSign</button>
+                                <a v-if="!viewermode &&  selectedRecord.status === 'reviewed' && selectedRecord.sent_preview === '0' && selectedRecord.orgsalary !== null && selectedRecord.orgsalary !== ''" class="btn btn-primary btn-sm" :href="'https://web.bftv.ucdavis.edu/gsr/app-preview.php?sid='+selectedRecord.sid+'&pi=false'" target="_blank">Preview Offer Letter</a>
+                                <button v-if="!viewermode &&  selectedRecord.status === 'reviewed' && selectedRecord.sent_preview === '0' && selectedRecord.orgsalary !== null && selectedRecord.orgsalary !== ''" type="submit" class="btn btn-primary btn-sm" name="send-pi-app" >Send Offer Letter Preview to PI</button>
+                                <button v-if="!viewermode &&  (selectedRecord.status === 'reviewed' || selectedRecord.status === 'pi_approved')" type="submit" class="btn btn-primary btn-sm" name="docusign-app" :disabled="!approvedPI">Save & Initiate DocuSign</button>
                             </div>
                         </form>
                     </div>

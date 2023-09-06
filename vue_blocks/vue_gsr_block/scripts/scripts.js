@@ -111,6 +111,7 @@ var mixin = {
             otherAdditionalFundingText: '',
             approvedAM: 0,
             approvedAdvising: 0,
+            approvedPI: 0,
             loading: true
         }
     },
@@ -199,7 +200,7 @@ var mixin = {
                 );
             } else {
                 this.listData = Object.fromEntries(
-                    Object.entries(this.listData).filter(([_, obj]) => obj[key] === value || obj.status === "reviewed")
+                    Object.entries(this.listData).filter(([_, obj]) => obj[key] === value || obj.status === "reviewed" || obj.status === "pi_approved")
                 );
             }
         },
@@ -228,6 +229,9 @@ var mixin = {
             if(this.selectedRecord.approved_advising){
                 this.approvedAdvising = 1
             }
+            if(this.selectedRecord.status == 'pi_approved'){
+                this.approvedPI = 1
+            }
         },
         unsetSelectedRecord: function(){
             this.selectedFunding = [];
@@ -236,6 +240,7 @@ var mixin = {
             this.otherAdditionalFundingText = '';
             this.approvedAM = 0;
             this.approvedAdvising = 0;
+            this.approvedPI = 0;
         },
         updateField(fieldName, event) {
             this.selectedRecord[fieldName] = event.target.value;
@@ -373,6 +378,8 @@ var mixin = {
             apam = document.getElementById('approved_am').checked;
             apad = document.getElementById('approved_advising').checked;
             apfname = document.getElementById('fullname').value;
+            ps = document.getElementById('salary').value;
+            gsradd = document.getElementById('gsr_address').value;
             if(apam == true){
                 apam = 1;
             } else {
@@ -385,6 +392,8 @@ var mixin = {
             }
             if(e.submitter.name == 'docusign-app'){
                 action = 'docusign'
+            } else if(e.submitter.name == 'send-pi-app'){
+                action = 'send_preview'
             } else {
                 action = 'save'
             }
@@ -396,7 +405,7 @@ var mixin = {
                 sid: sid, pi_fname: pfn, pi_lname: pln, pi_title: pt, pi_email: pe, pi_dept: pd,
                 gsr_fname: gfn, gsr_lname: gln, gsr_fullname: apfname, gsr_email: ge, worksite: gw,
                 appt_type: apt, fte_percentage: fte, step: st, account: ac, start_date: sd, end_date: ed, job_description: jd, training_grant: tg, grad_group: sgg,
-                additional_funding: selectedadf, ta_percentage: tap, approved_am: apam, approved_ad: apad,
+                additional_funding: selectedadf, ta_percentage: tap, approved_am: apam, approved_ad: apad, salary: ps, gsr_address: gsradd,
                 headers: {
                     'Content-Type': 'application/json'
                 }
