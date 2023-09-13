@@ -1,4 +1,5 @@
 <?php
+use Drupal\Core\Cache\CacheableMetadata;
 
 /**
  * @file
@@ -47,7 +48,8 @@ if($variables['elements']['#id'] == 'assignmentsblock'){
 /**
  * Implements hook_preprocess_node() for node.html.twig.
  */
-function sf1subtheme_preprocess_node(array &$vars) {
+function sf1subtheme_preprocess_node(array &$vars) {//var_dump($vars['node']);
+
  	$contentType = $vars['node']->getType();
 	if($contentType == 'people'){
 		$personUUID = $vars['node']->uuid();
@@ -71,20 +73,20 @@ function sf1subtheme_preprocess_node(array &$vars) {
 		];
 	}
 
-	$node = \Drupal::routeMatch()->getParameter('node');
+	//$node = \Drupal::routeMatch()->getParameter('node');
+	$current_user = \Drupal::currentUser();
+	$node = $vars['node']->id();
 	if ($node) { // check we have a node object.
 		// 6198/6356 = dev assignment / live assignment
 		// 6381/6421 = dev gsr / live gsr
-		if ($node->id() == 6198 || $node->id() == 6356 || $node->id() == 6381 || $node->id() == 6421) {echo "true!<br/>";
-			$vars['#attached']['drupalSettings']['assignments'] = ''; var_dump($vars['#attached']['drupalSettings']['assignments']);
-			$uid = '';
-			$cas = '';
-			$email = '';
-			$role = '';
-			$token = '';
-			$uid = \Drupal::currentUser()->id();echo $uid." ";
-			$role = \Drupal::currentUser()->getRoles();
-			$cas = \Drupal::service('cas.user_manager')->getCasUsernameForAccount($uid);echo $cas."<br/>";
+		if ($node == 6198 || $node == 6356 || $node == 6381 || $node == 6421) {
+			$cache_metadata = new CacheableMetadata();
+			$cache_metadata->addCacheContexts(['user']);
+			$vars['#cache']['contexts'] = $cache_metadata->getCacheContexts();
+			$uid = $current_user->id();
+			$role = $current_user->getRoles();
+			$cas = \Drupal::service('cas.user_manager')->getCasUsernameForAccount($uid);
+			//$cas = $vars['#cache']['tags']['user'];echo $cas."<br/>";
 
 			if($cas){
 				//$token = Drupal\Component\Utility\Crypt::hashBase64(\Drupal::service('session')->getId());
@@ -113,8 +115,8 @@ function sf1subtheme_preprocess_node(array &$vars) {
 				'role' => $role,
 				'token' => $token
 			];
-			var_dump($vars['#attached']['drupalSettings']['assignments']);
-		} else { echo "false!"; }
+			//var_dump($vars['#attached']['drupalSettings']['assignments']);
+		}
 	}
 }
 
