@@ -76,14 +76,15 @@ function sf1subtheme_preprocess_node(array &$variables) {
 		// 6198/6356 = dev assignment / live assignment
 		// 6381/6421 = dev gsr / live gsr
 		if ($node->id() == 6198 || $node->id() == 6356 || $node->id() == 6381 || $node->id() == 6421) {
+			$variables['#attached']['drupalSettings']['assignments'] = ''; var_dump($variables['#attached']['drupalSettings']['assignments']);
 			$uid = '';
 			$cas = '';
 			$email = '';
 			$role = '';
 			$token = '';
-			$uid = \Drupal::currentUser()->id();
+			$uid = \Drupal::currentUser()->id();echo $uid." ";
 			$role = \Drupal::currentUser()->getRoles();
-			$cas = \Drupal::service('cas.user_manager')->getCasUsernameForAccount($uid);
+			$cas = \Drupal::service('cas.user_manager')->getCasUsernameForAccount($uid);echo $cas."<br/>";
 
 			if($cas){
 				//$token = Drupal\Component\Utility\Crypt::hashBase64(\Drupal::service('session')->getId());
@@ -112,7 +113,7 @@ function sf1subtheme_preprocess_node(array &$variables) {
 				'role' => $role,
 				'token' => $token
 			];
-			//var_dump($variables['#attached']['drupalSettings']['assignments']);
+			var_dump($variables['#attached']['drupalSettings']['assignments']);
 		}
 	}
 }
