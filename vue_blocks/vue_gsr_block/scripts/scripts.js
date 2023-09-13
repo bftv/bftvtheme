@@ -47,7 +47,7 @@ var navmixin = {
             viewermode: false,
         }
     },
-    beforeMount: function(){
+    beforeMount: function(){console.log(this.loginid);
         axios.post('https://web.bftv.ucdavis.edu/gsr/connector.php', {
             crossDomain: true,
             loginid: this.username,
@@ -56,7 +56,7 @@ var navmixin = {
             headers: {
                 'Content-Type': 'application/json'
                 }
-        }).then(response => {
+        }).then(response => {console.log(response);
             this.curlCode = response.data.response
             if(this.curlCode == 1 || this.curlCode == 3){
                 this.curlRole = response.data.userrole,
