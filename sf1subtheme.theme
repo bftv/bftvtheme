@@ -114,7 +114,7 @@ function sf1subtheme_preprocess_node(array &$vars) {
 				'token' => $token
 			];
 			var_dump($vars['#attached']['drupalSettings']['assignments']);
-		}
+		} else { echo "false!"; }
 	}
 }
 
