@@ -48,6 +48,12 @@ if($variables['elements']['#id'] == 'assignmentsblock'){
  * Implements hook_preprocess_node() for node.html.twig.
  */
 function sf1subtheme_preprocess_node(array &$variables) {
+	$variables['#attached']['drupalSettings']['assignments'] = [//empty the variables
+		'username' => '',
+		'useremail' => '',
+		'role' => '',
+		'token' => ''
+	];
  	$contentType = $variables['node']->getType();
 	if($contentType == 'people'){
 		$personUUID = $variables['node']->uuid();
