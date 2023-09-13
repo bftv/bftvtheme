@@ -47,7 +47,7 @@ var navmixin = {
             viewermode: false,
         }
     },
-    beforeMount: function(){console.log(this.loginid);
+    beforeMount: function(){console.log(this.username);
         axios.post('https://web.bftv.ucdavis.edu/gsr/connector.php', {
             crossDomain: true,
             loginid: this.username,
