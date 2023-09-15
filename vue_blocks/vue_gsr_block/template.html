@@ -32,7 +32,7 @@
                 <span class="sr-only">Loading...</span>
             </div>
         </div>
-        <div>
+        <div v-if="curlRole !== 'anonymous'">
             <div v-if="screenmsg" class="mt-5">
                 <div :class="'alert alert--'+screenmsgtype">
                     <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="code == 401">Please <a href="/assignments">click here</a> to refresh the page.</span><span v-if="screenmsgtype == 'error'">If the problem persists, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a>.</span>
@@ -62,7 +62,7 @@
                                         <td><a :href="'mailto:'+applicant.gsr_email">{{ applicant.gsr_fname }} {{ applicant.gsr_lname }}</a></td>
                                         <td><a :href="'mailto:'+applicant.pi_email">{{ applicant.pi_fname }} {{ applicant.pi_lname }}</a><br/><span class="text-muted fs-6">{{ applicant.pi_dept }}</span></td>
                                         <td>{{ convertDateFormat(applicant.start_date, 'date') }} - {{ convertDateFormat(applicant.end_date, 'date') }}</td>
-                                        <td><a href="" @click="selectRecord(applicant)" data-bs-toggle="modal" data-bs-target="#modal-applicant"><i class="fa-solid fa-pen-to-square"></i></a><span v-if="applicant.status === 'new' || applicant.status === 'reviewed'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)"data-bs-target="#modalRejectApp"><i class="fa-solid fa-circle-xmark" title="Reject this application."></i></a></span></td>
+                                        <td><a href="" @click="selectRecord(applicant)" data-bs-toggle="modal" data-bs-target="#modal-applicant"><i class="fa-solid fa-pen-to-square"></i></a><span v-if="statusChecker(applicant.status) === 'rejectable'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalRejectApp"><i class="fa-solid fa-circle-xmark" title="Reject this application."></i></a></span><span v-if="statusChecker(applicant.status) === 'voidable'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalVoidApp"><i class="fa-solid fa-ban" title="Cancel DocuSign for this application."></i></a></span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -87,6 +87,9 @@
                                     <div class="col-md-12 mt-3">
                                         <input type="text" id="rejectreason" name="rejectreason" placeholder="Optional Reason" />
                                     </div>
+                                    <div class="col-md-12">
+                                        <p class="text-muted small">The PI or the Submitter will not be notified.</p>
+                                    </div>
                                 </div>
                             </div>
                             <!-- Modal footer -->
@@ -95,6 +98,41 @@
                                 <button type="submit" class="btn btn-primary btn-sm">Yes</button>
                                 <input type="hidden" name="mode" value="rejectapp" />
                                 <input type="hidden" name="sid" id="modalRejectAppsid" :value="selectedRecord.sid" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--Void App Modal-->
+            <div class="modal fade" id="modalVoidApp">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <!-- Modal body -->
+                        <form method="post" @submit.prevent="voidApp">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <p>Are you sure you want to void the application# <strong><span id="modalVoidAppNO">{{ selectedRecord.sid }}</span></strong> for <strong>{{ selectedRecord.gsr_fname }} {{ selectedRecord.gsr_lname }}</strong>?</p>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <input type="checkbox" id="restart_app" name="restart_app" value="Restart" />
+                                        <label class="radio-check-label" for="restart_app">Restart this application</label>
+                                    </div>
+                                    <div class="col-md-12 mt-3">
+                                        <input type="text" id="voidreason" name="voidreason" placeholder="Reason (required)" required/>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <p class="text-muted small">The PI or the Submitter will not be notified.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal footer -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" @click="unsetSelectedRecord()">No</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Yes</button>
+                                <input type="hidden" name="mode" value="voidapp" />
+                                <input type="hidden" name="sid" id="modalVoidAppsid" :value="selectedRecord.sid" />
+                                <input type="hidden" name="envid" id="envid" :value="selectedRecord.env_id" />
                             </div>
                         </form>
                     </div>
@@ -331,6 +369,11 @@
                         </form>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div v-else class="mt-5">
+            <div class="alert alert--error">
+                <i class="far fa-times-circle fa-2x alert--error-icon"></i> You are not authorized to view this page.
             </div>
         </div>
     </div>

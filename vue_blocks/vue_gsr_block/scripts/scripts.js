@@ -47,7 +47,7 @@ var navmixin = {
             viewermode: false,
         }
     },
-    beforeMount: function(){console.log(this.username);
+    beforeMount: function(){//console.log(this.username);
         axios.post('https://web.bftv.ucdavis.edu/gsr/connector.php', {
             crossDomain: true,
             loginid: this.username,
@@ -56,7 +56,7 @@ var navmixin = {
             headers: {
                 'Content-Type': 'application/json'
                 }
-        }).then(response => {console.log(response);
+        }).then(response => {//console.log(response);
             this.curlCode = response.data.response
             if(this.curlCode == 1 || this.curlCode == 3){
                 this.curlRole = response.data.userrole,
@@ -69,7 +69,7 @@ var navmixin = {
                 } else if(this.curlRole == 'editor'){
                     this.accesslevel1 = true;
                     this.viewermode = false;
-                } else {
+                } else if(this.curlRole == 'viewer'){
                     this.viewermode = true;
                 }
             } else {
@@ -248,6 +248,15 @@ var mixin = {
         loader: function(){
             this.loading = true;
         },
+        statusChecker: function(status){
+            if(status == 'new' || status == 'reviewed' || status == 'pi_approved'){
+                return 'rejectable';
+            } else if(status == 'pending' || status == 'completed'){
+                return 'voidable';
+            } else if(status == 'rejected'){
+                return 'rejected';
+            }
+        },
         addUser(e) {
             e.preventDefault();
             this.loading = true;
@@ -415,7 +424,7 @@ var mixin = {
                 this.screenmsgicon = this.successicon,
                 this.listData = response.data.updated_data.data,
                 this.filterObjectByKeyValue("status", "new")
-            }).catch(error => {console.log(error);
+            }).catch(error => {//console.log(error);
                 this.screenmsg = error.response.data.message,
                 this.screenmsgtype = "error",
                 this.screenmsgicon = this.erroricon,
@@ -430,7 +439,7 @@ var mixin = {
             e.preventDefault();
             this.loading = true;
             modal = bootstrap.Modal.getInstance(document.getElementById('modalRejectApp'));
-            sid = document.getElementById('sid').value;
+            sid = document.getElementById('modalRejectAppsid').value;
             reason = document.getElementById('rejectreason').value;
             axios.post('https://web.bftv.ucdavis.edu/gsr/data-reject.php', {
                 crossDomain: true,
@@ -440,7 +449,48 @@ var mixin = {
                 reason: reason,
                 headers: {
                     'Content-Type': 'application/json'
-                  }
+                }
+            }).then(response => {
+                this.screenmsg = response.data.message,
+                this.screenmsgtype = "success",
+                this.screenmsgicon = this.successicon,
+                this.listData = response.data.updated_data.data,
+                this.filterObjectByKeyValue("status", "new")
+            }).catch(error => {
+                this.screenmsg = error.response.data.message,
+                this.screenmsgtype = "error",
+                this.screenmsgicon = this.erroricon,
+                this.code = error.response.data.status
+            }).finally(() => {
+                modal.hide();
+                this.loading = false;
+            });
+            window.scrollTo(0, 400);
+        },
+        voidApp(e) {
+            e.preventDefault();
+            this.loading = true;
+            modal = bootstrap.Modal.getInstance(document.getElementById('modalVoidApp'));
+            sid = document.getElementById('modalVoidAppsid').value;
+            reason = document.getElementById('voidreason').value;
+            envid = document.getElementById('envid').value;
+            restart = document.getElementById('restart_app').checked;
+            if(restart == true){
+                restart = 1;
+            } else {
+                restart = 0;
+            }
+            axios.post('https://web.bftv.ucdavis.edu/gsr/data-void.php', {
+                crossDomain: true,
+                myid: this.username,
+                token: this.token,
+                sid: sid,
+                reason: reason,
+                envid: envid,
+                restart: restart,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             }).then(response => {
                 this.screenmsg = response.data.message,
                 this.screenmsgtype = "success",
