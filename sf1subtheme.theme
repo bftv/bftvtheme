@@ -79,7 +79,8 @@ function sf1subtheme_preprocess_node(array &$vars) {//var_dump($vars['node']);
 	if ($node) { // check we have a node object.
 		// 6198/6356 = dev assignment / live assignment
 		// 6381/6421 = dev gsr / live gsr
-		if ($node == 6198 || $node == 6356 || $node == 6381 || $node == 6421) {
+		// 6382/6471 = dev reporting / live reporting
+		if ($node == 6198 || $node == 6356 || $node == 6381 || $node == 6421 || $node == 6382 || $node == 6471) {
 			$cache_metadata = new CacheableMetadata();
 			$cache_metadata->addCacheContexts(['user']);
 			$vars['#cache']['contexts'] = $cache_metadata->getCacheContexts();
