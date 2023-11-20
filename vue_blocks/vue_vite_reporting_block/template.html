@@ -1,0 +1,136 @@
+<div id="reporting-block" class="reporting-main">
+    <the-navigation></the-navigation>
+    <router-view></router-view>
+</div>
+<template id="nav-template">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item"><router-link :to="{name: 'adgmembers'}" class="nav-link"  @click="loader">ADGroup Members</router-link></li>
+                    <li v-if="accesslevel1r" class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="nav-mgmt" data-bs-toggle="dropdown">Management</a>
+                        <ul class="dropdown-menu" aria-labelledby="nav-mgmt">
+                            <li v-if="accesslevel1r"><router-link :to="{name: 'users'}" class="dropdown-item" @click="loader">Users</router-link></li>
+                            <li v-if="accesslevel1"><router-link :to="{name: 'departments'}" class="dropdown-item" @click="loader">Departments</router-link></li>
+                            <li v-if="accesslevel1"><router-link :to="{name: 'adgroups'}" class="dropdown-item" @click="loader">AD Groups</router-link></li>
+                            <li v-if="accesslevel1"><router-link :to="{name: 'import'}" class="dropdown-item" @click="loader">Import</router-link></li>
+                            <li v-if="accesslevel1"><router-link :to="{name: 'sync'}" class="dropdown-item" @click="loader">Sync</router-link></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <span class="navbar-text user-info">
+                <span><a href="#" class="user-data-gear" data-bs-toggle="modal" data-bs-target="#modal-edit-self" title="Edit Your Settings"><i class="fa-solid fa-gear"></i></a> </span>
+                <span class="font-italic user-data-name">{{ curlName }} </span><span class="user-data-role font-italic secondary-color"> ({{ roleAnalyser(curlRole) }})</span>
+                <span v-if="!viewmode" class="authentication">{{ authText }}</span>
+            </span>
+        </div>
+    </nav>
+    <div v-if="accesslevel0r" class="modal fade" id="modal-edit-self" tabindex="-1" aria-labelledby="modal-edit-self-label" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title fs-5" id="modal-edit-self-label">Update Your Settings</h3>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" @submit.prevent="updateSelf">
+              <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <fieldset class="form-group">
+                            <legend>Your Information</legend>
+                            <div class="row m-2">
+                                <div class="col-md-4 fw-bold text-end">
+                                    Name
+                                </div>
+                                <div class="col-md-6">
+                                    <span>{{ curlName }}</span>
+                                </div>
+                            </div>
+                            <div class="row m-2">
+                                <div class="col-md-4 fw-bold text-end">
+                                    E-mail
+                                </div>
+                                <div class="col-md-6">
+                                    <span>{{ email }}</span>
+                                </div>
+                            </div>
+                            <div class="row m-2">
+                                <div class="col-md-4 fw-bold text-end">
+                                    Department
+                                </div>
+                                <div class="col-md-6">
+                                    <span>{{ curlDep }}</span>
+                                </div>
+                            </div>
+                            <div class="row m-2">
+                                <div class="col-md-4 fw-bold text-end">
+                                    Role
+                                </div>
+                                <div class="col-md-6">
+                                    <span>{{ roleAnalyser(curlRole) }}</span>
+                                </div>
+                            </div>
+                            <div class="row m-2">
+                                <div class="col-md-4 fw-bold text-end">
+                                    Associated Labs
+                                </div>
+                                <div class="col-md-6">
+                                    <span>{{ curlGrp }}</span>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col-md-6">
+                        <fieldset class="form-group">
+                            <legend>E-mail Notifications</legend>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <input type="checkbox" id="email_notification" name="email_notification" :checked="curlNotify == '1'" />
+                                    <label class="radio-check-label" for="email_notification">Send E-mail Notifications</label>
+                                </div>
+                                <small>The e-mail notification option only applies to the LabAdmins.</small>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-md-3 fw-bold">
+                                    Frequency
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="radio" id="freqmonthly" name="frequency" value="monthly" v-model="curlFreq">
+                                    <label class="radio-check-label" for="freqmonthly">Monthly</label>
+                                    <input type="radio" id="freqquarterly" name="frequency" value="quarterly" v-model="curlFreq">
+                                    <label class="radio-check-label" for="freqquarterly">Quarterly</label>
+                                    <input type="radio" id="freqannually" name="frequency" value="annually" v-model="curlFreq">
+                                    <label class="radio-check-label" for="freqannually">Annually</label>
+                                </div>
+                                <small><strong>Monthly</strong> e-mails are sent at the start of each month.<br/><strong>Quarterly</strong> e-mails are sent at the start of January, April, July, and October.<br/><strong>Annual</strong> e-mails are sent at the start of October.<br/>All e-mail notifications are sent at 8:15am.</small>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+              </div>
+            </form>
+          </div>
+        </div>
+    </div>
+    <div v-if="navscreenmsg" class="mt-5">
+        <div :class="'alert alert--'+navscreenmsgtype+' alert-dismissible fade show'">
+            <i :class="navscreenmsgicon"></i> {{ navscreenmsg }} <span v-if="navscreenmsgtype == 'error'"> Please contact one of the SuperAdmins through the Slack channel.</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @click="unsetmsg()"></button>
+        </div>
+    </div>
+    <div v-if="!authenticated && !viewmode" class="col-md-12 mb-3">
+        <div class="container-fluid">
+            <div class="alert alert--error">
+                <i class="far fa-times-circle fa-2x alert--error-icon"></i> Data modification and access to specific pages require authentication on the back-end. <a href="#" @click="authenticate()">Click here</a> to authenticate.
+            </div>
+        </div>
+    </div>
+</template>
