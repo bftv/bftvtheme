@@ -323,13 +323,13 @@ export default {
         headers: {
           'Content-Type': 'application/json'
         }
-      }).then(response => {console.log(response.data);
+      }).then(response => {
         this.screenmsg = response.data.message,
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
         this.listData = response.data.users,
         this.listData.sort(this.sortFname)
-      }).catch(error => {console.log(error);
+      }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
         } else if(error.data.message){

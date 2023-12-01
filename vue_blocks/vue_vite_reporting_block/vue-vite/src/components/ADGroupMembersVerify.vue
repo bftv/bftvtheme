@@ -39,8 +39,9 @@
                 </tbody>
               </table>
             </div>
-            <div class="text-center">
-              <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+            <div class="text-center sticky-bottom p-2" style="background-color: rgba(0, 0, 0, 0.8); ">
+              <div class="text-white">Please submit your changes once you are done. Otherwise, no changes will be made on your selection.</div>
+              <button type="submit" class="btn btn-primary mt-2">Submit Changes</button>
             </div>
           </div>
         </form>
