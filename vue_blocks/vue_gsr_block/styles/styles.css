@@ -269,6 +269,9 @@ table {
 .log-table {
 	font-size: small;
 }
+.log-table.table>:not(caption)>*>* {
+    padding: 0;
+}
 
 /*-----Forms-----*/
 fieldset {
@@ -415,6 +418,7 @@ input[type="checkbox"], input[type="radio"] {
 .alert--warning {
     background-color: #ffedd4 !important;
     color: #ed8b00 !important;
+    font-style: normal !important;
 }
 .alert--info {
     background-color: #dff4fb !important;
@@ -458,4 +462,21 @@ a.fa-single-edit:visited {
 /*-----Text-----*/
 .fs-6 {
     font-size: 0.7rem !important;
+}
+
+.status_date {
+    display: block;
+    font-size: 0.6rem !important;
+}
+
+.popper-text {
+    font-size: 0.6rem !important;
+}
+
+.btn-resend {
+    display: contents !important;
+    color: #13639e !important;
+}
+.btn-resend:hover {
+    color: #00b2e3 !important;
 }
