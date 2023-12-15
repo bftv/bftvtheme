@@ -25,7 +25,7 @@
             <tr>
               <th>Type</th>
               <th>Description</th>
-              <th v-if="accesslevel2">Department</th>
+              <th>Department</th>
               <th></th>
             </tr>
           </thead>
@@ -33,7 +33,7 @@
             <tr v-for="temp in listData">
               <td class="text-capitalize">{{ temp.type }}</td>
               <td>{{ temp.description }}</td>
-              <td v-if="accesslevel2">{{ temp.department }}</td>
+              <td>{{ temp.department }}</td>
               <td><a href="" @click="selectRecord(temp)" data-bs-toggle="modal" data-bs-target="#modal-edit-email" title="Edit e-mail template"><i class="fa-solid fa-pen-to-square"></i></a> <a href="" @click="selectRecord(temp)" data-bs-toggle="modal" data-bs-target="#modal-restore" title="Restore default template"><i class="fa-solid fa-arrow-rotate-right"></i></a></td>
             </tr>
           </tbody>
@@ -99,7 +99,7 @@
               </div>
               <div class="col-md-4">
                 <h5>Available Tokens</h5>
-                [PI_FULL_NAME]<br/>[PI_INITIAL_LASTNAME]<br/>[PI_LASTNAME_INITIAL]<br/>[PI_DEPARTMENT]<br/>[PI_EMAIL]<br/>[GSR_FULLNAME]<br/>[GSR_FIRSTNAME]<br/>[GSR_LASTNAME]<br/>[GSR_EMAIL]<br/>[GSR_START_DATE]<br/>[GSR_END_DATE]<br/>[PEP_STATUS]<br/>[APPOINTMENT_TYPE]<br/>[FTE_PERCENTAGE]<br/>[STEP]<br/>[ACCOUNT]<br/>[SALARY]<br/>[JOB_DESCRIPTION]<br/>[TRAINING_GRANT]<br/>[GRAD_GROUP]<br/>[ADDITIONAL_FUNDING]<br/>[OFFER_PREVIEW_LINK]<br/>[APPLICATION_LINK]
+                [PI_FULL_NAME]<br/>[PI_INITIAL_LASTNAME]<br/>[PI_LASTNAME_INITIAL]<br/>[PI_DEPARTMENT]<br/>[PI_EMAIL]<br/>[GSR_FULLNAME]<br/>[GSR_FIRSTNAME]<br/>[GSR_LASTNAME]<br/>[GSR_EMAIL]<br/>[WORKSITE]<br/>[GSR_START_DATE]<br/>[GSR_END_DATE]<br/>[PEP_STATUS]<br/>[APPOINTMENT_TYPE]<br/>[FTE_PERCENTAGE]<br/>[STEP]<br/>[ACCOUNT]<br/>[APPOINTMENT_TERM]<br/>[SALARY]<br/>[JOB_DESCRIPTION]<br/>[TRAINING_GRANT]<br/>[GRAD_GROUP]<br/>[ADDITIONAL_FUNDING]<br/>[OFFER_PREVIEW_LINK]<br/>[APPLICATION_LINK]
               </div>
             </div>
           </div>

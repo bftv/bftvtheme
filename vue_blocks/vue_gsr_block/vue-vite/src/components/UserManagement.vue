@@ -61,14 +61,26 @@
                     <input type="email" name="useremail" id="useremail" placeholder="email@ucdavis.edu" required>
                   </div>
                   <div class="col-md-12 mt-1">
-                    <select name="userrole" id="userrole" required>
-                      <option>-- select a role --</option>
+                    <select name="userrole" id="userrole" v-model="selectedRole" required>
+                      <option value="">-- select a role --</option>
                       <option v-if="accesslevel2" value="superadmin">SuperAdmin</option>
                       <option value="orgadmin">OrgAdmin</option>
                       <option value="editor">Editor</option>
                       <option value="viewer">Viewer</option>
                       <option value="submitter">Submitter</option>
                     </select>
+                  </div>
+                </div>
+                <div class="row m-2">
+                  <div class="col-md-12 fw-bold" :class="{'required': selectedRole === 'editor'}">
+                      Team
+                  </div>
+                  <div class="col-md-12">
+                    <input type="radio" id="userteam_am" name="userteam" value="am" :required="selectedRole === 'editor'">
+                    <label class="radio-check-label" for="userteam_am">Account Management</label>
+                    <input type="radio" id="userteam_adv" name="userteam" value="adv" :required="selectedRole === 'editor'">
+                    <label class="radio-check-label" for="userteam_adv">Advising</label>
+                    <div><small>Team is only required if the role is set to Editor.</small></div>
                   </div>
                 </div>
               </div>
@@ -171,6 +183,14 @@
                 </div>
                 <div class="row m-2">
                   <div class="col-md-4 fw-bold text-end">
+                    Work Phone
+                  </div>
+                  <div class="col-md-6">
+                    <input type="tel" name="phone" id="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="000-000-0000" :value="selectedRecord.phone">
+                  </div>
+                </div>
+                <div class="row m-2">
+                  <div class="col-md-4 fw-bold text-end">
                     Departments
                   </div>
                   <div class="col-md-6">
@@ -193,6 +213,18 @@
                       <option value="viewer">Viewer</option>
                       <option value="submitter">Submitter</option>
                     </select>
+                  </div>
+                </div>
+                <div class="row m-2">
+                  <div class="col-md-4 fw-bold text-end" :class="{'required': selectedRecord.role === 'editor'}">
+                      Team
+                  </div>
+                  <div class="col-md-6">
+                    <input type="radio" id="team_am" name="team" value="am" v-model="selectedRecord.team" :required="selectedRecord.role === 'editor'">
+                    <label class="radio-check-label" for="team_am">Account Management</label>
+                    <input type="radio" id="team_adv" name="team" value="adv" v-model="selectedRecord.team" :required="selectedRecord.role === 'editor'">
+                    <label class="radio-check-label" for="team_adv">Advising</label>
+                    <div><small>Team is only required if the role is set to Editor.</small></div>
                   </div>
                 </div>
                 <div class="row m-2">
@@ -227,6 +259,12 @@
     mixins: [navmixin, globalMixin],
     name: 'UserManagement',
 
+    data() {
+      return {
+        selectedRole: ''
+      };
+    },
+
     mounted: function(){
       var url = 'https://web.bftv.ucdavis.edu/gsr/users-get.php';
       this.getDataList(url, 'users')
@@ -238,21 +276,25 @@
         var modal = bootstrap.Modal.getInstance(document.getElementById('modal-add-user'));
         var usremail = document.getElementById('useremail').value;
         var usrrole = document.getElementById('userrole').value;
+        var team = '';
+        if(document.querySelector('input[name="userteam"]:checked')){
+          team = document.querySelector('input[name="userteam"]:checked').value;
+        }
         axios.post('https://web.bftv.ucdavis.edu/gsr/user-add.php', {
           crossDomain: true,
-          email: usremail, role: usrrole,
+          email: usremail, role: usrrole, team: team,
           myid: this.username,
           token: this.token,
           headers: {
             'Content-Type': 'application/json'
           }
-        }).then(response => {
+        }).then(response => {console.log(response);
           this.screenmsg = response.data.message,
           this.screenmsgtype = "success",
           this.screenmsgicon = this.successicon,
           this.listData = response.data.users,
           this.listData.sort(this.sortFname)
-        }).catch(error => {
+        }).catch(error => {console.log(error);
           if(error.response.data.message){
             this.screenmsg = error.response.data.message
           } else if(error.data.message){
@@ -265,6 +307,8 @@
           this.code = error.response.status
         }).finally(() => {
           document.getElementById('useremail').value = '';
+          document.querySelector('input[name="userteam"]').checked = false;
+          this.selectedRole = '';
           modal.hide();
           this.loading = false;
         });
@@ -278,10 +322,15 @@
         var usrclname = document.getElementById('userclname').value;
         var usrrole = document.getElementById('role').value;
         var usremail = document.getElementById('email').value;
+        var usrphone = document.getElementById('phone').value;
         var usrdep = document.getElementById('department').value;
         var usrstatus = document.getElementById('status_check').checked;
         var usrname = document.getElementById('fullname').value;
+        var team = '';
         var action = '';
+        if(document.querySelector('input[name="team"]:checked')){
+          team = document.querySelector('input[name="team"]:checked').value;
+        }
         if(usrstatus == true){
           usrstatus = 1;
         } else {
@@ -294,7 +343,7 @@
         }
         axios.post('https://web.bftv.ucdavis.edu/gsr/user-update.php', {
           crossDomain: true,
-          cfname: usrcfname, clname: usrclname, role: usrrole, email: usremail, enabled: usrstatus, name: usrname, department: usrdep,
+          cfname: usrcfname, clname: usrclname, role: usrrole, team: team, email: usremail, phone: usrphone, enabled: usrstatus, name: usrname, department: usrdep,
           myid: this.username,
           token: this.token,
           mode: action,

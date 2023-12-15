@@ -44,7 +44,7 @@
                     <td>{{ convertDateFormat(applicant.created, 'datetime') }}</td>
                     <td>{{ convertDateFormat(applicant.start_date, 'date') }} - {{ convertDateFormat(applicant.end_date, 'date') }}<br/><span class="text-muted fs-t">{{ applicant.appt_type }}</span></td>
                     <td><a :href="'mailto:'+applicant.gsr_email">{{ applicant.gsr_fname }} {{ applicant.gsr_lname }}</a></td>
-                    <td><a :href="'mailto:'+applicant.pi_email">{{ applicant.pi_fname }} {{ applicant.pi_lname }}</a><br/><span class="text-muted fs-6">{{ applicant.pi_dept }}</span></td>
+                    <td><a :href="'mailto:'+applicant.pi_email">{{ applicant.pi_fname }} {{ applicant.pi_lname }}</a><br/><span class="text-muted fs-6">{{ applicant.department }} ({{ applicant.abbr }})</span></td>
                     <td v-if="pendingTab" class="text-muted fs-6">
                       {{ statusAnalyzer(applicant.status, applicant.sent_preview, applicant.approved_pi, applicant.change_request) }}
                       <span v-if="applicant.status == 'pending'">
@@ -53,11 +53,11 @@
                         </a>
                       </span>
                       <div v-if="applicant.status == 'pending'">
-                        <span v-if="applicant.signers == 'NR'">Status not received yet.</span>
+                        <span v-if="applicant.signers.signers == 'NR'">Status not received yet.</span>
                         <span v-else>
                           <span v-for="signer in applicant.signers">
                             <span v-if="signer.status == 'sent' || signer.status == 'delivered'">
-                              <a :href="'mailto:'+signer.email">{{ signer.name }}</a><span v-if="signer.currentresend == 1" class="text-muted"> | <button class="btn btn-sm btn-link btn-resend" title="Resend DocuSign to the pending recepient."><i class="fa-solid fa-paper-plane"></i></button></span>
+                              <a :href="'mailto:'+signer.email">{{ signer.name }}</a><span v-if="signer.currentresend == 1 && isGreaterThan24Hours(applicant.sent_pdate)" class="text-muted"> | <button class="btn btn-sm btn-link btn-resend" @click="resendDS(applicant.sid)" title="Resend DocuSign to the pending recepient."><i class="fa-solid fa-paper-plane"></i></button></span>
                               <span class="status_date">{{ signer.date }}</span>
                             </span>
                             <span v-if="signer.status == 'declined'">
@@ -68,7 +68,7 @@
                         </span>
                       </div>
                       <div v-if="applicant.status == 'reviewed' && applicant.sent_preview == 1 && applicant.change_request == 0">
-                        <span class="popper-text">{{ convertDateFormat(applicant.sent_pdate, 'datetime', true) }}</span><span v-if="isGreaterThan24Hours(applicant.sent_pdate)"> | <button class="btn btn-sm btn-link btn-resend" title="Resend offer letter preview to the PI."><i class="fa-solid fa-paper-plane"></i></button></span>
+                        <span class="popper-text">{{ convertDateFormat(applicant.sent_pdate, 'datetime', true) }}</span><span v-if="isGreaterThan24Hours(applicant.sent_pdate)"> | <button class="btn btn-sm btn-link btn-resend" @click="resendPI(applicant.sid)" title="Resend offer letter preview to the PI."><i class="fa-solid fa-paper-plane"></i></button></span>
                       </div>
                     </td>
                     <td><a href="" @click="selectRecord(applicant)" data-bs-toggle="modal" data-bs-target="#modal-applicant"><i class="fa-solid fa-pen-to-square"></i></a><span v-if="statusChecker(applicant.status) === 'rejectable'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalRejectApp"><i class="fa-solid fa-circle-xmark" title="Reject this application."></i></a></span><span v-if="statusChecker(applicant.status) === 'voidable'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalVoidApp"><i class="fa-solid fa-ban" title="Cancel DocuSign for this application."></i></a></span></td>
@@ -141,7 +141,7 @@
                 <button type="submit" class="btn btn-primary btn-sm">Yes</button>
                 <input type="hidden" name="mode" value="voidapp" />
                 <input type="hidden" name="sid" id="modalVoidAppsid" :value="selectedRecord.sid" />
-                <input type="hidden" name="envid" id="envid" :value="selectedRecord.env_id" />
+                <input type="hidden" name="envid" id="envid" :value="selectedRecord.envelope_id" />
               </div>
             </form>
           </div>
@@ -160,36 +160,30 @@
                 <fieldset class="form-group mt-2">
                   <legend  class="w-auto">PI Information</legend>
                   <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                       <label for="pi_fname" class="input-label required" id="pi_fname-title">PI First Name</label>
                       <input type="text" id="pi_fname" name="pi_fname" :value="selectedRecord.pi_fname" @input="updateField('pi_fname', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                       <label for="pi_lname" class="input-label required" id="pi_lname-title">PI Last Name</label>
                       <input type="text" id="pi_lname" name="pi_lname" :value="selectedRecord.pi_lname" @input="updateField('pi_lname', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                     </div>
-                  </div>
-                  <div class="row mt-4">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                       <label for="pi_title" class="input-label required" id="pi_title-title">PI Title</label>
                       <input type="text" id="pi_title" name="pi_title" :value="selectedRecord.pi_title" @input="updateField('pi_title', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                     </div>
+                  </div>
+                  <div class="row mt-4">
                     <div class="col-md-6">
                       <label for="pi_email" class="input-label required" id="pi_email-title">PI E-mail</label>
                       <input type="email" id="pi_email" name="pi_email" :value="selectedRecord.pi_email" @input="updateField('pi_email', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                     </div>
-                  </div>
-                  <div class="row mt-4">
-                    <div class="col-md-12">
-                      <label class="radio-check-main-label required" id="pi_dept-title">Department</label>
-                    </div>
-                    <div class="col-md-12 mt-2">
-                      <input type="radio" id="pi_dept_bae" name="pi_dept" value="Biological and Agricultural Engineering (BAE)" v-model="selectedRecord.pi_dept" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
-                      <label class="radio-check-label" for="pi_dept_bae">Biological and Agricultural Engineering (BAE)</label>
-                      <input type="radio" id="pi_dept_fst" name="pi_dept" value="Food Science and Technology (FST)" v-model="selectedRecord.pi_dept" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
-                      <label class="radio-check-label" for="pi_dept_fst">Food Science and Technology (FST)</label>
-                      <input type="radio" id="pi_dept_ven" name="pi_dept" value="Viticulture & Enology (VEN)" v-model="selectedRecord.pi_dept" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
-                      <label class="radio-check-label" for="pi_dept_ven">Viticulture & Enology (VEN)</label>
+                    <div class="col-md-6">
+                      <label class="input-label required" id="pi_dept-title">Department</label>
+                      <select name="pi_dept" id="pi_dept" v-model="selectedRecord.depid" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
+                        <option>-- select an option --</option>
+                        <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.department }}</option>
+                      </select>
                     </div>
                   </div>
                 </fieldset>
@@ -211,8 +205,8 @@
                       <input type="email" id="gsr_email" name="gsr_email" :value="selectedRecord.gsr_email" @input="updateField('gsr_email', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                     </div>
                     <div class="col-md-6">
-                      <label for="worksite" class="input-label" id="worksite-title">Worksite</label>
-                      <input type="text" id="worksite" name="worksite" :value="selectedRecord.worksite" @input="updateField('worksite', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
+                      <label for="worksite" class="input-label required" id="worksite-title">Worksite</label>
+                      <input type="text" id="worksite" name="worksite" :value="selectedRecord.worksite" @input="updateField('worksite', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                     </div>
                   </div>
                 </fieldset>
@@ -221,7 +215,7 @@
                   <div class="row">
                     <div class="col-md-4">
                       <div>
-                        <label class="radio-check-main-label required" id="pi_dept-title">Appointment Type</label>
+                        <label class="radio-check-main-label required" id="appt_type-title">Appointment Type</label>
                       </div>
                       <div>
                         <input type="radio" id="appt_type_new" name="appt_type" value="New" v-model="selectedRecord.appt_type" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
@@ -235,20 +229,33 @@
                       <input type="text" id="fte_percentage" name="fte_percentage" :value="selectedRecord.fte_percentage" @input="updateField('fte_percentage', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                     </div>
                     <div class="col-md-4">
-                      <label for="step" class="input-label required" id="step-title">Salary Point</label>
-                      <input type="text" id="step" name="step" :value="selectedRecord.step" @input="updateField('step', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
+                      <label for="step" class="input-label" :class="{'required': curlRole === 'editor' && curlTeam === 'adv'}" id="step-title">Salary Point</label>
+                      <input type="text" id="step" name="step" :value="selectedRecord.step" @input="updateField('step', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" :required="curlRole === 'editor' && curlTeam === 'adv'">
                     </div>
                   </div>
                   <div class="row mt-4">
                     <div class="col-md-4">
-                      <label for="account" class="input-label required" id="account-title">Account</label>
-                      <input type="text" id="account" name="account" :value="selectedRecord.account" @input="updateField('account', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
+                      <div>
+                        <label class="radio-check-main-label required" id="appt_term-title">Appointment Term</label>
+                      </div>
+                      <div>
+                        <input type="radio" id="appt_term_academic" name="appt_term" value="Academic Year" v-model="selectedRecord.appt_term" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
+                        <label class="radio-check-label" for="appt_term_academic">Academic Year</label>
+                        <input type="radio" id="appt_term_summer" name="appt_term" value="Summer" v-model="selectedRecord.appt_term" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
+                        <label class="radio-check-label" for="appt_term_summer">Summer</label>
+                      </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-8">
+                      <label for="account" class="input-label" :class="{'required': curlRole === 'editor' && curlTeam === 'am'}" id="account-title">Account</label>
+                      <input type="text" id="account" name="account" :value="selectedRecord.account" @input="updateField('account', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" :required="curlRole === 'editor' && curlTeam === 'am'">
+                    </div>
+                  </div>
+                  <div class="row mt-4">
+                    <div class="col-md-6">
                       <label for="start_date" class="input-label required" id="start_date-title">Start Date</label>
                       <input type="date" id="start_date" name="start_date" :value="selectedRecord.start_date" @input="updateField('start_date', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                       <label for="end_date" class="input-label required" id="end_date-title">End Date</label>
                       <input type="date" id="end_date" name="end_date" :value="selectedRecord.end_date" @input="updateField('end_date', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" required>
                     </div>
@@ -322,12 +329,31 @@
                   <legend  class="w-auto">Advising Use Only</legend>
                   <div class="row">
                     <div class="col-md-6">
-                      <label for="salary" class="input-label required" id="salary-title">Proposed Salary</label>
-                      <input type="text" id="salary" name="salary" :value="selectedRecord.salary" @input="updateField('salary', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected' || selectedRecord.status === 'pi_approved'" :required="selectedRecord.status === 'reviewed'">
+                      <label for="salary" class="input-label" :class="{'required': curlRole === 'editor' && curlTeam === 'adv'}" id="salary-title">Proposed Salary</label>
+                      <input type="text" id="salary" name="salary" :value="selectedRecord.salary" @input="updateField('salary', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected' || selectedRecord.status === 'pi_approved'" :required="curlRole === 'editor' && curlTeam === 'adv'">
                     </div>
+                    <div class="col-md-6">
+                      <div>
+                        <label class="radio-check-main-label" :class="{'required': curlRole === 'editor' && curlTeam === 'adv'}" id="pep_status-title">PEP Status</label>
+                      </div>
+                      <div>
+                        <input type="radio" id="pep_required" name="pep" value="Required" v-model="selectedRecord.pep_status" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" :required="curlRole === 'editor' && curlTeam === 'adv'">
+                        <label class="radio-check-label" for="pep_required">Required</label>
+                        <input type="radio" id="pep_notrequired" name="pep" value="Not Required" v-model="selectedRecord.pep_status" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" :required="curlRole === 'editor' && curlTeam === 'adv'">
+                        <label class="radio-check-label" for="pep_notrequired">Not Required</label>
+                        <input type="radio" id="pep_pending" name="pep" value="Pending" v-model="selectedRecord.pep_status" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'" :required="curlRole === 'editor' && curlTeam === 'adv'">
+                        <label class="radio-check-label" for="pep_pending">Pending</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-4">
                     <div class="col-md-6">
                       <label for="gsr_address" class="input-label" id="gsr_address-title">GSR Address</label>
                       <textarea id="gsr_address" name="gsr_address" rows="3" :value="selectedRecord.gsr_address" @input="updateField('gsr_address', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected' || selectedRecord.status === 'pi_approved'"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="pep_comment" class="input-label" id="pep_comment-title">Additional Comment for PEP</label>
+                      <textarea id="pep_comment" name="pep_comment" rows="3" :value="selectedRecord.pep_comment" @input="updateField('pep_comment', $event)" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'"></textarea>
                     </div>
                   </div>
                 </fieldset>
@@ -345,8 +371,8 @@
                     <div class="col-md-12 table-responsive">
                       <table class='table text-muted log-table'>
                         <tr v-for="history in selectedRecord.history">
-                          <td style='width: 200px'>{{ convertDateFormat(history.affected_date, 'datetime', true) }}</td>
-                          <td><span v-if="history.user">{{ history.user }}&nbsp;</span><span v-html="removeAllBackslashes(history.note)"></span></td>
+                          <td style='width: 200px'>{{ convertDateFormat(history.date, 'datetime', true) }}</td>
+                          <td><span v-if="history.user">{{ history.user }}&nbsp;</span><span v-html="removeAllBackslashes(history.action)"></span></td>
                         </tr>
                       </table>
                     </div>
@@ -360,7 +386,7 @@
                       <label class='radio-check-label' for='approved_am'>Approved by Account Management Team</label>
                       <input type="checkbox" id="approved_advising" name="approved_advising" value="1" v-model="approvedAdvising" :checked="approvedAdvising" :disabled="selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                       <label class='radio-check-label' for='approved_advising'>Approved by Advising Section</label>
-                      <input type="checkbox" id="approved_pi" name="approved_pi" value="1" v-model="approvedPI" :checked="approvedPI" :disabled="selectedRecord.status !== 'reviewed' || selectedRecord.sent_preview !== '1'">
+                      <input type="checkbox" id="approved_pi" name="approved_pi" value="1" v-model="approvedPI" :checked="approvedPI" :disabled="(curlRole === 'editor' && curlTeam !== 'adv') || selectedRecord.status === 'completed' || selectedRecord.status === 'rejected'">
                       <label class='radio-check-label' for='approved_pi'>PI Approved</label>
                     </div>
                   </div>
@@ -427,8 +453,8 @@
         setTimeout(() => {
             const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
             const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
-        }, 1000); // Delay of 1 second
-    });
+        }, 2000); // Delay of 2 second
+      });
     },
     methods: {
       removeAllBackslashes(inputString) {
@@ -437,13 +463,15 @@
       statusChecker: function(status){
         if(status == 'new' || status == 'reviewed' || status == 'pi_approved'){
           return 'rejectable';
-        } else if(status == 'pending' || status == 'completed'){
+        } else if(status == 'pending'){
           return 'voidable';
+        } else if(status == 'completed'){
+          return 'completed';
         } else if(status == 'rejected'){
           return 'rejected';
         }
       },
-      popoverContent(signers) {//console.log(signers);
+      popoverContent(signers) {
         var content = '<ul>';
         for(var i=0; i<signers.length; i++){
           content += '<li class="popper-text"><a href="mailto:'+signers[i]['email']+'">'+signers[i]['name']+'</a> - <span class="text-uppercase fw-bold text-muted">'+signers[i]['status']+'</span><br/><span class="text-muted">'+signers[i]['date']+'</span></li>';
@@ -454,10 +482,8 @@
       isGreaterThan24Hours(datetimeString) {
         const givenDateTime = new Date(datetimeString);
         const currentDateTime = new Date();
-
         const differenceInMilliseconds = currentDateTime - givenDateTime;
         const hoursDifference = differenceInMilliseconds / (1000 * 60 * 60);
-
         return hoursDifference > 24;
       },
       updateApplicant(e) {
@@ -469,7 +495,8 @@
         var pln = document.getElementById('pi_lname').value;
         var pt = document.getElementById('pi_title').value;
         var pe = document.getElementById('pi_email').value;
-        var pd = document.querySelector('input[name="pi_dept"]:checked').value;
+        //var pd = document.querySelector('input[name="pi_dept"]:checked').value;
+        var pd = document.getElementById('pi_dept').value;
         var gfn = document.getElementById('gsr_fname').value;
         var gln = document.getElementById('gsr_lname').value;
         var ge = document.getElementById('gsr_email').value;
@@ -477,11 +504,10 @@
         var apt = document.querySelector('input[name="appt_type"]:checked').value;
         var fte = document.getElementById('fte_percentage').value;
         var st = document.getElementById('step').value;
+        var apter = document.querySelector('input[name="appt_term"]:checked').value;
         var ac = document.getElementById('account').value;
         var sd = document.getElementById('start_date').value;
         var ed = document.getElementById('end_date').value;
-        //gn = document.getElementById('grant_name').value;
-        //fa = document.getElementById('fund_agency').value;
         var jd = document.getElementById('job_description').value;
         var tg = document.querySelector('input[name="training_grant"]:checked').value;
         var sgg = '';
@@ -509,11 +535,16 @@
         }
         selectedadf = selectedadf.join(', ');
 
+        var ps = document.getElementById('salary').value;
+        var gsradd = document.getElementById('gsr_address').value;
+        var peps = '';
+        if(document.querySelector('input[name="pep"]:checked')){
+          peps = document.querySelector('input[name="pep"]:checked').value;
+        }
+        var pepc = document.getElementById('pep_comment').value;
         var apam = document.getElementById('approved_am').checked;
         var apad = document.getElementById('approved_advising').checked;
         var apfname = document.getElementById('fullname').value;
-        var ps = document.getElementById('salary').value;
-        var gsradd = document.getElementById('gsr_address').value;
         if(apam == true){
             apam = 1;
         } else {
@@ -532,6 +563,7 @@
         } else {
           action = 'save'
         }
+        modal.hide();
         axios.post('https://web.bftv.ucdavis.edu/gsr/data-update.php', {
           crossDomain: true,
           myid: this.username,
@@ -539,18 +571,17 @@
           mode: action,
           sid: sid, pi_fname: pfn, pi_lname: pln, pi_title: pt, pi_email: pe, pi_dept: pd,
           gsr_fname: gfn, gsr_lname: gln, gsr_fullname: apfname, gsr_email: ge, worksite: gw,
-          appt_type: apt, fte_percentage: fte, step: st, account: ac, start_date: sd, end_date: ed, job_description: jd, training_grant: tg, grad_group: sgg,
-          additional_funding: selectedadf, ta_percentage: tap, approved_am: apam, approved_ad: apad, salary: ps, gsr_address: gsradd,
+          appt_type: apt, fte_percentage: fte, step: st, appt_term: apter, account: ac, start_date: sd, end_date: ed, job_description: jd, training_grant: tg, grad_group: sgg, additional_funding: selectedadf, ta_percentage: tap, approved_am: apam, approved_ad: apad, salary: ps, gsr_address: gsradd, pep_status: peps, pep_comment: pepc,
           headers: {
             'Content-Type': 'application/json'
           }
-        }).then(response => {
+        }).then(response => {console.log(response);
           this.screenmsg = response.data.message,
           this.screenmsgtype = "success",
           this.screenmsgicon = this.successicon,
           this.listData = response.data.updated_data.data,
-          this.filterObjectByKeyValue("status", "new")
-        }).catch(error => {
+          this.filterObjectByKeyValue("status", "pending")
+        }).catch(error => {console.log(error);
           if(error.response.data.message){
             this.screenmsg = error.response.data.message
           } else if(error.data.message){
@@ -563,7 +594,6 @@
           this.code = error.response.data.status
         }).finally(() => {
           this.unsetSelectedRecord();
-          modal.hide();
           this.loading = false;
         });
         window.scrollTo(0, 150);
@@ -636,7 +666,7 @@
           this.screenmsgtype = "success",
           this.screenmsgicon = this.successicon,
           this.listData = response.data.updated_data.data,
-          this.filterObjectByKeyValue("status", "new")
+          this.filterObjectByKeyValue("status", "pending")
         }).catch(error => {
           if(error.response.data.message){
             this.screenmsg = error.response.data.message
@@ -655,6 +685,74 @@
         });
         window.scrollTo(0, 400);
       },
+      resendDS(id){
+        this.loading = true;
+        var mode = 'docusign';
+        axios.post('https://web.bftv.ucdavis.edu/gsr/app-reminder.php', {
+          crossDomain: true,
+          myid: this.username,
+          token: this.token,
+          sid: id,
+          mode: mode,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => {
+          this.screenmsg = response.data.message,
+          this.screenmsgtype = "success",
+          this.screenmsgicon = this.successicon,
+          this.listData = response.data.updated_data.data,
+          this.filterObjectByKeyValue("status", "pending")
+        }).catch(error => {
+          if(error.response.data.message){
+            this.screenmsg = error.response.data.message
+          } else if(error.data.message){
+            this.screenmsg = error.data.message
+          } else {
+            this.screenmsg = error.message
+          }
+          this.screenmsgtype = "error",
+          this.screenmsgicon = this.erroricon,
+          this.code = error.response.data.status
+        }).finally(() => {
+          this.loading = false;
+        });
+        window.scrollTo(0, 400);
+      },
+      resendPI(id){
+        this.loading = true;
+        var mode = 'resend_preview';
+        axios.post('https://web.bftv.ucdavis.edu/gsr/data-update.php', {
+          crossDomain: true,
+          myid: this.username,
+          token: this.token,
+          sid: id,
+          mode: mode,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => {
+          this.screenmsg = response.data.message,
+          this.screenmsgtype = "success",
+          this.screenmsgicon = this.successicon,
+          this.listData = response.data.updated_data.data,
+          this.filterObjectByKeyValue("status", "pending")
+        }).catch(error => {console.log(error);
+          if(error.response.data.message){
+            this.screenmsg = error.response.data.message
+          } else if(error.data.message){
+            this.screenmsg = error.data.message
+          } else {
+            this.screenmsg = error.message
+          }
+          this.screenmsgtype = "error",
+          this.screenmsgicon = this.erroricon,
+          this.code = error.response.data.status
+        }).finally(() => {
+          this.loading = false;
+        });
+        window.scrollTo(0, 400);
+      }
     },
     computed: {
       hasApplicants() {

@@ -9,6 +9,7 @@ export var navmixin = {
       curlRole: '',
       curlName: '',
       curlDep: '',
+      curlTeam: '',
       authenticated: '',
       authText: '',
       accesslevel0r: false,
@@ -33,6 +34,7 @@ export var navmixin = {
           this.curlRole = response.data.userrole,
           this.curlName = response.data.username,
           this.curlDep = response.data.userdep,
+          this.curlTeam = response.data.userteam,
           this.authenticated = response.data.authenticated,
           this.check_auth()
           if(this.curlRole == 'superadmin'){

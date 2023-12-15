@@ -143,6 +143,14 @@
                 </div>
               </div>
               <div class="row m-2">
+                <div class="col-md-4 fw-bold text-end">
+                  RT API URL
+                </div>
+                <div class="col-md-6">
+                  <input type="text" id="rtapiurl" name="rtapiurl">
+                </div>
+              </div>
+              <div class="row m-2">
                 <div class="col-md-4 fw-bold text-end" :class="{ 'required': !inherit }">
                   Account Managers RT Queue/E-mail
                 </div>
@@ -335,6 +343,14 @@
                 </div>
               </div>
               <div class="row m-2">
+                <div class="col-md-4 fw-bold text-end">
+                  RT API URL
+                </div>
+                <div class="col-md-6">
+                  <input type="text" id="upd_rtapiurl" name="upd_rtapiurl" :value="selectedRecord.rtapiurl" @input="updateField('rtapiurl', $event)">
+                </div>
+              </div>
+              <div class="row m-2">
                 <div class="col-md-4 fw-bold text-end" :class="{ 'required': !inheritSettings }">
                   Account Managers RT Queue/E-mail
                 </div>
@@ -451,6 +467,7 @@ export default {
       var mdep = document.getElementById('maindep').checked;
       var inh = document.getElementById('inherit').checked;
       var rurl = document.getElementById('rturl').value;
+      var rapiurl = document.getElementById('rtapiurl').value;
       var amqe = document.getElementById('amqemail').value;
       var advqe = document.getElementById('advqemail').value;
       var payqe = document.getElementById('payemail').value;
@@ -475,7 +492,7 @@ export default {
         crossDomain: true,
         myid: this.username,
         token: this.token,
-        department: dep, abbreviation: abb, depcode: dcode, parentdep: pdep, support_email: support, maindep: mdep, inherit: inh, comtype: ctype, rturl: rurl, amqemail: amqe, advqemail: advqe, payemail: payqe, fromemail: fe, rt_token: rttok, ds_user: dsu, ds_userid: dsui, ds_tempid: dsti,
+        department: dep, abbreviation: abb, depcode: dcode, parentdep: pdep, support_email: support, maindep: mdep, inherit: inh, comtype: ctype, rturl: rurl, rtapiurl: rapiurl, amqemail: amqe, advqemail: advqe, payemail: payqe, fromemail: fe, rt_token: rttok, ds_user: dsu, ds_userid: dsui, ds_tempid: dsti,
         headers: {
           'Content-Type': 'application/json'
         }
@@ -501,6 +518,7 @@ export default {
         document.getElementById('abbr').value = '';
         document.getElementById('parentdep').value = '';
         document.getElementById('email').value = '';
+        document.getElementById('depcode').value = '';
         document.getElementById('maindep').checked = false;
         modal.hide();
         this.loading = false;
@@ -520,6 +538,7 @@ export default {
       var mdep = document.getElementById('upd_maindep').checked;
       var inh = document.getElementById('upd_inherit').checked;
       var rurl = document.getElementById('upd_rturl').value;
+      var rapiurl = document.getElementById('upd_rtapiurl').value;
       var amqe = document.getElementById('upd_amqemail').value;
       var advqe = document.getElementById('upd_advqemail').value;
       var payqe = document.getElementById('upd_payemail').value;
@@ -545,7 +564,7 @@ export default {
         crossDomain: true,
         myid: this.username,
         token: this.token,
-        id: depid, department: dep, abbreviation: abb, depcode: dcode, parentdep: pdep, support_email: support, maindep: mdep, inherit: inh, comtype: ctype, rturl: rurl, amqemail: amqe, advqemail: advqe, payemail: payqe, fromemail: fe, rt_token: rttok, ds_user: dsu, ds_userid: dsui, ds_tempid: dsti,
+        id: depid, department: dep, abbreviation: abb, depcode: dcode, parentdep: pdep, support_email: support, maindep: mdep, inherit: inh, comtype: ctype, rturl: rurl, rtapiurl: rapiurl, amqemail: amqe, advqemail: advqe, payemail: payqe, fromemail: fe, rt_token: rttok, ds_user: dsu, ds_userid: dsui, ds_tempid: dsti,
         headers: {
           'Content-Type': 'application/json'
         }

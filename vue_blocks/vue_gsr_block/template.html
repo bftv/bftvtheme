@@ -15,9 +15,9 @@
                     <li class="nav-item"><router-link :to="{name: 'rej-apps'}" class="nav-link" @click="loader">Rejected</router-link></li>
                     <li v-if="accesslevel1" class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="nav-mgmt" data-bs-toggle="dropdown">Management</a>
                         <ul class="dropdown-menu" aria-labelledby="nav-mgmt">
-                            <li v-if="accesslevel1"><router-link :to="{name: 'users'}" class="dropdown-item" @click="loader">Users</router-link></li>
-                            <li v-if="accesslevel2"><router-link :to="{name: 'departments'}" class="dropdown-item" @click="loader">Departments</router-link></li>
-                            <li v-if="accesslevel1"><router-link :to="{name: 'email-templates'}" class="dropdown-item" @click="loader">Email Templates</router-link></li>
+                            <li><router-link :to="{name: 'users'}" class="dropdown-item" @click="loader">Users</router-link></li>
+                            <li><router-link :to="{name: 'departments'}" class="dropdown-item" @click="loader">Departments</router-link></li>
+                            <li><router-link :to="{name: 'email-templates'}" class="dropdown-item" @click="loader">Email Templates</router-link></li>
                         </ul>
                     </li>
                 </ul>

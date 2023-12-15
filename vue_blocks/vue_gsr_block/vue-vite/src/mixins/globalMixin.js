@@ -35,9 +35,10 @@ export var globalMixin = {
         myid: this.username,
         token: this.token
       }).then(response => {
-        if(type == 'data'){console.log(response);
+        if(type == 'data'){
           this.listData = response.data.data;
           this.metaData = response.data.metadata;
+          this.departments = response.data.departments;
           var id = false;
           if(this.$route.query.sid){
             id = this.$route.query.sid
@@ -48,15 +49,19 @@ export var globalMixin = {
             if(section == 'new'){
               this.filterObjectByKeyValue("status", "new");
               this.pendingTab = false;
+              this.screenmsg = '';
             } else if (section == 'pending'){
               this.filterObjectByKeyValue("status", "pending");
               this.pendingTab = true;
+              this.screenmsg = '';
             } else if (section == 'completed'){
               this.filterObjectByKeyValue("status", "completed");
               this.pendingTab = false;
+              this.screenmsg = '';
             } else if (section == 'rejected'){
               this.filterObjectByKeyValue("status", "rejected");
               this.pendingTab = false;
+              this.screenmsg = '';
             }
           }
         } else if(type == 'users'){
@@ -152,6 +157,19 @@ export var globalMixin = {
           this.otherAdditionalFundingText = otherOptions.join(', ');
         }
       }
+      if(this.selectedRecord.user_history){
+        var users = this.selectedRecord.user_history.split(';');
+        var datesArray = this.selectedRecord.affected_dates.split(';');
+        var actions = this.selectedRecord.history_notes.split(';');
+        this.selectedRecord.history = [];
+        for (var i = 0; i < users.length; i++) {
+          this.selectedRecord.history.push({
+            user: i < users.length ? users[i] : '',
+            date: i < datesArray.length ? datesArray[i] : '',
+            action: i < actions.length ? actions[i] : ''
+          });
+        }
+      }
       if(this.selectedRecord.approved_am){
         this.approvedAM = 1
       }
@@ -182,7 +200,7 @@ export var globalMixin = {
           return 'Pending Advising Review';
         } else if(sent == 1 && change_request == 0){
           return 'Waiting PI Review';
-        } else if(sent == 1 && change_request == 1){
+        } else if(sent == 0 && change_request == 1){
           return 'PI Requested Change';
         }
       } else if(status == 'pi_approved'){
