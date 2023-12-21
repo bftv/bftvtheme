@@ -6,7 +6,7 @@
         <span class="sr-only">Loading...</span>
       </div>
     </div>
-    <div v-if="accesslevel1">
+    <div v-if="accessLevels.level1">
       <div v-if="screenmsg" class="mt-5">
         <div :class="'alert alert--'+screenmsgtype">
          <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="screenmsgtype == 'error'"> Please contact one of the SuperAdmins through the Slack channel.</span>
@@ -28,10 +28,34 @@
         <table class='table table-bordered table-hover table-striped'>
           <thead class='thead-light'>
             <tr>
-              <th>Name</th>
-              <th>Department</th>
-              <th>Role</th>
-              <th>Status</th>
+              <th @click="sortData('firstname')" class="sortable">
+                Name
+                <span v-if="currentSortColumn === 'firstname'">
+                  <span v-if="sortAscending">&#9650;</span>
+                  <span v-else>&#9660;</span>
+                </span>
+              </th>
+              <th @click="sortData('department')" class="sortable">
+                Department
+                <span v-if="currentSortColumn === 'department'">
+                  <span v-if="sortAscending">&#9650;</span>
+                  <span v-else>&#9660;</span>
+                </span>
+              </th>
+              <th @click="sortData('role')" class="sortable">
+                Role
+                <span v-if="currentSortColumn === 'role'">
+                  <span v-if="sortAscending">&#9650;</span>
+                  <span v-else>&#9660;</span>
+                </span>
+              </th>
+              <th @click="sortData('status')" class="sortable">
+                Status
+                <span v-if="currentSortColumn === 'status'">
+                  <span v-if="sortAscending">&#9650;</span>
+                  <span v-else>&#9660;</span>
+                </span>
+              </th>
               <th></th>
             </tr>
           </thead>
@@ -47,7 +71,7 @@
               <td>
                 <select id="role_search" class="fs-6" v-model="searchRole">
                   <option value=""></option>
-                  <option v-if="accesslevel2" value="superadmin">SuperAdmin</option>
+                  <option v-if="accessLevels.level2" value="superadmin">SuperAdmin</option>
                   <option value="orgadmin">OrgAdmin</option>
                   <option value="editor">Editor</option>
                   <option value="viewer">Viewer</option>
@@ -62,10 +86,21 @@
               <td>{{ person.department }}</td>
               <td class="text-capitalize">{{ person.role }}</td>
               <td><span title="It shows user status." v-html="person.status == 1 ? '<i class=\'fa-solid fa-check color-green\'></i>' : '<i class=\'fa-solid fa-x color-red\'></i>'"></span></td>
-              <td><a v-if="accesslevel1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-user" title="Edit user"><i class="fa-solid fa-pen-to-square"></i></a> <a v-if="accesslevel1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-del-user" title="Delete user"><i class="fa-solid fa-circle-xmark"></i></a></td>
+              <td><a v-if="accessLevels.level1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-user" title="Edit user"><i class="fa-solid fa-pen-to-square"></i></a> <a v-if="accessLevels.level1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-del-user" title="Delete user"><i class="fa-solid fa-circle-xmark"></i></a></td>
             </tr>
           </tbody>
         </table>
+        <nav v-if="fullLength > pageSize" aria-label="Page navigation">
+          <ul class="pagination pagination-sm justify-content-center">
+            <li class="page-item"><button class="page-link" @click="firstPage"><i class="fa-solid fa-angles-left"></i></button></li>
+            <li class="page-item"><button class="page-link" @click="prevPage"><i class="fa-solid fa-angle-left"></i></button></li>
+            <li class="page-item" v-for="n in totalPages" :key="n">
+              <button class="page-link" @click="goToPage(n)">{{ n }}</button>
+            </li>
+            <li class="page-item"><button class="page-link" @click="nextPage"><i class="fa-solid fa-angle-right"></i></button></li>
+            <li class="page-item"><button class="page-link" @click="lastPage"><i class="fa-solid fa-angles-right"></i></button></li>
+          </ul>
+        </nav>
       </div>
       <!-- Modal Add -->
       <div class="modal fade" id="modal-add-user" tabindex="-1" aria-labelledby="modal-add-user-label" aria-hidden="true">
@@ -84,7 +119,7 @@
                   <div class="col-md-12 mt-1">
                     <select name="userrole" id="userrole" v-model="selectedRole" required>
                       <option value="">-- select a role --</option>
-                      <option v-if="accesslevel2" value="superadmin">SuperAdmin</option>
+                      <option v-if="accessLevels.level2" value="superadmin">SuperAdmin</option>
                       <option value="orgadmin">OrgAdmin</option>
                       <option value="editor">Editor</option>
                       <option value="viewer">Viewer</option>
@@ -228,7 +263,7 @@
                   <div class="col-md-6">
                     <select name="role" id="role" v-model="selectedRecord.role">
                       <option>-- select an option --</option>
-                      <option v-if="accesslevel2" value="superadmin">SuperAdmin</option>
+                      <option v-if="accessLevels.level2" value="superadmin">SuperAdmin</option>
                       <option value="orgadmin">OrgAdmin</option>
                       <option value="editor">Editor</option>
                       <option value="viewer">Viewer</option>
@@ -283,10 +318,10 @@
 </template>
 
 <script>
-  import { navmixin } from '../mixins/navMixin.js';
+  import axios from 'axios';
   import { globalMixin } from '../mixins/globalMixin.js';
   export default {
-    mixins: [navmixin, globalMixin],
+    mixins: [globalMixin],
     name: 'UserManagement',
 
     data() {
@@ -450,6 +485,8 @@
     },
     computed: {
       filteredData() {
+        const start = (this.currentPage - 1) * this.pageSize;
+        const end = start + this.pageSize;
         let conditions = [];
         if (this.searchTextUser.length >= 3) {
           conditions.push(applicant => this.matchesSearch(applicant.firstname, this.searchTextUser) || this.matchesSearch(applicant.lastname, this.searchTextUser));
@@ -461,9 +498,9 @@
           conditions.push(applicant => this.matchesSearch(applicant.role, this.searchRole));
         }
         if (conditions.length === 0) {
-          return this.listData;
+          return this.listData.slice(start, end);
         }
-        return this.listData.filter(applicant => conditions.every(condition => condition(applicant)));
+        return this.listData.filter(applicant => conditions.every(condition => condition(applicant))).slice(start, end);
       }
     }
   };

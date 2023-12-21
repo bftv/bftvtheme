@@ -14,7 +14,7 @@
       </div>
       <div v-if="!hidebody" class="mt-3">
         <div class="row">
-          <div v-if="!authenticated" class="col-md-12 mb-3">
+          <div v-if="!authenticated && !viewermode" class="col-md-12 mb-3">
             <div class="alert alert--error">
               <i class="far fa-times-circle fa-2x alert--error-icon"></i> Your changes will not be saved as you are not authenticated to the server. <a href="#" @click="authenticate()">Click here</a> to authenticate.
             </div>
@@ -121,17 +121,53 @@
               <table class='table table-bordered table-hover table-striped'>
                 <thead class='thead-light'>
                   <tr>
-                    <th>#</th>
-                    <th>Date</th>
-                    <th>Period / Apptmt Type</th>
-                    <th>Applicant</th>
-                    <th>PI/Supervisor</th>
-                    <th v-if="pendingTab">Status</th>
+                    <th @click="sortData('sid')" class="sortable">
+                      #
+                      <span v-if="currentSortColumn === 'sid'">
+                        <span v-if="sortAscending">&#9650;</span>
+                        <span v-else>&#9660;</span>
+                      </span>
+                    </th>
+                    <th @click="sortData('created')" class="sortable">
+                      Date
+                      <span v-if="currentSortColumn === 'created'">
+                        <span v-if="sortAscending">&#9650;</span>
+                        <span v-else>&#9660;</span>
+                      </span>
+                    </th>
+                    <th @click="sortData('start_date')" class="sortable">
+                      Period / Apptmt Type
+                      <span v-if="currentSortColumn === 'start_date'">
+                        <span v-if="sortAscending">&#9650;</span>
+                        <span v-else>&#9660;</span>
+                      </span>
+                    </th>
+                    <th @click="sortData('gsr_fname')" class="sortable">
+                      Applicant
+                      <span v-if="currentSortColumn === 'gsr_fname'">
+                        <span v-if="sortAscending">&#9650;</span>
+                        <span v-else>&#9660;</span>
+                      </span>
+                    </th>
+                    <th @click="sortData('pi_fname')" class="sortable">
+                      PI/Supervisor
+                      <span v-if="currentSortColumn === 'pi_fname'">
+                        <span v-if="sortAscending">&#9650;</span>
+                        <span v-else>&#9660;</span>
+                      </span>
+                    </th>
+                    <th v-if="pendingTab" @click="sortData('status_sort')" class="sortable">
+                      Status
+                      <span v-if="currentSortColumn === 'status_sort'">
+                        <span v-if="sortAscending">&#9650;</span>
+                        <span v-else>&#9660;</span>
+                      </span>
+                    </th>
                     <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-if="listData.length > 5">
+                  <tr v-if="currentOriginalListData.length > 5">
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
@@ -181,10 +217,21 @@
                         <span class="popper-text">{{ convertDateFormat(applicant.sent_pdate, 'datetime', true) }}</span><span v-if="isGreaterThan24Hours(applicant.sent_pdate)"> | <button class="btn btn-sm btn-link btn-resend" @click="resendPI(applicant.sid)" title="Resend offer letter preview to the PI."><i class="fa-solid fa-paper-plane"></i></button></span>
                       </div>
                     </td>
-                    <td><a href="" @click="selectRecord(applicant)" data-bs-toggle="modal" data-bs-target="#modal-applicant"><i class="fa-solid fa-pen-to-square"></i></a><span v-if="statusChecker(applicant.status) === 'rejectable'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalRejectApp"><i class="fa-solid fa-circle-xmark" title="Reject this application."></i></a></span><span v-if="statusChecker(applicant.status) === 'voidable'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalVoidApp"><i class="fa-solid fa-ban" title="Cancel DocuSign for this application."></i></a> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalCompApp"><i class="fa-solid fa-circle-check" title="Manually mark application complete."></i></a></span><span v-if="applicant.status == 'completed'"> | <a :href="linkGenerator(applicant)"><i class="fa-solid fa-rotate-right" title="Resubmit/extend this application."></i></a></span></td>
+                    <td><a href="" @click="selectRecord(applicant)" data-bs-toggle="modal" data-bs-target="#modal-applicant"><i class="fa-solid fa-pen-to-square"></i></a><span v-if="statusChecker(applicant.status) === 'rejectable' && !viewermode"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalRejectApp"><i class="fa-solid fa-circle-xmark" title="Reject this application."></i></a></span><span v-if="statusChecker(applicant.status) === 'voidable' && !viewermode"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalVoidApp"><i class="fa-solid fa-ban" title="Cancel DocuSign for this application."></i></a> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalCompApp"><i class="fa-solid fa-circle-check" title="Manually mark application complete."></i></a></span><span v-if="applicant.status == 'completed'"> | <a :href="linkGenerator(applicant)"><i class="fa-solid fa-rotate-right" title="Resubmit/extend this application."></i></a></span></td>
                   </tr>
                 </tbody>
               </table>
+              <nav v-if="fullLength > pageSize" aria-label="Page navigation">
+                <ul class="pagination pagination-sm justify-content-center">
+                  <li class="page-item"><button class="page-link" @click="firstPage"><i class="fa-solid fa-angles-left"></i></button></li>
+                  <li class="page-item"><button class="page-link" @click="prevPage"><i class="fa-solid fa-angle-left"></i></button></li>
+                  <li class="page-item" v-for="n in totalPages" :key="n">
+                    <button class="page-link" @click="goToPage(n)">{{ n }}</button>
+                  </li>
+                  <li class="page-item"><button class="page-link" @click="nextPage"><i class="fa-solid fa-angle-right"></i></button></li>
+                  <li class="page-item"><button class="page-link" @click="lastPage"><i class="fa-solid fa-angles-right"></i></button></li>
+                </ul>
+              </nav>
             </div>
             <div v-else>
               <div class="alert alert--info">There is currently no record in this section.</div>
@@ -553,46 +600,24 @@
 
 <script>
   import axios from 'axios';
-  import { navmixin } from '../mixins/navMixin.js';
+  //import { navmixin } from '../mixins/navMixin.js';
   import { globalMixin } from '../mixins/globalMixin.js';
   export default {
-    mixins: [navmixin, globalMixin],
+    mixins: [globalMixin],
     name: 'Apps',
-    /* watch: {
-      '$route': {
-        immediate: true, // to run the handler immediately when the component is created
-        handler(to, from) {
-          const url = 'https://web.bftv.ucdavis.edu/gsr/data-get.php';
-          let status;
-
-          switch (to.name) { // 'to' is the target Route Object being navigated to.
-            case 'pen-apps':
-              status = 'pending';
-              break;
-            case 'new-apps':
-              status = 'new';
-              break;
-            case 'rej-apps':
-              status = 'rejected';
-              break;
-            case 'com-apps':
-              status = 'completed';
-              break;
-            default:
-              status = 'new'; // default status or any other default you want to set
-          }
-          this.getDataList(url, 'data', status);
-        }
+    watch: {
+      listData(newList) {
+        this.totalPages = Math.ceil(newList.length / this.pageSize);
       }
-    }, */
+    },
     data() {
       return {
         searchTextGsr: '',
         searchTextPi: '',
         searchStatus: '',
         search: false,
-        routeWatcher: null
-      };
+        routeWatcher: null,
+      }
     },
     mounted: function(){
       /* this.$nextTick(() => {
@@ -604,36 +629,54 @@
       this.routeWatcher = Vue.watch(
         () => this.$route,
         (to, from) => {
-          const url = 'https://web.bftv.ucdavis.edu/gsr/data-get.php';
-          let status;
-
-          switch (to.name) { // 'to' is the target Route Object being navigated to.
-            case 'pen-apps':
-              status = 'pending';
-              break;
-            case 'new-apps':
-              status = 'new';
-              break;
-            case 'rej-apps':
-              status = 'rejected';
-              break;
-            case 'com-apps':
-              status = 'completed';
-              break;
-            default:
-              status = 'new'; // default status or any other default you want to set
+          if (this.$store.state.username) {
+            this.processRouteChange(to);
           }
-          this.getDataList(url, 'data', status);
         },
         { immediate: true }
+      );
+      this.userNameWatcher = Vue.watch(
+        () => this.$store.state.username,
+        (newUserName) => {
+          if (newUserName) {
+            this.processRouteChange(this.$route);
+          }
+        }
       );
     },
     beforeUnmount() {
       if (this.routeWatcher) {
         this.routeWatcher(); // This stops the watcher
       }
+      if (this.userNameWatcher) {
+        this.userNameWatcher(); // This stops the watcher
+      }
     },
     methods: {
+      processRouteChange(to) {
+        const url = 'https://web.bftv.ucdavis.edu/gsr/data-get.php';
+        let status;
+        switch (to.name) {
+          case 'pen-apps':
+            status = 'pending';
+            break;
+          case 'new-apps':
+            status = 'new';
+            break;
+          case 'rej-apps':
+            status = 'rejected';
+            break;
+          case 'com-apps':
+            status = 'completed';
+            break;
+          case 'my-apps':
+            status = 'all';
+            break;
+          default:
+            status = 'new';
+        }
+        this.getDataList(url, 'data', status);
+      },
       searchAp() {
         var searched = false;
         this.search = true;
@@ -1372,6 +1415,8 @@
         return Object.keys(this.currentOriginalListData).length > 0;
       },
       filteredData() {
+        const start = (this.currentPage - 1) * this.pageSize;
+        const end = start + this.pageSize;
         let conditions = [];
         if (this.searchTextGsr.length >= 3) {
           conditions.push(applicant => this.matchesSearch(applicant.gsr_fname, this.searchTextGsr) || this.matchesSearch(applicant.gsr_lname, this.searchTextGsr));
@@ -1393,9 +1438,9 @@
           }
         }
         if (conditions.length === 0) {
-          return this.listData;
+          return this.listData.slice(start, end);
         }
-        return this.listData.filter(applicant => conditions.every(condition => condition(applicant)));
+        return this.listData.filter(applicant => conditions.every(condition => condition(applicant))).slice(start, end);
       }
     }
   };

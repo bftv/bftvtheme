@@ -6,7 +6,7 @@
         <span class="sr-only">Loading...</span>
       </div>
     </div>
-    <div v-if="accesslevel1">
+    <div v-if="accessLevels.level1">
       <div v-if="screenmsg" class="mt-5">
         <div :class="'alert alert--'+screenmsgtype">
          <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="screenmsgtype == 'error'"> Please contact one of the SuperAdmins through the Slack channel.</span>
@@ -20,7 +20,7 @@
         </div>
       </div>
       <div v-if="!hidebody" class="row mt-3">
-        <div  v-if="accesslevel2" class="col-md-12 text-end">
+        <div  v-if="accessLevels.level2" class="col-md-12 text-end">
           <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-add-dep">+ Add a Department</button>
         </div>
       </div>
@@ -28,7 +28,13 @@
         <table class='table table-bordered table-hover table-striped'>
           <thead class='thead-light'>
             <tr>
-              <th>Departments</th>
+              <th @click="sortData('department')" class="sortable">
+                Department
+                <span v-if="currentSortColumn === 'department'">
+                  <span v-if="sortAscending">&#9650;</span>
+                  <span v-else>&#9660;</span>
+                </span>
+              </th>
               <th>Parent</th>
               <th>Support E-mail</th>
               <th></th>
@@ -50,10 +56,21 @@
               <td>{{ department.department }} ({{ department.abbr }})</td>
               <td><span v-if="department.parentdep">{{ getDepartmentById(department.parentdep) }}</span></td>
               <td>{{ department.support_email }}</td>
-              <td><a href="" @click="selectRecord(department)" data-bs-toggle="modal" data-bs-target="#modal-edit-dep" title="Edit department"><i class="fa-solid fa-pen-to-square"></i></a> <a v-if="accesslevel2" href="" @click="selectRecord(department)" data-bs-toggle="modal" data-bs-target="#modal-del-dep" title="Delete department"><i class="fa-solid fa-circle-xmark"></i></a></td>
+              <td><a href="" @click="selectRecord(department)" data-bs-toggle="modal" data-bs-target="#modal-edit-dep" title="Edit department"><i class="fa-solid fa-pen-to-square"></i></a> <a v-if="accessLevels.level2" href="" @click="selectRecord(department)" data-bs-toggle="modal" data-bs-target="#modal-del-dep" title="Delete department"><i class="fa-solid fa-circle-xmark"></i></a></td>
             </tr>
           </tbody>
         </table>
+        <nav v-if="fullLength > pageSize" aria-label="Page navigation">
+          <ul class="pagination pagination-sm justify-content-center">
+            <li class="page-item"><button class="page-link" @click="firstPage"><i class="fa-solid fa-angles-left"></i></button></li>
+            <li class="page-item"><button class="page-link" @click="prevPage"><i class="fa-solid fa-angle-left"></i></button></li>
+            <li class="page-item" v-for="n in totalPages" :key="n">
+              <button class="page-link" @click="goToPage(n)">{{ n }}</button>
+            </li>
+            <li class="page-item"><button class="page-link" @click="nextPage"><i class="fa-solid fa-angle-right"></i></button></li>
+            <li class="page-item"><button class="page-link" @click="lastPage"><i class="fa-solid fa-angles-right"></i></button></li>
+          </ul>
+        </nav>
       </div>
     </div>
     <div v-else>
@@ -63,7 +80,7 @@
     </div>
   </div>
   <!-- Modal Add -->
-  <div  v-if="accesslevel2" class="modal fade" id="modal-add-dep" tabindex="-1" aria-labelledby="modal-add-dep-label" aria-hidden="true">
+  <div  v-if="accessLevels.level2" class="modal fade" id="modal-add-dep" tabindex="-1" aria-labelledby="modal-add-dep-label" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
@@ -237,7 +254,7 @@
     </div>
   </div>
   <!-- Modal Delete -->
-  <div  v-if="accesslevel2" class="modal fade" id="modal-del-dep" tabindex="-1" aria-labelledby="modal-del-dep-label" aria-hidden="true">
+  <div  v-if="accessLevels.level2" class="modal fade" id="modal-del-dep" tabindex="-1" aria-labelledby="modal-del-dep-label" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -262,7 +279,7 @@
     </div>
   </div>
   <!-- Modal Edit -->
-  <div  v-if="accesslevel1" class="modal fade" id="modal-edit-dep" tabindex="-1" aria-labelledby="modal-edit-dep-label" aria-hidden="true">
+  <div  v-if="accessLevels.level1" class="modal fade" id="modal-edit-dep" tabindex="-1" aria-labelledby="modal-edit-dep-label" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
@@ -441,10 +458,10 @@
 </template>
 
 <script>
-import { navmixin } from '../mixins/navMixin.js';
+import axios from 'axios';
 import { globalMixin } from '../mixins/globalMixin.js';
 export default {
-  mixins: [navmixin, globalMixin],
+  mixins: [globalMixin],
   name: 'DepartmentManagement',
 
   data: function() {
@@ -587,7 +604,7 @@ export default {
         this.screenmsgicon = this.successicon,
         this.listData = response.data.dataList,
         this.departments = response.data.departments
-      }).catch(error => {console.log(error);
+      }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
         } else if(error.data.message){
@@ -645,6 +662,8 @@ export default {
   },
   computed: {
     filteredData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
       let conditions = [];
       if (this.searchTextDep.length >= 3) {
         conditions.push(applicant => this.matchesSearch(applicant.department, this.searchTextDep) || this.matchesSearch(applicant.abbr, this.searchTextDep));

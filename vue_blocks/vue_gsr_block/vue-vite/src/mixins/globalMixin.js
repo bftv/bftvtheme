@@ -28,7 +28,14 @@ export var globalMixin = {
       approvedAdvising: 0,
       approvedPI: 0,
       inherit: false,
-      loading: true
+      loading: true,
+      //pagination
+      currentPage: 1,
+      pageSize: 10,
+      totalPages: 0,
+      //sorting
+      currentSortColumn: null,
+      sortAscending: true,
     }
   },
 
@@ -67,6 +74,9 @@ export var globalMixin = {
                 this.filterObjectByKeyValue("status", "rejected");
                 this.pendingTab = false;
                 this.screenmsg = '';
+              } else if(section == 'all'){
+                this.pendingTab = false;
+                this.screenmsg = '';
               }
             }
             this.currentOriginalListData = this.listData;
@@ -84,7 +94,13 @@ export var globalMixin = {
         this.message = response.data.message,
         this.success = response.data.success,
         this.code = response.data.code
-      }).catch(error => {console.log(error);
+        this.totalPages = Math.ceil(this.listData.length / this.pageSize);
+      }).catch(error => {//console.log(error);
+          if(type='data'){
+            if (error.response && error.response.status === 409) { // Adjust status code as necessary
+              setTimeout(this.getDataList(url, type, section), 2000); // Retry after 2 seconds
+            }
+          }
           if(error.response.status == 404 || error.response.status == 403 || error.response.status == 401 || error.response.status == 400){
             this.screenmsg = error.response.data.message,
             this.screenmsgtype = "error",
@@ -136,17 +152,6 @@ export var globalMixin = {
         }
       }
     },
-    /* filterObjectByKeyValue(key, value) {
-      if(value != 'pending'){
-        this.listData = Object.fromEntries(
-          Object.entries(this.listData).filter(([_, obj]) => obj[key] === value)
-        );
-      } else {
-        this.listData = Object.fromEntries(
-          Object.entries(this.listData).filter(([_, obj]) => obj[key] === value || obj.status === "reviewed" || obj.status === "pi_approved")
-        );
-      }
-    }, */
     filterObjectByKeyValue(key, value) {
       if (value != 'pending') {
         this.listData = this.listData.filter(obj => obj[key] === value);
@@ -248,8 +253,79 @@ export var globalMixin = {
     loader: function(){
       this.loading = true;
     },
+    authenticate(){
+      var w = 600;
+      var h = 800;
+      var url = 'https://web.bftv.ucdavis.edu/gsr/auth.php';
+      var LeftPosition = (screen.width) ? (screen.width-w)/2 : 0;
+      var TopPosition = (screen.height) ? (screen.height-h)/2 : 0;
+      var settings = 'height='+h+',width='+w+',top='+TopPosition+',left='+LeftPosition+',scrollbars=yes,resizable';
+      var popupWindow = window.open(url,"CAS - Central Authentication Service",settings);
+      window.addEventListener('message', function(e) {
+        // e.data hold the message from child
+        if(e.data == "Authenticated."){
+          popupWindow.close();
+          //return axios(originalRequest);
+          this.location.reload();
+        } else if (e.data == "Authentication failed."){
+          popupWindow.close();
+          return Promise.reject(e.data);
+        }
+      } , false);
+    },
+    goToPage(pageNumber) {
+      this.currentPage = pageNumber;
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
+      }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
+      }
+    },
+    firstPage() {
+      this.currentPage = 1;
+    },
+    lastPage() {
+      this.currentPage = this.totalPages;
+    },
+    sortData(column) {
+      if (this.currentSortColumn === column) {
+        this.sortAscending = !this.sortAscending;
+      } else {
+        this.currentSortColumn = column;
+        this.sortAscending = true;
+      }
+
+      this.listData.sort((a, b) => {
+        let valA = a[column];
+        let valB = b[column];
+
+        // Handle null values
+        if (valA === null && valB === null) return 0;
+        if (valA === null) return this.sortAscending ? 1 : -1;
+        if (valB === null) return this.sortAscending ? -1 : 1;
+
+        // Check if the column is a date
+        if (column.toLowerCase().includes('date') || column.toLowerCase() == 'created' || column.toLowerCase() == 'changed') {
+          valA = valA ? new Date(valA) : null;
+          valB = valB ? new Date(valB) : null;
+        }
+
+        // Main comparison
+        if (valA < valB) return this.sortAscending ? -1 : 1;
+        if (valA > valB) return this.sortAscending ? 1 : -1;
+        return 0;
+      });
+    },
   },
   computed: {
+    fullLength() {
+      return this.listData.length;
+    },
     inheritSettings: {
       get() {
         return this.selectedRecord.inherit_settings === '1';
@@ -257,6 +333,39 @@ export var globalMixin = {
       set(value) {
         this.selectedRecord.inherit_settings = value ? '1' : '0';
       }
-    }
+    },
+    curlRole() {
+      return this.$store.state.curlRole;
+    },
+    curlName() {
+      return this.$store.state.curlName;
+    },
+    curlTeam() {
+      return this.$store.state.curlTeam;
+    },
+    authText() {
+      return this.$store.state.authText;
+    },
+    authenticated() {
+      return this.$store.state.authenticated;
+    },
+    accessLevels() {
+      return {
+        level0s: this.$store.state.accesslevel0s,
+        level0r: this.$store.state.accesslevel0r,
+        level0: this.$store.state.accesslevel0,
+        level1: this.$store.state.accesslevel1,
+        level2: this.$store.state.accesslevel2
+      };
+    },
+    viewermode() {
+      return this.$store.state.viewermode;
+    },
+    username() {
+      return this.$store.state.username;
+    },
+    token() {
+      return this.$store.state.token;
+    },
   }
 }

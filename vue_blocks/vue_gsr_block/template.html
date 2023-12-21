@@ -9,11 +9,12 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item"><router-link :to="{name: 'new-apps'}" class="nav-link" @click="loader">New</router-link></li>
-                    <li v-if="!accesslevel0s && !viewermode" class="nav-item"><router-link :to="{name: 'pen-apps'}" class="nav-link" @click="loader">Pending</router-link></li>
-                    <li v-if="!accesslevel0s && !viewermode" class="nav-item"><router-link :to="{name: 'com-apps'}" class="nav-link" @click="loader">Completed</router-link></li>
-                    <li v-if="!accesslevel0s && !viewermode" class="nav-item"><router-link :to="{name: 'rej-apps'}" class="nav-link" @click="loader">Rejected</router-link></li>
-                    <li v-if="accesslevel1" class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="nav-mgmt" data-bs-toggle="dropdown">Management</a>
+                    <li v-if="!accessLevels.level0s" class="nav-item"><router-link :to="{name: 'new-apps'}" class="nav-link" @click="loader">New</router-link></li>
+                    <li v-if="!accessLevels.level0s" class="nav-item"><router-link :to="{name: 'pen-apps'}" class="nav-link" @click="loader">Pending</router-link></li>
+                    <li v-if="!accessLevels.level0s" class="nav-item"><router-link :to="{name: 'com-apps'}" class="nav-link" @click="loader">Completed</router-link></li>
+                    <li v-if="!accessLevels.level0s" class="nav-item"><router-link :to="{name: 'rej-apps'}" class="nav-link" @click="loader">Rejected</router-link></li>
+                    <li v-if="accessLevels.level0s" class="nav-item"><router-link :to="{name: 'my-apps'}" class="nav-link" @click="loader">My Applications</router-link></li>
+                    <li v-if="accessLevels.level1" class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="nav-mgmt" data-bs-toggle="dropdown">Management</a>
                         <ul class="dropdown-menu" aria-labelledby="nav-mgmt">
                             <li><router-link :to="{name: 'users'}" class="dropdown-item" @click="loader">Users</router-link></li>
                             <li><router-link :to="{name: 'departments'}" class="dropdown-item" @click="loader">Departments</router-link></li>

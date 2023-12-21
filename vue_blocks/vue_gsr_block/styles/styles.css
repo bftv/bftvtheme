@@ -530,3 +530,9 @@ a.fa-single-edit:visited {
     font-size: 0.75rem !important;
     border-radius: 0 !important;
 }
+.sortable {
+    cursor: pointer;
+}
+.sortable span {
+    font-size: 0.5rem;
+}

@@ -6,7 +6,7 @@
         <span class="sr-only">Loading...</span>
       </div>
     </div>
-    <div v-if="accesslevel1">
+    <div v-if="accessLevels.level1">
       <div v-if="screenmsg" class="mt-5">
         <div :class="'alert alert--'+screenmsgtype">
          <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="screenmsgtype == 'error'"> Please contact one of the SuperAdmins through the Slack channel.</span>
@@ -23,9 +23,21 @@
         <table class='table table-bordered table-hover table-striped'>
           <thead class='thead-light'>
             <tr>
-              <th>Type</th>
+              <th @click="sortData('type')" class="sortable">
+                Type
+                <span v-if="currentSortColumn === 'type'">
+                  <span v-if="sortAscending">&#9650;</span>
+                  <span v-else>&#9660;</span>
+                </span>
+              </th>
               <th>Description</th>
-              <th>Department</th>
+              <th @click="sortData('department')" class="sortable">
+                Department
+                <span v-if="currentSortColumn === 'department'">
+                  <span v-if="sortAscending">&#9650;</span>
+                  <span v-else>&#9660;</span>
+                </span>
+              </th>
               <th></th>
             </tr>
           </thead>
@@ -49,6 +61,17 @@
             </tr>
           </tbody>
         </table>
+        <nav v-if="fullLength > pageSize" aria-label="Page navigation">
+          <ul class="pagination pagination-sm justify-content-center">
+            <li class="page-item"><button class="page-link" @click="firstPage"><i class="fa-solid fa-angles-left"></i></button></li>
+            <li class="page-item"><button class="page-link" @click="prevPage"><i class="fa-solid fa-angle-left"></i></button></li>
+            <li class="page-item" v-for="n in totalPages" :key="n">
+              <button class="page-link" @click="goToPage(n)">{{ n }}</button>
+            </li>
+            <li class="page-item"><button class="page-link" @click="nextPage"><i class="fa-solid fa-angle-right"></i></button></li>
+            <li class="page-item"><button class="page-link" @click="lastPage"><i class="fa-solid fa-angles-right"></i></button></li>
+          </ul>
+        </nav>
       </div>
     </div>
     <div v-else>
@@ -86,7 +109,7 @@
     </div>
   </div>
   <!-- Modal Edit -->
-  <div  v-if="accesslevel1" class="modal fade" id="modal-edit-email" tabindex="-1" aria-labelledby="modal-edit-email-label" aria-hidden="true">
+  <div  v-if="accessLevels.level1" class="modal fade" id="modal-edit-email" tabindex="-1" aria-labelledby="modal-edit-email-label" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
@@ -127,10 +150,10 @@
 </template>
 
 <script>
-import { navmixin } from '../mixins/navMixin.js';
+import axios from 'axios';;
 import { globalMixin } from '../mixins/globalMixin.js';
 export default {
-  mixins: [navmixin, globalMixin],
+  mixins: [globalMixin],
   name: 'EmailManagement',
 
   data() {
@@ -167,7 +190,7 @@ export default {
         this.screenmsgicon = this.successicon,
         this.listData = response.data.dataList,
         this.departments = response.data.departments
-      }).catch(error => {console.log(error);
+      }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
         } else if(error.data.message){
@@ -200,13 +223,13 @@ export default {
         headers: {
           'Content-Type': 'application/json'
         }
-      }).then(response => {console.log(response);
+      }).then(response => {
         this.screenmsg = response.data.message,
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
         this.listData = response.data.dataList,
         this.departments = response.data.departments
-      }).catch(error => {console.log(error);
+      }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
         } else if(error.data.message){
@@ -226,17 +249,19 @@ export default {
     },
   },
   computed: {
-      filteredData() {
-        let conditions = [];
-        if(this.searchDepartment != ''){
-          conditions.push(applicant => { return applicant.department == this.searchDepartment; });
-        }
-        if (conditions.length === 0) {
-          return this.listData;
-        }
-        return this.listData.filter(applicant => conditions.every(condition => condition(applicant)));
+    filteredData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      let conditions = [];
+      if(this.searchDepartment != ''){
+        conditions.push(applicant => { return applicant.department == this.searchDepartment; });
       }
+      if (conditions.length === 0) {
+        return this.listData.slice(start, end);
+      }
+      return this.listData.filter(applicant => conditions.every(condition => condition(applicant))).slice(start, end);
     }
+  }
 };
 </script>
 
