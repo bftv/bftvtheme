@@ -116,7 +116,9 @@
             </div>
             <div v-if="hasApplicants" class='table-responsive mt-2'>
               <div class="text-end">
-                <button class="btn btn-sm btn-link btn-resend" title="Exports current view to CSV." @click="exportToCSV">Export to CSV</button>
+                <button class="btn btn-sm btn-link btn-resend" title="Exports current view to CSV." @click="exportToCSV(false)">Export Filtered Data to CSV</button>
+                <span>&nbsp;|&nbsp;</span>
+                <button class="btn btn-sm btn-link btn-resend" title="Exports all records to CSV." @click="exportToCSV(true)">Export All Data to CSV</button>
               </div>
               <table class='table table-bordered table-hover table-striped'>
                 <thead class='thead-light'>
@@ -1401,7 +1403,7 @@
         });
         window.scrollTo(0, 400);
       },
-      exportToCSV() {
+      exportToCSV(all=false) {
         let csvContent = '';
         const header_row = ['Key App ID', 'PI First Name', 'PI Last Name', 'PI Title', 'PI E-mail', 'Department', 'GSR First Name', 'GSR Last Name', 'GSR E-mail', 'Worksite', 'Appointment Term', 'Start Date', 'End Date', 'Appointment Type', 'FTE%', 'Step', 'Account', 'Salary', 'Status', 'PEP Status'];
 
@@ -1409,10 +1411,17 @@
 
         csvContent += header_row.join(",") + "\r\n";
 
-        this.filteredData.forEach(row => {
-          let rowData = fields.map(field => JSON.stringify(row[field] || '', this.replacer));
-          csvContent += rowData.join(",") + "\r\n";
-        });
+        if(all){
+          this.currentOriginalListData.forEach(row => {
+            let rowData = fields.map(field => JSON.stringify(row[field] || '', this.replacer));
+            csvContent += rowData.join(",") + "\r\n";
+          });
+        } else {
+          this.filteredData.forEach(row => {
+            let rowData = fields.map(field => JSON.stringify(row[field] || '', this.replacer));
+            csvContent += rowData.join(",") + "\r\n";
+          });
+        }
 
         // Create Blob for CSV content
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
