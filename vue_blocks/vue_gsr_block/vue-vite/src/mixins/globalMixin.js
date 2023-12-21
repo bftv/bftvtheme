@@ -31,7 +31,7 @@ export var globalMixin = {
       loading: true,
       //pagination
       currentPage: 1,
-      pageSize: 10,
+      pageSize: 25,
       totalPages: 0,
       //sorting
       currentSortColumn: null,
