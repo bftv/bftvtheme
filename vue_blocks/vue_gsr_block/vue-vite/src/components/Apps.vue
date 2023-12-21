@@ -643,6 +643,22 @@
           }
         }
       );
+
+      if (this.$route.name === 'pen-apps') {
+        this.initializePopovers();
+      }
+
+      this.$watch(
+        () => this.$route.name,
+        (newRouteName) => {
+          if (newRouteName === 'pen-apps') {
+            // Ensure DOM is updated before initializing popovers
+            this.$nextTick(() => {
+              this.initializePopovers();
+            });
+          }
+        }
+      );
     },
     beforeUnmount() {
       if (this.routeWatcher) {
@@ -676,6 +692,12 @@
             status = 'new';
         }
         this.getDataList(url, 'data', status);
+      },
+      initializePopovers() {
+        setTimeout(() => {
+          const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+          const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+        }, 2000);
       },
       searchAp() {
         var searched = false;
