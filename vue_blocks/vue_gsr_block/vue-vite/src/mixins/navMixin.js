@@ -1,3 +1,4 @@
+import axios from 'axios';
 export var navmixin = {
   data: function() {
     return {
@@ -12,6 +13,7 @@ export var navmixin = {
       curlTeam: '',
       authenticated: '',
       authText: '',
+      accesslevel0s: false,
       accesslevel0r: false,
       accesslevel0: false,
       accesslevel1: false,
@@ -19,7 +21,7 @@ export var navmixin = {
       viewermode: false,
     }
   },
-  beforeMount: function(){
+  beforeMount: function(){console.log("before mount triggered");
     axios.post('https://web.bftv.ucdavis.edu/gsr/connector.php', {
       crossDomain: true,
       loginid: this.username,
@@ -38,29 +40,39 @@ export var navmixin = {
           this.authenticated = response.data.authenticated,
           this.check_auth()
           if(this.curlRole == 'superadmin'){
+            this.accesslevel0s = false;
             this.accesslevel0r = true;
             this.accesslevel0 = true;
             this.accesslevel1 = true;
             this.accesslevel2 = true;
           } else if(this.curlRole == 'orgadmin'){
+            this.accesslevel0s = false;
             this.accesslevel0r = true;
             this.accesslevel0 = true;
             this.accesslevel1 = true;
             this.accesslevel2 = false;
           } else if(this.curlRole == 'editor'){
+            this.accesslevel0s = false;
             this.accesslevel0r = false;
             this.accesslevel0 = true;
             this.accesslevel1 = false;
             this.accesslevel2 = false;
           } else if(this.curlRole == 'viewer'){
+            this.accesslevel0s = false;
             this.accesslevel0r = true;
             this.accesslevel0 = false;
             this.accesslevel1 = false;
             this.accesslevel2 = false;
+          } else if(this.curlRole == 'submitter'){
+            this.accesslevel0s = true;
+            this.accesslevel0r = false;
+            this.accesslevel0 = false;
+            this.accesslevel1 = false;
+            this.accesslevel2 = false;
           }
-          if(this.curlRole == 'orgreportadmin' || this.curlRole == 'labadmin' || this.curlRole == 'labreportadmin'){
+          if(this.curlRole == 'orgreportadmin' || this.curlRole == 'labadmin' || this.curlRole == 'labreportadmin' || this.curlRole == 'submitter'){
             this.viewermode = true;
-        }
+          }
         } else {
           this.curlRole = 'anonymous'
         }
@@ -69,6 +81,9 @@ export var navmixin = {
     });
   },
   methods: {
+    returnRole(){
+      return this.curlRole;
+    },
     check_auth(){
       if(this.authenticated){
         this.authText = 'Authenticated'
@@ -79,15 +94,17 @@ export var navmixin = {
     roleAnalyser(role){
       var crole;
       if(role == 'superadmin'){
-          crole = 'SuperAdmin'
+        crole = 'SuperAdmin'
       } else if(role == 'orgadmin'){
-          crole = 'OrgAdmin'
+        crole = 'OrgAdmin'
       } else if(role == 'editor'){
-          crole = 'Editor'
+        crole = 'Editor'
       } else if(role == 'viewer'){
-          crole = 'Viewer'
+        crole = 'Viewer'
+      } else if(role == 'submitter'){
+        crole = 'Submitter'
       } else {
-          crole = 'none'
+        crole = 'none'
       }
       return crole;
     },

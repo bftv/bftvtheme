@@ -1,3 +1,4 @@
+import axios from 'axios';
 export var globalMixin = {
   data: function() {
     return {
@@ -10,7 +11,9 @@ export var globalMixin = {
       hidebody: false,
       success: null,
       code: null,
+      allListData: [],
       listData: [],
+      currentOriginalListData: [],
       metaData: [],
       pendingTab:  false,
       departments: [],
@@ -34,8 +37,9 @@ export var globalMixin = {
       axios.post(url, {
         myid: this.username,
         token: this.token
-      }).then(response => {
+      }).then(response => {//console.log(response);
         if(type == 'data'){
+          this.allListData = response.data.data;
           this.listData = response.data.data;
           this.metaData = response.data.metadata;
           this.departments = response.data.departments;
@@ -46,23 +50,27 @@ export var globalMixin = {
           if(id){
               this.filterObjectByKeyValue("sid", id);
           } else {
-            if(section == 'new'){
-              this.filterObjectByKeyValue("status", "new");
-              this.pendingTab = false;
-              this.screenmsg = '';
-            } else if (section == 'pending'){
-              this.filterObjectByKeyValue("status", "pending");
-              this.pendingTab = true;
-              this.screenmsg = '';
-            } else if (section == 'completed'){
-              this.filterObjectByKeyValue("status", "completed");
-              this.pendingTab = false;
-              this.screenmsg = '';
-            } else if (section == 'rejected'){
-              this.filterObjectByKeyValue("status", "rejected");
-              this.pendingTab = false;
-              this.screenmsg = '';
+            if(this.curlRole != 'submitter'){
+              if(section == 'new'){
+                this.filterObjectByKeyValue("status", "new");
+                this.pendingTab = false;
+                this.screenmsg = '';
+              } else if (section == 'pending'){
+                this.filterObjectByKeyValue("status", "pending");
+                this.pendingTab = true;
+                this.screenmsg = '';
+              } else if (section == 'completed'){
+                this.filterObjectByKeyValue("status", "completed");
+                this.pendingTab = false;
+                this.screenmsg = '';
+              } else if (section == 'rejected'){
+                this.filterObjectByKeyValue("status", "rejected");
+                this.pendingTab = false;
+                this.screenmsg = '';
+              }
             }
+            this.currentOriginalListData = this.listData;
+            this.clearSearch();
           }
         } else if(type == 'users'){
           this.listData = response.data.users,
@@ -72,10 +80,11 @@ export var globalMixin = {
           this.listData = response.data.dataList,
           this.departments = response.data.departments
         }
+        this.resetQuickSearch();
         this.message = response.data.message,
         this.success = response.data.success,
         this.code = response.data.code
-      }).catch(error => {
+      }).catch(error => {console.log(error);
           if(error.response.status == 404 || error.response.status == 403 || error.response.status == 401 || error.response.status == 400){
             this.screenmsg = error.response.data.message,
             this.screenmsgtype = "error",
@@ -127,7 +136,7 @@ export var globalMixin = {
         }
       }
     },
-    filterObjectByKeyValue(key, value) {
+    /* filterObjectByKeyValue(key, value) {
       if(value != 'pending'){
         this.listData = Object.fromEntries(
           Object.entries(this.listData).filter(([_, obj]) => obj[key] === value)
@@ -135,6 +144,15 @@ export var globalMixin = {
       } else {
         this.listData = Object.fromEntries(
           Object.entries(this.listData).filter(([_, obj]) => obj[key] === value || obj.status === "reviewed" || obj.status === "pi_approved")
+        );
+      }
+    }, */
+    filterObjectByKeyValue(key, value) {
+      if (value != 'pending') {
+        this.listData = this.listData.filter(obj => obj[key] === value);
+      } else {
+        this.listData = this.listData.filter(obj =>
+          obj[key] === value || obj.status === "reviewed" || obj.status === "pi_approved"
         );
       }
     },
@@ -212,6 +230,20 @@ export var globalMixin = {
       } else if(status == 'rejected'){
         return 'Rejected';
       }
+    },
+    matchesSearch(fieldValue, searchText) {
+      return fieldValue.toLowerCase().includes(searchText.toLowerCase());
+    },
+    resetQuickSearch(){
+      this.searchTextGsr = '';
+      this.searchTextPi = '';
+      this.searchAptType = '';
+      this.searchStatus = '';
+      this.searchTextUser = '';
+      this.searchDepartment = '';
+      this.searchRole = '';
+      this.searchTextDep = '';
+      this.searchParent = '';
     },
     loader: function(){
       this.loading = true;

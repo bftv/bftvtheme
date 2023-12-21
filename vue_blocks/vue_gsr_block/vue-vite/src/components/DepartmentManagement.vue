@@ -35,7 +35,18 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="department in listData">
+            <tr v-if="listData.length > 3">
+              <td><input type="text" id="department_search" class="fs-6" v-model="searchTextDep"></td>
+              <td>
+                <select id="parent_search" class="fs-6" v-model="searchParent">
+                  <option value=""></option>
+                  <option v-for="department in departments" :key="department" :value="department.id">{{ department.department }}</option>
+                </select>
+              </td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+            <tr v-for="department in filteredData">
               <td>{{ department.department }} ({{ department.abbr }})</td>
               <td><span v-if="department.parentdep">{{ getDepartmentById(department.parentdep) }}</span></td>
               <td>{{ department.support_email }}</td>
@@ -127,27 +138,27 @@
                 </div>
                 <div class="col-md-6">
                   <div class="col-md-9">
-                    <input type="radio" id="comrt" name="com" value="rt" :required="!inherit">
+                    <input type="radio" id="comrt" name="com" value="rt" v-model="comtype" :required="!inherit">
                     <label class="radio-check-label" for="comrt">RT</label>
-                    <input type="radio" id="comemail" name="com" value="email" :required="!inherit">
+                    <input type="radio" id="comemail" name="com" value="email" v-model="comtype" :required="!inherit">
                     <label class="radio-check-label" for="comemail">Regular E-mail</label>
                   </div>
                 </div>
               </div>
               <div class="row m-2">
-                <div class="col-md-4 fw-bold text-end">
+                <div class="col-md-4 fw-bold text-end" :class="{ 'required': comtype == 'rt' }">
                   RT URL
                 </div>
                 <div class="col-md-6">
-                  <input type="text" id="rturl" name="rturl">
+                  <input type="text" id="rturl" name="rturl" :required="comtype == 'rt'">
                 </div>
               </div>
               <div class="row m-2">
-                <div class="col-md-4 fw-bold text-end">
+                <div class="col-md-4 fw-bold text-end" :class="{ 'required': comtype == 'rt' }">
                   RT API URL
                 </div>
                 <div class="col-md-6">
-                  <input type="text" id="rtapiurl" name="rtapiurl">
+                  <input type="text" id="rtapiurl" name="rtapiurl" :required="comtype == 'rt'">
                 </div>
               </div>
               <div class="row m-2">
@@ -184,11 +195,11 @@
                 </div>
               </div>
               <div class="row m-2">
-                <div class="col-md-4 fw-bold text-end" :class="{ 'required': !inherit }">
+                <div class="col-md-4 fw-bold text-end" :class="{ 'required': comtype == 'rt' }">
                   RT API Token
                 </div>
                 <div class="col-md-6">
-                  <input type="text" id="rttoken" name="rttoken" :required="!inherit">
+                  <input type="text" id="rttoken" name="rttoken" :required="comtype == 'rt'">
                 </div>
               </div>
               <div class="row m-2">
@@ -335,19 +346,19 @@
                 </div>
               </div>
               <div class="row m-2">
-                <div class="col-md-4 fw-bold text-end">
+                <div class="col-md-4 fw-bold text-end" :class="{ 'required': selectedRecord.com_type == 'rt' }">
                   RT URL
                 </div>
                 <div class="col-md-6">
-                  <input type="text" id="upd_rturl" name="upd_rturl" :value="selectedRecord.rturl" @input="updateField('rturl', $event)">
+                  <input type="text" id="upd_rturl" name="upd_rturl" :value="selectedRecord.rturl" @input="updateField('rturl', $event)" :required="selectedRecord.com_type == 'rt'">
                 </div>
               </div>
               <div class="row m-2">
-                <div class="col-md-4 fw-bold text-end">
+                <div class="col-md-4 fw-bold text-end" :class="{ 'required': selectedRecord.com_type == 'rt' }">
                   RT API URL
                 </div>
                 <div class="col-md-6">
-                  <input type="text" id="upd_rtapiurl" name="upd_rtapiurl" :value="selectedRecord.rtapiurl" @input="updateField('rtapiurl', $event)">
+                  <input type="text" id="upd_rtapiurl" name="upd_rtapiurl" :value="selectedRecord.rtapiurl" @input="updateField('rtapiurl', $event)" :required="selectedRecord.com_type == 'rt'">
                 </div>
               </div>
               <div class="row m-2">
@@ -384,11 +395,11 @@
                 </div>
               </div>
               <div class="row m-2">
-                <div class="col-md-4 fw-bold text-end" :class="{ 'required': !inheritSettings }">
+                <div class="col-md-4 fw-bold text-end" :class="{ 'required': selectedRecord.com_type == 'rt' }">
                   RT API Token
                 </div>
                 <div class="col-md-6">
-                  <input type="text" id="upd_rttoken" name="upd_rttoken" :value="selectedRecord.rt_token" @input="updateField('rt_token', $event)" :required="!inheritSettings">
+                  <input type="text" id="upd_rttoken" name="upd_rttoken" :value="selectedRecord.rt_token" @input="updateField('rt_token', $event)" :required="selectedRecord.com_type == 'rt'">
                 </div>
               </div>
               <div class="row m-2">
@@ -438,7 +449,9 @@ export default {
 
   data: function() {
     return {
-
+      searchTextDep: '',
+      searchParent: '',
+      comtype: ''
     }
   },
 
@@ -630,6 +643,21 @@ export default {
       window.scrollTo(0, 400);
     },
   },
+  computed: {
+    filteredData() {
+      let conditions = [];
+      if (this.searchTextDep.length >= 3) {
+        conditions.push(applicant => this.matchesSearch(applicant.department, this.searchTextDep) || this.matchesSearch(applicant.abbr, this.searchTextDep));
+      }
+      if(this.searchParent != ''){
+        conditions.push(applicant => { return applicant.parentdep == this.searchParent; });
+      }
+      if (conditions.length === 0) {
+        return this.listData;
+      }
+      return this.listData.filter(applicant => conditions.every(condition => condition(applicant)));
+    }
+  }
 };
 </script>
 

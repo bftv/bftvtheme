@@ -30,7 +30,18 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="temp in listData">
+            <tr v-if="listData.length > 5">
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>
+                <select id="department_search" class="fs-6" v-model="searchDepartment">
+                  <option value=""></option>
+                  <option v-for="department in departments" :key="department" :value="department">{{ department }}</option>
+                </select>
+              </td>
+              <td>&nbsp;</td>
+            </tr>
+            <tr v-for="temp in filteredData">
               <td class="text-capitalize">{{ temp.type }}</td>
               <td>{{ temp.description }}</td>
               <td>{{ temp.department }}</td>
@@ -122,6 +133,12 @@ export default {
   mixins: [navmixin, globalMixin],
   name: 'EmailManagement',
 
+  data() {
+    return {
+      searchDepartment: ''
+    };
+  },
+
   mounted: function(){
     const url = 'https://web.bftv.ucdavis.edu/gsr/email-get.php'
     this.getDataList(url, 'department')
@@ -208,6 +225,18 @@ export default {
       window.scrollTo(0, 400);
     },
   },
+  computed: {
+      filteredData() {
+        let conditions = [];
+        if(this.searchDepartment != ''){
+          conditions.push(applicant => { return applicant.department == this.searchDepartment; });
+        }
+        if (conditions.length === 0) {
+          return this.listData;
+        }
+        return this.listData.filter(applicant => conditions.every(condition => condition(applicant)));
+      }
+    }
 };
 </script>
 

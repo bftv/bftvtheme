@@ -12,20 +12,112 @@
           <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="code == 401">Please <a href="/assignments">click here</a> to refresh the page.</span><span v-if="screenmsgtype == 'error'">If the problem persists, please contact <a href="mailto:bftvtech@ucdavis.edu">bftvtech@ucdavis.edu</a>.</span>
         </div>
       </div>
-      <div v-if="!hidebody" class="mt-5">
+      <div v-if="!hidebody" class="mt-3">
         <div class="row">
           <div v-if="!authenticated" class="col-md-12 mb-3">
             <div class="alert alert--error">
               <i class="far fa-times-circle fa-2x alert--error-icon"></i> Your changes will not be saved as you are not authenticated to the server. <a href="#" @click="authenticate()">Click here</a> to authenticate.
             </div>
           </div>
-          <div v-if="pendingTab" class="col-md-12 mb-3">
-            <div class="alert alert--warning">
-              <i class="fa-regular fa-clock fa-2x alert--error-icon"></i> <span class="text-muted"><small>There is an up to <strong>20-minute delay</strong> with the status updates. This results in not showing status updates for the newly created DocuSign applications.</small></span><br/><span class="fs-6">Last updated: {{ metaData.lastupdated }}</span>
+          <div class="col-md-12 text-end">
+            <button class="btn btn-primary btn-sm" style="padding-top: 0.4rem !important" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSearch" aria-expanded="false" aria-controls="collapseExample"><i class="fa-solid fa-magnifying-glass"></i></button>
+          </div>
+          <div class="col-md-12 collapse mt-2" id="collapseSearch">
+            <div class="row">
+              <div class="col-md-3">
+                <input type="text" class="search-input" name="sid_search" id="sid_search" placeholder="Key App ID" />
+                <input type="text" class="search-input" name="pi_name_search" id="pi_name_search" placeholder="Supervisor/PI Name" />
+                <input type="text" class="search-input" name="pi_email_search" id="pi_email_search" placeholder="Supervisor/PI E-mail" />
+                <input type="text" class="search-input" name="gsr_name_search" id="gsr_name_search" placeholder="GSR Name" />
+                <input type="text" class="search-input" name="gsr_email_search" id="gsr_email_search" placeholder="GSR E-mail" />
+              </div>
+              <div class="col-md-3">
+                <select class="search-input" name="department_search" id="department_search">
+                  <option value="">-- Department --</option>
+                  <option v-for="department in departments" :key="department.id" :value="department.id">{{ department.department }}</option>
+                </select>
+                <select class="search-input" name="status_search" id="status_search">
+                  <option value="">-- Status --</option>
+                  <option value="1">New/Pending AM Review</option>
+                  <option value="2">Pending Advising Review</option>
+                  <option value="3">Pending PI Review</option>
+                  <option value="4">PI Requested Change</option>
+                  <option value="5">Waiting DocuSign Initiation</option>
+                  <option value="6">Pending Signatures</option>
+                  <option value="7">Completed</option>
+                  <option value="8">Rejected</option>
+                </select>
+                <select class="search-input" name="appt_term_search" id="appt_term_search">
+                  <option value="">-- Appointment Term --</option>
+                  <option value="Academic Year">Academic Year</option>
+                  <option value="Summer">Summer</option>
+                </select>
+                <div class="input-group input-group-sm input-group-custom">
+                  <span class="input-group-text input-group-text-custom" id="sd-label">Start</span>
+                  <select class="form-select select-wrap" name="sd_equalizer" id="sd_equalizer">
+                    <option value="on" selected>on</option>
+                    <option value="before">before</option>
+                    <option value="after">after</option>
+                    <option value="not">not</option>
+                  </select>
+                  <input type="date" class="form-control input-wrap" name="start_date_search" id="start_date_search" aria-label="Start Date" aria-describedby="sd-label">
+                </div>
+                <div class="input-group input-group-sm input-group-custom">
+                  <span class="input-group-text input-group-text-custom" id="sd-label">End&nbsp;</span>
+                  <select class="form-select select-wrap" name="ed_equalizer" id="ed_equalizer">
+                    <option value="on" selected>on</option>
+                    <option value="before">before</option>
+                    <option value="after">after</option>
+                    <option value="not">not</option>
+                  </select>
+                  <input type="date" class="form-control input-wrap" name="end_date_search" id="end_date_search" aria-label="End Date" aria-describedby="ed-label">
+                </div>
+              </div>
+              <div class="col-md-3">
+                <select class="search-input" name="appt_type_search" id="appt_type_search">
+                  <option value="">-- Appointment Type --</option>
+                  <option value="New">New</option>
+                  <option value="Extension">Extension</option>
+                </select>
+                <input type="text" class="search-input" name="fte_search" id="fte_search" placeholder="FTE Percentage - don't add %" />
+                <input type="text" class="search-input" name="step_search" id="step_search" placeholder="Salary Point" />
+                <input type="text" class="search-input" name="account_search" id="account_search" placeholder="Account Number" />
+                <input type="text" class="search-input" name="grad_group_search" id="grad_group_search" placeholder="Grad Group" />
+              </div>
+              <div class="col-md-3">
+                <select class="search-input" name="training_grant_search" id="training_grant_search">
+                  <option value="">-- Training Grant --</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+                <input type="text" class="search-input" name="additional_funding_search" id="additional_funding_search" placeholder="Additional Funding" />
+                <input type="text" class="search-input" name="salary_search" id="salary_search" placeholder="Proposed Salary" />
+                <select class="search-input" name="pep_search" id="pep_search">
+                  <option value="">-- PEP Status --</option>
+                  <option value="Required">Required</option>
+                  <option value="Not Required">Not Required</option>
+                  <option value="Pending">Pending</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12 text-end">
+                  <button type="button" class="btn btn-primary btn-sm" @click="clearSearch" :disabled="!search">Reset</button>
+                  <button type="button" class="btn btn-primary btn-sm" style="margin-left: 0.25rem;" @click="searchAp">Search</button>
+                </div>
             </div>
           </div>
           <div class="col-md-12">
+            <div v-if="hasApplicants && pendingTab && !search" class="alert alert--warning">
+              <i class="fa-regular fa-clock fa-2x alert--error-icon"></i> <span class="text-muted"><small>There is an up to <strong>20-minute delay</strong> with the status updates. This results in not showing status updates for the newly created DocuSign applications.</small></span><br/><span class="fs-6">Last updated: {{ metaData.lastupdated }}</span>
+            </div>
+            <div v-if="search" class="alert alert--info">
+              <small><strong>{{ listData.length }} {{ listData.length === 1 ? 'row' : 'rows' }}</strong> returned.</small>
+            </div>
             <div v-if="hasApplicants" class='table-responsive mt-2'>
+              <div class="text-end">
+                <button class="btn btn-sm btn-link btn-resend" title="Exports current view to CSV." @click="exportToCSV">Export to CSV</button>
+              </div>
               <table class='table table-bordered table-hover table-striped'>
                 <thead class='thead-light'>
                   <tr>
@@ -39,7 +131,25 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="applicant in listData">
+                  <tr v-if="listData.length > 5">
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td><input type="text" id="gsr_name_search" class="fs-6" v-model="searchTextGsr"></td>
+                    <td><input type="text" id="pi_name_search" class="fs-6" v-model="searchTextPi"></td>
+                    <td v-if="pendingTab">
+                      <select id="status_search" class="fs-6" v-model="searchStatus">
+                        <option value=""></option>
+                        <option value="1">Pending Advising Review</option>
+                        <option value="2">Pending PI Review</option>
+                        <option value="3">PI Requested Change</option>
+                        <option value="4">Waiting DocuSign Initiation</option>
+                        <option value="5">Pending Signature</option>
+                      </select>
+                    </td>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr v-for="applicant in filteredData" :key="applicant.sid">
                     <td>{{ applicant.sid }}</td>
                     <td>{{ convertDateFormat(applicant.created, 'datetime') }}</td>
                     <td>{{ convertDateFormat(applicant.start_date, 'date') }} - {{ convertDateFormat(applicant.end_date, 'date') }}<br/><span class="text-muted fs-t">{{ applicant.appt_type }}</span></td>
@@ -71,7 +181,7 @@
                         <span class="popper-text">{{ convertDateFormat(applicant.sent_pdate, 'datetime', true) }}</span><span v-if="isGreaterThan24Hours(applicant.sent_pdate)"> | <button class="btn btn-sm btn-link btn-resend" @click="resendPI(applicant.sid)" title="Resend offer letter preview to the PI."><i class="fa-solid fa-paper-plane"></i></button></span>
                       </div>
                     </td>
-                    <td><a href="" @click="selectRecord(applicant)" data-bs-toggle="modal" data-bs-target="#modal-applicant"><i class="fa-solid fa-pen-to-square"></i></a><span v-if="statusChecker(applicant.status) === 'rejectable'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalRejectApp"><i class="fa-solid fa-circle-xmark" title="Reject this application."></i></a></span><span v-if="statusChecker(applicant.status) === 'voidable'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalVoidApp"><i class="fa-solid fa-ban" title="Cancel DocuSign for this application."></i></a></span></td>
+                    <td><a href="" @click="selectRecord(applicant)" data-bs-toggle="modal" data-bs-target="#modal-applicant"><i class="fa-solid fa-pen-to-square"></i></a><span v-if="statusChecker(applicant.status) === 'rejectable'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalRejectApp"><i class="fa-solid fa-circle-xmark" title="Reject this application."></i></a></span><span v-if="statusChecker(applicant.status) === 'voidable'"> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalVoidApp"><i class="fa-solid fa-ban" title="Cancel DocuSign for this application."></i></a> | <a data-bs-toggle="modal" href="" @click="selectRecord(applicant)" data-bs-target="#modalCompApp"><i class="fa-solid fa-circle-check" title="Manually mark application complete."></i></a></span><span v-if="applicant.status == 'completed'"> | <a :href="linkGenerator(applicant)"><i class="fa-solid fa-rotate-right" title="Resubmit/extend this application."></i></a></span></td>
                   </tr>
                 </tbody>
               </table>
@@ -142,6 +252,33 @@
                 <input type="hidden" name="mode" value="voidapp" />
                 <input type="hidden" name="sid" id="modalVoidAppsid" :value="selectedRecord.sid" />
                 <input type="hidden" name="envid" id="envid" :value="selectedRecord.envelope_id" />
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!--Complete App Modal-->
+      <div class="modal fade" id="modalCompApp">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <!-- Modal body -->
+            <form method="post" @submit.prevent="compApp">
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <p>Are you sure you want to manually mark complete the application# <strong><span id="modalCompAppNO">{{ selectedRecord.sid }}</span></strong> for <strong>{{ selectedRecord.gsr_fname }} {{ selectedRecord.gsr_lname }}</strong>?</p>
+                  </div>
+                  <div class="col-md-12">
+                    <p class="text-muted small">This action cannot be undone.</p>
+                  </div>
+                </div>
+              </div>
+              <!-- Modal footer -->
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" @click="unsetSelectedRecord()">No</button>
+                <button type="submit" class="btn btn-primary btn-sm">Yes</button>
+                <input type="hidden" name="mode" value="compapp" />
+                <input type="hidden" name="sid" id="modalCompAppsid" :value="selectedRecord.sid" />
               </div>
             </form>
           </div>
@@ -415,12 +552,13 @@
 </template>
 
 <script>
+  import axios from 'axios';
   import { navmixin } from '../mixins/navMixin.js';
   import { globalMixin } from '../mixins/globalMixin.js';
   export default {
     mixins: [navmixin, globalMixin],
     name: 'Apps',
-    watch: {
+    /* watch: {
       '$route': {
         immediate: true, // to run the handler immediately when the component is created
         handler(to, from) {
@@ -443,20 +581,405 @@
             default:
               status = 'new'; // default status or any other default you want to set
           }
-
           this.getDataList(url, 'data', status);
         }
       }
+    }, */
+    data() {
+      return {
+        searchTextGsr: '',
+        searchTextPi: '',
+        searchStatus: '',
+        search: false,
+        routeWatcher: null
+      };
     },
     mounted: function(){
-      this.$nextTick(() => {
+      /* this.$nextTick(() => {
         setTimeout(() => {
             const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
             const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
         }, 2000); // Delay of 2 second
-      });
+      }); */
+      this.routeWatcher = Vue.watch(
+        () => this.$route,
+        (to, from) => {
+          const url = 'https://web.bftv.ucdavis.edu/gsr/data-get.php';
+          let status;
+
+          switch (to.name) { // 'to' is the target Route Object being navigated to.
+            case 'pen-apps':
+              status = 'pending';
+              break;
+            case 'new-apps':
+              status = 'new';
+              break;
+            case 'rej-apps':
+              status = 'rejected';
+              break;
+            case 'com-apps':
+              status = 'completed';
+              break;
+            default:
+              status = 'new'; // default status or any other default you want to set
+          }
+          this.getDataList(url, 'data', status);
+        },
+        { immediate: true }
+      );
+    },
+    beforeUnmount() {
+      if (this.routeWatcher) {
+        this.routeWatcher(); // This stops the watcher
+      }
     },
     methods: {
+      searchAp() {
+        var searched = false;
+        this.search = true;
+        let conditions = [];
+        var sid = document.getElementById('sid_search').value;
+        var piname = document.getElementById('pi_name_search').value;
+        var piemail = document.getElementById('pi_email_search').value;
+        var gsrname = document.getElementById('gsr_name_search').value;
+        var gsremail = document.getElementById('gsr_email_search').value;
+        var department = document.getElementById('department_search').value;
+        var appointment_type = document.getElementById('appt_type_search').value;
+        var status = document.getElementById('status_search').value;
+        var appointment_term = document.getElementById('appt_term_search').value;
+        var sd_eq = document.getElementById('sd_equalizer').value;
+        var startdate = document.getElementById('start_date_search').value;
+        var ed_eq = document.getElementById('ed_equalizer').value;
+        var enddate = document.getElementById('end_date_search').value;
+        var fte = document.getElementById('fte_search').value;
+        var step = document.getElementById('step_search').value;
+        var account = document.getElementById('account_search').value;
+        var gradgroup = document.getElementById('grad_group_search').value;
+        var traininggrant = document.getElementById('training_grant_search').value;
+        var addtionalfunding = document.getElementById('additional_funding_search').value;
+        var salary = document.getElementById('salary_search').value;
+        var pepstatus = document.getElementById('pep_search').value;
+        let newConditions;
+        if(sid != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.sid.includes(sid));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.sid.includes(sid));
+          }
+        } else if(piname != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.pi_fname.toLowerCase().includes(piname.toLowerCase()) || e.pi_lname.toLowerCase().includes(piname.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.pi_fname.toLowerCase().includes(piname.toLowerCase()) || e.pi_lname.toLowerCase().includes(piname.toLowerCase()));
+          }
+        }
+        if(piemail != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.pi_email.toLowerCase().includes(piemail.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.pi_email.toLowerCase().includes(piemail.toLowerCase()));
+          }
+        }
+        if(gsrname != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.gsr_fname.toLowerCase().includes(gsrname.toLowerCase()) || e.gsr_lname.toLowerCase().includes(gsrname.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.gsr_fname.toLowerCase().includes(gsrname.toLowerCase()) || e.gsr_lname.toLowerCase().includes(gsrname.toLowerCase()));
+          }
+        }
+        if(gsremail != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.gsr_email.toLowerCase().includes(gsremail.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.gsr_email.toLowerCase().includes(gsremail.toLowerCase()));
+          }
+        }
+        if(department != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.depid && e.depid == department);
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.depid && e.depid == department);
+          }
+        }
+        if(appointment_type != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.appt_type && e.appt_type.toLowerCase().includes(appointment_type.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.appt_type && e.appt_type.toLowerCase().includes(appointment_type.toLowerCase()));
+          }
+        }
+        if(status != ''){
+          switch (status) {
+            case '1':
+              if(!searched){
+                newConditions = this.allListData.filter(e => e.status_sort == 1);
+                searched = true;
+              } else {
+                newConditions = newConditions.filter(e => e.status_sort == 1);
+              }
+              break;
+            case '2':
+              if(!searched){
+                newConditions = this.allListData.filter(e => e.status_sort == 2);
+                searched = true;
+              } else {
+                newConditions = newConditions.filter(e => e.status_sort == 2);
+              }
+              break;
+            case '3':
+              if(!searched){
+                newConditions = this.allListData.filter(e => e.status_sort == 3);
+                searched = true;
+              } else {
+                newConditions = newConditions.filter(e => e.status_sort == 3);
+              }
+              break;
+            case '4':
+              if(!searched){
+                newConditions = this.allListData.filter(e => e.status_sort == 4);
+                searched = true;
+              } else {
+                newConditions = newConditions.filter(e => e.status_sort == 4);
+              }
+              break;
+            case '5':
+              if(!searched){
+                newConditions = this.allListData.filter(e => e.status_sort == 5);
+                searched = true;
+              } else {
+                newConditions = newConditions.filter(e => e.status_sort == 5);
+              }
+              break;
+            case '6':
+              if(!searched){
+                newConditions = this.allListData.filter(e => e.status_sort == 6);
+                searched = true;
+              } else {
+                newConditions = newConditions.filter(e => e.status_sort == 6);
+              }
+              break;
+            case '7':
+              if(!searched){
+                newConditions = this.allListData.filter(e => e.status_sort == 7);
+                searched = true;
+              } else {
+                newConditions = newConditions.filter(e => e.status_sort == 7);
+              }
+              break;
+            case '8':
+              if(!searched){
+                newConditions = this.allListData.filter(e => e.status_sort == 8);
+                searched = true;
+              } else {
+                newConditions = newConditions.filter(e => e.status_sort == 8);
+              }
+              break;
+          }
+        }
+        if(appointment_term != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.appt_term && e.appt_term.toLowerCase().includes(appointment_term.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.appt_term && e.appt_term.toLowerCase().includes(appointment_term.toLowerCase()));
+          }
+        }
+        if(startdate != ''){
+          startdate = new Date(startdate);
+          if(!searched){
+            if(sd_eq == 'on'){
+              newConditions = this.allListData.filter(e => {
+                let startDate = new Date(e.start_date);
+                return startDate.getTime() === startdate.getTime();
+              });
+            } else if(sd_eq == 'before'){
+              newConditions = this.allListData.filter(e => {
+                let startDate = new Date(e.start_date);
+                return startDate < startdate;
+              });
+            } else if(sd_eq == 'after'){
+              newConditions = this.allListData.filter(e => {
+                let startDate = new Date(e.start_date);
+                return startDate > startdate;
+              });
+            } else if(sd_eq == 'not'){
+              newConditions = this.allListData.filter(e => {
+                let startDate = new Date(e.start_date);
+                return startDate.getTime() !== startdate.getTime();
+              });
+            }
+            searched = true;
+          } else {
+            if(sd_eq == 'on'){
+              newConditions = newConditions.filter(e => {
+                let startDate = new Date(e.start_date);
+                return startDate.getTime() === startdate.getTime();
+              });
+            } else if(sd_eq == 'before'){
+              newConditions = newConditions.filter(e => {
+                let startDate = new Date(e.start_date);
+                return startDate < startdate;
+              });
+            } else if(sd_eq == 'after'){
+              newConditions = newConditions.filter(e => {
+                let startDate = new Date(e.start_date);
+                return startDate > startdate;
+              });
+            } else if(sd_eq == 'not'){
+              newConditions = newConditions.filter(e => {
+                let startDate = new Date(e.start_date);
+                return startDate.getTime() !== startdate.getTime();
+              });
+            }
+          }
+        }
+        if(enddate != ''){
+          enddate = new Date(enddate);
+          if(!searched){
+            if(ed_eq == 'on'){
+              newConditions = this.allListData.filter(e => {
+                let endDate = new Date(e.end_date);
+                return endDate.getTime() === enddate.getTime();
+              });
+            } else if(ed_eq == 'before'){
+              newConditions = this.allListData.filter(e => {
+                let endDate = new Date(e.end_date);
+                return endDate < enddate;
+              });
+            } else if(ed_eq == 'after'){
+              newConditions = this.allListData.filter(e => {
+                let endDate = new Date(e.end_date);
+                return endDate > enddate;
+              });
+            } else if(ed_eq == 'not'){
+              newConditions = this.allListData.filter(e => {
+                let endDate = new Date(e.end_date);
+                return endDate.getTime() !== enddate.getTime();
+              });
+            }
+            searched = true;
+          } else {
+            if(ed_eq == 'on'){
+              newConditions = newConditions.filter(e => {
+                let endDate = new Date(e.end_date);
+                return endDate.getTime() === enddate.getTime();
+              });
+            } else if(ed_eq == 'before'){
+              newConditions = newConditions.filter(e => {
+                let endDate = new Date(e.end_date);
+                return endDate < enddate;
+              });
+            } else if(ed_eq == 'after'){
+              newConditions = newConditions.filter(e => {
+                let endDate = new Date(e.end_date);
+                return endDate > enddate;
+              });
+            } else if(ed_eq == 'not'){
+              newConditions = newConditions.filter(e => {
+                let endDate = new Date(e.end_date);
+                return startendDateDate.getTime() !== enddate.getTime();
+              });
+            }
+          }
+        }
+        if(fte != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.fte_percentage && e.fte_percentage.toLowerCase().includes(fte.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.fte_percentage && e.fte_percentage.toLowerCase().includes(fte.toLowerCase()));
+          }
+        }
+        if(step != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.step && e.step.toLowerCase().includes(step.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.step && e.step.toLowerCase().includes(step.toLowerCase()));
+          }
+        }
+        if(account != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.account && e.account.toLowerCase().includes(account.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.account && e.account.toLowerCase().includes(account.toLowerCase()));
+          }
+        }
+        if(gradgroup != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.grad_group && (e.grad_group.toLowerCase().includes(gradgroup.toLowerCase()) || e.other_grad_group.toLowerCase().includes(gradgroup.toLowerCase())));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.grad_group && (e.grad_group.toLowerCase().includes(gradgroup.toLowerCase()) || e.other_grad_group.toLowerCase().includes(gradgroup.toLowerCase())));
+          }
+        }
+        if(traininggrant != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.training_grant && e.training_grant.toLowerCase().includes(traininggrant.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.training_grant && e.training_grant.toLowerCase().includes(traininggrant.toLowerCase()));
+          }
+        }
+        if(addtionalfunding != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.additional_funding && e.additional_funding.toLowerCase().includes(addtionalfunding.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.additional_funding && e.additional_funding.toLowerCase().includes(addtionalfunding.toLowerCase()));
+          }
+        }
+        if(salary != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.salary && e.salary.toLowerCase().includes(salary.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.salary && e.salary.toLowerCase().includes(salary.toLowerCase()));
+          }
+        }
+        if(pepstatus != ''){
+          if(!searched){
+            newConditions = this.allListData.filter(e => e.pep_status && e.pep_status.toLowerCase().includes(pepstatus.toLowerCase()));
+            searched = true;
+          } else {
+            newConditions = newConditions.filter(e => e.pep_status && e.pep_status.toLowerCase().includes(pepstatus.toLowerCase()));
+          }
+        }
+        if(searched){
+          conditions.push(...newConditions);
+          this.listData = conditions;
+        } else {
+          this.search = false;
+        }
+      },
+      clearSearch() {
+        this.search = false;
+        document.getElementById('sid_search').value = '';
+        document.getElementById('pi_name_search').value = '';
+        document.getElementById('pi_email_search').value = '';
+        document.getElementById('gsr_name_search').value = '';
+        document.getElementById('gsr_email_search').value = '';
+        document.getElementById('department_search').value = '';
+        document.getElementById('appt_type_search').value = '';
+        document.getElementById('status_search').value = '';
+        document.getElementById('appt_term_search').value = '';
+        document.getElementById('sd_equalizer').value = 'on';
+        document.getElementById('start_date_search').value = '';
+        document.getElementById('ed_equalizer').value = 'on';
+        document.getElementById('end_date_search').value = '';
+        document.getElementById('fte_search').value = '';
+        document.getElementById('step_search').value = '';
+        document.getElementById('account_search').value = '';
+        this.listData = this.currentOriginalListData;
+      },
       removeAllBackslashes(inputString) {
         return inputString.replace(/\\/g, "");
       },
@@ -485,6 +1008,23 @@
         const differenceInMilliseconds = currentDateTime - givenDateTime;
         const hoursDifference = differenceInMilliseconds / (1000 * 60 * 60);
         return hoursDifference > 24;
+      },
+      linkGenerator(app){
+        var webform_url = "https://bftv.ucdavis.edu/gsr";
+        var pifname = app.pi_fname;
+        var pilname = app.pi_lname;
+        var pititle = app.pi_title;
+        var piemail = app.pi_email;
+        var pidep = app.depcode;
+        var gsrfname = app.gsr_fname;
+        var gsrlname = app.gsr_lname;
+        var gsremail = app.gsr_email;
+        var worksite = app.worksite;
+        var appttype = 'Extension';
+        var jobdescription = app.job_description;
+        var url = "faculty_pi_firstname="+pifname+"&faculty_pi_lastname="+pilname+"&title="+pititle+"&faculty_pi_email="+piemail+"&faculty_pi_department="+pidep+"&first_name="+gsrfname+"&last_name="+gsrlname+"&e_mail_address="+gsremail+"&worksite="+worksite+"&appointment_type="+appttype+"&job_description="+jobdescription;
+        var finalUrl = webform_url+"?data="+btoa(unescape(encodeURIComponent(url)));
+        return finalUrl;
       },
       updateApplicant(e) {
         e.preventDefault();
@@ -575,13 +1115,14 @@
           headers: {
             'Content-Type': 'application/json'
           }
-        }).then(response => {console.log(response);
+        }).then(response => {
           this.screenmsg = response.data.message,
           this.screenmsgtype = "success",
           this.screenmsgicon = this.successicon,
+          this.allListData = response.data.updated_data.data,
           this.listData = response.data.updated_data.data,
           this.filterObjectByKeyValue("status", "pending")
-        }).catch(error => {console.log(error);
+        }).catch(error => {
           if(error.response.data.message){
             this.screenmsg = error.response.data.message
           } else if(error.data.message){
@@ -617,6 +1158,7 @@
           this.screenmsg = response.data.message,
           this.screenmsgtype = "success",
           this.screenmsgicon = this.successicon,
+          this.allListData = response.data.updated_data.data,
           this.listData = response.data.updated_data.data,
           this.filterObjectByKeyValue("status", "new")
         }).catch(error => {
@@ -665,6 +1207,45 @@
           this.screenmsg = response.data.message,
           this.screenmsgtype = "success",
           this.screenmsgicon = this.successicon,
+          this.allListData = response.data.updated_data.data,
+          this.listData = response.data.updated_data.data,
+          this.filterObjectByKeyValue("status", "pending")
+        }).catch(error => {
+          if(error.response.data.message){
+            this.screenmsg = error.response.data.message
+          } else if(error.data.message){
+            this.screenmsg = error.data.message
+          } else {
+            this.screenmsg = error.message
+          }
+          this.screenmsgtype = "error",
+          this.screenmsgicon = this.erroricon,
+          this.code = error.response.data.status
+        }).finally(() => {
+          this.unsetSelectedRecord();
+          modal.hide();
+          this.loading = false;
+        });
+        window.scrollTo(0, 400);
+      },
+      compApp(e) {
+        e.preventDefault();
+        this.loading = true;
+        var modal = bootstrap.Modal.getInstance(document.getElementById('modalCompApp'));
+        var sid = document.getElementById('modalCompAppsid').value;
+        axios.post('https://web.bftv.ucdavis.edu/gsr/data-complete.php', {
+          crossDomain: true,
+          myid: this.username,
+          token: this.token,
+          sid: sid,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(response => {
+          this.screenmsg = response.data.message,
+          this.screenmsgtype = "success",
+          this.screenmsgicon = this.successicon,
+          this.allListData = response.data.updated_data.data,
           this.listData = response.data.updated_data.data,
           this.filterObjectByKeyValue("status", "pending")
         }).catch(error => {
@@ -701,6 +1282,7 @@
           this.screenmsg = response.data.message,
           this.screenmsgtype = "success",
           this.screenmsgicon = this.successicon,
+          this.allListData = response.data.updated_data.data,
           this.listData = response.data.updated_data.data,
           this.filterObjectByKeyValue("status", "pending")
         }).catch(error => {
@@ -735,9 +1317,10 @@
           this.screenmsg = response.data.message,
           this.screenmsgtype = "success",
           this.screenmsgicon = this.successicon,
+          this.allListData = response.data.updated_data.data,
           this.listData = response.data.updated_data.data,
           this.filterObjectByKeyValue("status", "pending")
-        }).catch(error => {console.log(error);
+        }).catch(error => {
           if(error.response.data.message){
             this.screenmsg = error.response.data.message
           } else if(error.data.message){
@@ -752,12 +1335,68 @@
           this.loading = false;
         });
         window.scrollTo(0, 400);
+      },
+      exportToCSV() {
+        let csvContent = '';
+        const header_row = ['Key App ID', 'PI First Name', 'PI Last Name', 'PI Title', 'PI E-mail', 'Department', 'GSR First Name', 'GSR Last Name', 'GSR E-mail', 'Worksite', 'Appointment Term', 'Start Date', 'End Date', 'Appointment Type', 'FTE%', 'Step', 'Account', 'Salary', 'Status', 'PEP Status'];
+
+        const fields = ['sid', 'pi_fname', 'pi_lname', 'pi_title', 'pi_email', 'department', 'gsr_fname', 'gsr_lname', 'gsr_email', 'worksite', 'appt_term', 'start_date', 'end_date', 'appt_type', 'fte_percentage', 'step', 'account', 'salary', 'status_exp', 'pep_status'];
+
+        csvContent += header_row.join(",") + "\r\n";
+
+        this.filteredData.forEach(row => {
+          let rowData = fields.map(field => JSON.stringify(row[field] || '', this.replacer));
+          csvContent += rowData.join(",") + "\r\n";
+        });
+
+        // Create Blob for CSV content
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'GSR_Data.csv');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      },
+      replacer(key, value) {
+        if (value === null || value === undefined) {
+          return '';
+        }
+        return value;
       }
     },
     computed: {
       hasApplicants() {
-        return Object.keys(this.listData).length > 0;
+        return Object.keys(this.currentOriginalListData).length > 0;
       },
+      filteredData() {
+        let conditions = [];
+        if (this.searchTextGsr.length >= 3) {
+          conditions.push(applicant => this.matchesSearch(applicant.gsr_fname, this.searchTextGsr) || this.matchesSearch(applicant.gsr_lname, this.searchTextGsr));
+        }
+        if (this.searchTextPi.length >= 3) {
+          conditions.push(applicant => this.matchesSearch(applicant.pi_fname, this.searchTextPi) || this.matchesSearch(applicant.pi_lname, this.searchTextPi));
+        }
+        if(this.searchStatus != ''){
+          if(this.searchStatus == 1){
+            conditions.push(applicant => { return applicant.status_sort == 2 });
+          } else if(this.searchStatus == 2){
+            conditions.push(applicant => { return applicant.status_sort == 3 });
+          } else if(this.searchStatus == 3){
+            conditions.push(applicant => { return applicant.status_sort == 4 });
+          } else if(this.searchStatus == 4){
+            conditions.push(applicant => { return applicant.status_sort == 5 });
+          } else if(this.searchStatus == 5){
+            conditions.push(applicant => { return applicant.status_sort == 6 });
+          }
+        }
+        if (conditions.length === 0) {
+          return this.listData;
+        }
+        return this.listData.filter(applicant => conditions.every(condition => condition(applicant)));
+      }
     }
   };
 </script>

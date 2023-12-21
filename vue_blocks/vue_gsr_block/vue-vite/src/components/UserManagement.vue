@@ -36,7 +36,28 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="person in listData">
+            <tr v-if="listData.length > 5">
+              <td><input type="text" id="user_name_search" class="fs-6" v-model="searchTextUser"></td>
+              <td>
+                <select id="department_search" class="fs-6" v-model="searchDepartment">
+                  <option value=""></option>
+                  <option v-for="department in departments" :key="department" :value="department">{{ department }}</option>
+                </select>
+              </td>
+              <td>
+                <select id="role_search" class="fs-6" v-model="searchRole">
+                  <option value=""></option>
+                  <option v-if="accesslevel2" value="superadmin">SuperAdmin</option>
+                  <option value="orgadmin">OrgAdmin</option>
+                  <option value="editor">Editor</option>
+                  <option value="viewer">Viewer</option>
+                  <option value="submitter">Submitter</option>
+                </select>
+              </td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+            <tr v-for="person in filteredData">
               <td>{{ person.firstname }} {{ person.lastname }}</td>
               <td>{{ person.department }}</td>
               <td class="text-capitalize">{{ person.role }}</td>
@@ -228,6 +249,15 @@
                   </div>
                 </div>
                 <div class="row m-2">
+                  <div class="col-md-4 fw-bold text-end">
+                      Data Source
+                  </div>
+                  <div class="col-md-6">
+                    <textarea id="data_source" name="data_source" rows="4" :value="selectedRecord.data_source" @input="updateField('data_source', $event)"></textarea>
+                    <div><small>Default source is the user's loginid. But you can add other PI email addresses here separated by '; ' to show the user the relevant applications.</small></div>
+                  </div>
+                </div>
+                <div class="row m-2">
                   <div class="col-md-6 offset-md-4">
                     <input type="checkbox" id="status_check" name="status_check" :value="selectedRecord.status" :checked="selectedRecord.status == '1'" />
                     <label class="radio-check-label" for="status_check">Enable User</label>
@@ -261,7 +291,10 @@
 
     data() {
       return {
-        selectedRole: ''
+        selectedRole: '',
+        searchTextUser: '',
+        searchDepartment: '',
+        searchRole: ''
       };
     },
 
@@ -326,6 +359,7 @@
         var usrdep = document.getElementById('department').value;
         var usrstatus = document.getElementById('status_check').checked;
         var usrname = document.getElementById('fullname').value;
+        var usrsrc = document.getElementById('data_source').value;
         var team = '';
         var action = '';
         if(document.querySelector('input[name="team"]:checked')){
@@ -343,7 +377,7 @@
         }
         axios.post('https://web.bftv.ucdavis.edu/gsr/user-update.php', {
           crossDomain: true,
-          cfname: usrcfname, clname: usrclname, role: usrrole, team: team, email: usremail, phone: usrphone, enabled: usrstatus, name: usrname, department: usrdep,
+          cfname: usrcfname, clname: usrclname, role: usrrole, team: team, email: usremail, phone: usrphone, enabled: usrstatus, name: usrname, department: usrdep, datasource: usrsrc,
           myid: this.username,
           token: this.token,
           mode: action,
@@ -413,6 +447,24 @@
         });
         window.scrollTo(0, 400);
       },
+    },
+    computed: {
+      filteredData() {
+        let conditions = [];
+        if (this.searchTextUser.length >= 3) {
+          conditions.push(applicant => this.matchesSearch(applicant.firstname, this.searchTextUser) || this.matchesSearch(applicant.lastname, this.searchTextUser));
+        }
+        if(this.searchDepartment != ''){
+          conditions.push(applicant => { return applicant.department == this.searchDepartment; });
+        }
+        if(this.searchRole != ''){
+          conditions.push(applicant => this.matchesSearch(applicant.role, this.searchRole));
+        }
+        if (conditions.length === 0) {
+          return this.listData;
+        }
+        return this.listData.filter(applicant => conditions.every(condition => condition(applicant)));
+      }
     }
   };
 </script>
