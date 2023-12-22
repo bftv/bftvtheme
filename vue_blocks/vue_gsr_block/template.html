@@ -21,6 +21,7 @@
                             <li><router-link :to="{name: 'email-templates'}" class="dropdown-item" @click="loader">Email Templates</router-link></li>
                         </ul>
                     </li>
+                    <li v-if="accessLevels.level2" class="nav-item"><router-link :to="{name: 'settings'}" class="nav-link" @click="loader">Global Settings</router-link></li>
                 </ul>
             </div>
             <span class="navbar-text user-info">

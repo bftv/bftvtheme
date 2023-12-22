@@ -309,7 +309,7 @@ label.radio-check-label {
 input[type="text"], input[type="number"], input[type="email"], input[type="date"], select {
     height: 2.5em !important;
 }
-input[type="text"]:not(.search-input, .input-wrap), input[type="number"]:not(.search-input, .input-wrap), input[type="email"]:not(.search-input, .input-wrap), input[type="date"]:not(.search-input, .input-wrap), select:not(.search-input, .select-wrap), textarea:not(.search-input, .input-wrap) {
+input[type="text"]:not(.search-input, .input-wrap), input[type="number"]:not(.search-input, .input-wrap), input[type="email"]:not(.search-input, .input-wrap), input[type="date"]:not(.search-input, .input-wrap), select:not(.search-input, .select-wrap, .rpp), textarea:not(.search-input, .input-wrap) {
     border: 1px solid #ccc !important;
     border-radius: 0 !important;
     padding: .25em .75em !important;
@@ -535,4 +535,8 @@ a.fa-single-edit:visited {
 }
 .sortable span {
     font-size: 0.5rem;
+}
+.rpp {
+    width: auto !important;
+    padding: .25em .25em !important;
 }

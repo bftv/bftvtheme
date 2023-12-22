@@ -11,12 +11,14 @@ export var globalMixin = {
       hidebody: false,
       success: null,
       code: null,
+      specific:  false,
       allListData: [],
       listData: [],
       currentOriginalListData: [],
       metaData: [],
       pendingTab:  false,
       departments: [],
+      defaultEmails: [],
       selectedRecord: '',
       initialState: {},
       selectedFunding: [],
@@ -55,7 +57,8 @@ export var globalMixin = {
             id = this.$route.query.sid
           }
           if(id){
-              this.filterObjectByKeyValue("sid", id);
+            this.currentOriginalListData = this.listData;
+            this.filterObjectByKeyValue("sid", id);
           } else {
             if(this.curlRole != 'submitter'){
               if(section == 'new'){
@@ -87,8 +90,13 @@ export var globalMixin = {
           this.departments = response.data.departments,
           this.listData.sort(this.sortFname)
         } else {
-          this.listData = response.data.dataList,
-          this.departments = response.data.departments
+          this.listData = response.data.dataList;
+          if(response.data.departments){
+            this.departments = response.data.departments
+          }
+          if(response.data.emailList){
+            this.defaultEmails = response.data.emailList
+          }
         }
         this.resetQuickSearch();
         this.message = response.data.message,
@@ -342,6 +350,9 @@ export var globalMixin = {
     },
     curlTeam() {
       return this.$store.state.curlTeam;
+    },
+    curlDev() {
+      return this.$store.state.curlDev;
     },
     authText() {
       return this.$store.state.authText;

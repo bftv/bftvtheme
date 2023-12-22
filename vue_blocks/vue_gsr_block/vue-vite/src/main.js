@@ -3,6 +3,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import UserManagement from './components/UserManagement.vue';
 import DepartmentManagement from './components/DepartmentManagement.vue';
 import EmailManagement from './components/EmailManagement.vue';
+import Settings from './components/Settings.vue';
 import Apps from './components/Apps.vue';
 
 //import mixins
@@ -70,7 +71,7 @@ const router = createRouter({
 
   routes: [
     { path: '/', name: 'new-apps', component: Apps },
-    { path: '/view:id',  name: 'GsrMgmtFiltered', component: Apps },
+    { path: '/view',  name: 'GsrMgmtFiltered', component: Apps },
     { path: '/pen-apps', name: 'pen-apps', component: Apps },
     { path: '/com-apps', name: 'com-apps', component: Apps },
     { path: '/rej-apps', name: 'rej-apps', component: Apps },
@@ -78,6 +79,7 @@ const router = createRouter({
     { path: '/users', name: 'users', component: UserManagement },
     { path: '/departments', name: 'departments', component: DepartmentManagement },
     { path: '/email-templates', name: 'email-templates', component: EmailManagement },
+    { path: '/settings', name: 'settings', component: Settings },
     { path: '/:pathMatch(.*)*', name: 'new-apps-any', component: Apps, props: true }
   ]
 });

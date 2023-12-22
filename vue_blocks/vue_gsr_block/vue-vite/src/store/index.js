@@ -12,6 +12,7 @@ export default createStore({
     curlName: '',
     curlDep: '',
     curlTeam: '',
+    curlDev: '',
     authenticated: '',
     authText: '',
     accesslevel0s: false,
@@ -36,6 +37,9 @@ export default createStore({
     },
     setCurlTeam(state, team) {
       state.curlTeam = team;
+    },
+    setCurlDev(state, dev) {
+      state.curlDev = dev;
     },
     setAuthenticated(state, auth) {
       state.authenticated = auth;
@@ -73,6 +77,7 @@ export default createStore({
           commit('setCurlDep', data.userdep);
           commit('setCurlTeam', data.userteam);
           commit('setAuthenticated', data.authenticated);
+          commit('setCurlDev', data.userdev);
           if(data.authenticated){
             commit('setAuthText', 'Authenticated');
           } else {

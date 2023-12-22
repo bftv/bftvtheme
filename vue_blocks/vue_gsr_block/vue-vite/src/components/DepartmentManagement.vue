@@ -25,6 +25,19 @@
         </div>
       </div>
       <div v-if="!hidebody" class='table-responsive mt-2'>
+        <div class="text-end">
+          <span style="font-size: 0.75rem;">
+            Records Per Page
+            <select id="parent_search" class="fs-6 rpp" v-model="pageSize">
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="250">250</option>
+              <option value="500">500</option>
+            </select>
+          </span>
+        </div>
         <table class='table table-bordered table-hover table-striped'>
           <thead class='thead-light'>
             <tr>
@@ -62,13 +75,21 @@
         </table>
         <nav v-if="fullLength > pageSize" aria-label="Page navigation">
           <ul class="pagination pagination-sm justify-content-center">
-            <li class="page-item"><button class="page-link" @click="firstPage"><i class="fa-solid fa-angles-left"></i></button></li>
-            <li class="page-item"><button class="page-link" @click="prevPage"><i class="fa-solid fa-angle-left"></i></button></li>
-            <li class="page-item" v-for="n in totalPages" :key="n">
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <button class="page-link" @click="firstPage" :disabled="currentPage === 1"><i class="fa-solid fa-angles-left"></i></button>
+            </li>
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <button class="page-link" @click="prevPage" :disabled="currentPage === 1"><i class="fa-solid fa-angle-left"></i></button>
+            </li>
+            <li class="page-item" v-for="n in totalPages" :key="n" :class="{ active: currentPage === n }">
               <button class="page-link" @click="goToPage(n)">{{ n }}</button>
             </li>
-            <li class="page-item"><button class="page-link" @click="nextPage"><i class="fa-solid fa-angle-right"></i></button></li>
-            <li class="page-item"><button class="page-link" @click="lastPage"><i class="fa-solid fa-angles-right"></i></button></li>
+            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+              <button class="page-link" @click="nextPage" :disabled="currentPage === totalPages"><i class="fa-solid fa-angle-right"></i></button>
+            </li>
+            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+              <button class="page-link" @click="lastPage" :disabled="currentPage === totalPages"><i class="fa-solid fa-angles-right"></i></button>
+            </li>
           </ul>
         </nav>
       </div>
@@ -241,6 +262,25 @@
                 </div>
                 <div class="col-md-6">
                   <input type="text" id="dstempid" name="dstempid" :required="!inherit">
+                </div>
+              </div>
+              <div class="row m-2">
+                <div class="col-md-4 fw-bold text-end">
+                  Notifications
+                </div>
+                <div class="col-md-6">
+                  <div>
+                    <input type="checkbox" id="notification_pay1" name="notification_pay1" />
+                    <label class="radio-check-label" for="notification_pay1">Inform Payroll on DocuSign Initiation</label>
+                  </div>
+                  <div>
+                    <input type="checkbox" id="notification_am" name="notification_am" />
+                    <label class="radio-check-label" for="notification_am">Inform Account Management on DocuSign Initiation</label>
+                  </div>
+                  <div>
+                    <input type="checkbox" id="notification_pay2" name="notification_pay2" />
+                    <label class="radio-check-label" for="notification_pay2">Inform Payroll on Final Status of the Offer Letter</label>
+                  </div>
                 </div>
               </div>
             </fieldset>
@@ -444,6 +484,25 @@
                   <div><small>Only SuperAdmins can update DocuSign settings. They need to validate the DocuSign user and template.</small></div>
                 </div>
               </div>
+              <div class="row m-2">
+                <div class="col-md-4 fw-bold text-end">
+                  Notifications
+                </div>
+                <div class="col-md-6">
+                  <div>
+                    <input type="checkbox" id="upd_notification_pay1" name="upd_notification_pay1" :value="selectedRecord.notification_pay_a" :checked="selectedRecord.notification_pay_a == 1" />
+                    <label class="radio-check-label" for="upd_notification_pay1">Inform Payroll on DocuSign Initiation</label>
+                  </div>
+                  <div>
+                    <input type="checkbox" id="upd_notification_am" name="upd_notification_am" :value="selectedRecord.notification_am" :checked="selectedRecord.notification_am == 1" />
+                    <label class="radio-check-label" for="upd_notification_am">Inform Account Management on DocuSign Initiation</label>
+                  </div>
+                  <div>
+                    <input type="checkbox" id="upd_notification_pay2" name="upd_notification_pay2" :value="selectedRecord.notification_pay_b" :checked="selectedRecord.notification_pay_b == 1" />
+                    <label class="radio-check-label" for="upd_notification_pay2">Inform Payroll on Final Status of the Offer Letter</label>
+                  </div>
+                </div>
+              </div>
             </fieldset>
           </div>
           <div class="modal-footer">
@@ -463,6 +522,15 @@ import { globalMixin } from '../mixins/globalMixin.js';
 export default {
   mixins: [globalMixin],
   name: 'DepartmentManagement',
+  watch: {
+    pageSize(newSize) {console.log(newSize);
+      newSize = parseInt(newSize);
+      if (newSize > 0) {
+        this.totalPages = Math.ceil(this.fullLength / newSize);
+        this.currentPage = 1; // Reset to first page
+      }
+    }
+  },
 
   data: function() {
     return {
@@ -506,6 +574,9 @@ export default {
       var dsu = document.getElementById('dsuser').value;
       var dsui = document.getElementById('dsuserid').value;
       var dsti = document.getElementById('dstempid').value;
+      var notpay1 = document.getElementById('notification_pay1').checked;
+      var notam = document.getElementById('notification_am').checked;
+      var notpay2 = document.getElementById('notification_pay2').checked;
       var ctype = '';
       if(mdep == true){
         mdep = 1;
@@ -518,11 +589,26 @@ export default {
         inh = 0;
         ctype = document.querySelector('input[name="com"]:checked').value;
       }
+      if(notpay1 == true){
+        notpay1 = 1;
+      } else {
+        notpay1 = 0;
+      }
+      if(notam == true){
+        notam = 1;
+      } else {
+        notam = 0;
+      }
+      if(notpay2 == true){
+        notpay2 = 1;
+      } else {
+        notpay2 = 0;
+      }
       axios.post('https://web.bftv.ucdavis.edu/gsr/dep-add.php', {
         crossDomain: true,
         myid: this.username,
         token: this.token,
-        department: dep, abbreviation: abb, depcode: dcode, parentdep: pdep, support_email: support, maindep: mdep, inherit: inh, comtype: ctype, rturl: rurl, rtapiurl: rapiurl, amqemail: amqe, advqemail: advqe, payemail: payqe, fromemail: fe, rt_token: rttok, ds_user: dsu, ds_userid: dsui, ds_tempid: dsti,
+        department: dep, abbreviation: abb, depcode: dcode, parentdep: pdep, support_email: support, maindep: mdep, inherit: inh, comtype: ctype, rturl: rurl, rtapiurl: rapiurl, amqemail: amqe, advqemail: advqe, payemail: payqe, fromemail: fe, rt_token: rttok, ds_user: dsu, ds_userid: dsui, ds_tempid: dsti, notification_pay1: notpay1, notification_am: notam, notification_pay2: notpay2,
         headers: {
           'Content-Type': 'application/json'
         }
@@ -577,6 +663,9 @@ export default {
       var dsu = document.getElementById('upd_dsuser').value;
       var dsui = document.getElementById('upd_dsuserid').value;
       var dsti = document.getElementById('upd_dstempid').value;
+      var notpay1 = document.getElementById('upd_notification_pay1').checked;
+      var notam = document.getElementById('upd_notification_am').checked;
+      var notpay2 = document.getElementById('upd_notification_pay2').checked;
       var ctype = '';
       if(mdep == true){
         mdep = 1;
@@ -589,12 +678,26 @@ export default {
         inh = 0;
         ctype = document.querySelector('input[name="upd_com"]:checked').value;
       }
-
+      if(notpay1 == true){
+        notpay1 = 1;
+      } else {
+        notpay1 = 0;
+      }
+      if(notam == true){
+        notam = 1;
+      } else {
+        notam = 0;
+      }
+      if(notpay2 == true){
+        notpay2 = 1;
+      } else {
+        notpay2 = 0;
+      }
       axios.post('https://web.bftv.ucdavis.edu/gsr/dep-update.php', {
         crossDomain: true,
         myid: this.username,
         token: this.token,
-        id: depid, department: dep, abbreviation: abb, depcode: dcode, parentdep: pdep, support_email: support, maindep: mdep, inherit: inh, comtype: ctype, rturl: rurl, rtapiurl: rapiurl, amqemail: amqe, advqemail: advqe, payemail: payqe, fromemail: fe, rt_token: rttok, ds_user: dsu, ds_userid: dsui, ds_tempid: dsti,
+        id: depid, department: dep, abbreviation: abb, depcode: dcode, parentdep: pdep, support_email: support, maindep: mdep, inherit: inh, comtype: ctype, rturl: rurl, rtapiurl: rapiurl, amqemail: amqe, advqemail: advqe, payemail: payqe, fromemail: fe, rt_token: rttok, ds_user: dsu, ds_userid: dsui, ds_tempid: dsti, notification_pay1: notpay1, notification_am: notam, notification_pay2: notpay2,
         headers: {
           'Content-Type': 'application/json'
         }
