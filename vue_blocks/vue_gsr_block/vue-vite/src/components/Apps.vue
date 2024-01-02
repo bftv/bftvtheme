@@ -1106,7 +1106,7 @@
         return hoursDifference > 24;
       },
       linkGenerator(app){
-        var webform_url = "https://bftv.ucdavis.edu/gsr";
+        var webform_url = app.gsrform;
         var pifname = app.pi_fname;
         var pilname = app.pi_lname;
         var pititle = app.pi_title;

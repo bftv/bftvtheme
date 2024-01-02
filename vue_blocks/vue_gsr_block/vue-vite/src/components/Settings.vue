@@ -23,7 +23,7 @@
         <div class="col-md-6">
           <fieldset  class="form-group">
             <legend>Global Settings</legend>
-            <div class="text-center"><small>Only the <strong>developer</strong> can change the Base URL and the GSR Form Link.</small></div>
+            <div class="text-center"><small>Only the <strong>developer</strong> can change the URL and the GSR Form Link.</small></div>
             <form method="post" @submit.prevent="updateSettings">
               <div class="row m-2">
                 <div class="col-md-4 fw-bold text-end required">
@@ -49,10 +49,21 @@
               </div>
               <div class="row m-2">
                 <div class="col-md-4 fw-bold text-end required">
+                  GSR Form
+                </div>
+                <div v-if="curlDev == 1" class="col-md-6">
+                  <input type="text" id="gsrform" name="gsrform" :value="listData.gsr_form_link" required>
+                </div>
+                <div v-else class="col-md-6">
+                  <span>{{ listData.gsr_form_link }}</span>
+                </div>
+              </div>
+              <div class="row m-2">
+                <div class="col-md-4 fw-bold text-end required">
                   Generic E-mail
                 </div>
                 <div class="col-md-6">
-                  <input type="text" id="genericemail" name="genericemail" :value="listData.generic_email" required>
+                  <input type="email" id="genericemail" name="genericemail" :value="listData.generic_email" required>
                 </div>
               </div>
               <div class="row m-2 text-end">
@@ -151,11 +162,15 @@
         this.loading = true;
         var burl = '';
         var gurl = '';
+        var gfrm = '';
         if(document.getElementById('baseurl')){
           burl = document.getElementById('baseurl').value;
         }
         if(document.getElementById('gsrmgmt')){
           gurl = document.getElementById('gsrmgmt').value;
+        }
+        if(document.getElementById('gsrform')){
+          gfrm = document.getElementById('gsrform').value;console.log(gfrm);
         }
         var gemail = document.getElementById('genericemail').value;
         var sid = document.getElementById('settingid').value;
@@ -163,7 +178,7 @@
           crossDomain: true,
           myid: this.username,
           token: this.token,
-          id: sid, baseurl: burl, gsrurl: gurl, genericemail: gemail,
+          id: sid, baseurl: burl, gsrurl: gurl, gsrform: gfrm, genericemail: gemail,
           headers: {
             'Content-Type': 'application/json'
           }
