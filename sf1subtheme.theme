@@ -133,6 +133,9 @@ function sf1subtheme_theme_suggestions_node_alter(array &$suggestions, array $va
 }
 
 function sf1subtheme_form_alter(&$form){
+	if($form['#id'] == 'webform-submission-keycard-form-add-form'){
+		$form['#cache']['max-age'] = 0;
+	}
 	if($form['#id'] == 'webform-submission-keycard-request-add-form' && isset($_GET['values'])){
 		$base = "http://bftv.local/tools/keycard-request?";
 		$values = base64_decode($_GET['values']);
