@@ -140,11 +140,11 @@ function sf1subtheme_form_alter(&$form){
 		//var_dump($form['elements']['general_information']['provider_info2']['pla_exp_date']['#options']);
 		$today = new DateTime();
 		$form['elements']['general_information']['provider_info2']['pla_exp_date']['#options'] = [];
-		$durations = ['3 Months', '1 Year', '3 Years'];
+		$durations = ['1 Year', '2 Years', '3 Years'];
 		foreach ($durations as $duration) {
       $futureDate = $today->modify('+' . $duration);
       $form['elements']['general_information']['provider_info2']['pla_exp_date']['#options'][$futureDate->format('Y-m-d')] = $duration;
-			if ($duration === '3 Months') {
+			if ($duration === '1 Year') {
 				$form['elements']['general_information']['provider_info2']['pla_exp_date']['#default_value'] = $futureDate->format('Y-m-d');
       }
     }
