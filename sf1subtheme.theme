@@ -142,7 +142,7 @@ function sf1subtheme_form_alter(&$form){
 		$form['elements']['general_information']['provider_info2']['pla_exp_date']['#options'] = [];
 		$durations = ['1 Year', '2 Years', '3 Years'];
 		foreach ($durations as $duration) {
-      $futureDate = $today->modify('+' . $duration);
+      $futureDate = (clone $today)->modify('+' . $duration);
       $form['elements']['general_information']['provider_info2']['pla_exp_date']['#options'][$futureDate->format('Y-m-d')] = $duration;
 			if ($duration === '1 Year') {
 				$form['elements']['general_information']['provider_info2']['pla_exp_date']['#default_value'] = $futureDate->format('Y-m-d');
