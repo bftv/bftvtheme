@@ -174,3 +174,33 @@ tr.Reviewed, tr.HardKey {
 .salarytable tbody td:first-child {
     min-width: 200px !important;
 }
+
+/* Styles for software page */
+p.text-align-center:has(+ article.media img[alt="Self Service Application"]), p.text-align-center:has(+ div.media img[alt="Self Service Application"]) {
+	display: inline-flex;
+	align-items: center;
+}
+p.text-align-center + article.media:has(img[alt="Self Service Application"]), p.text-align-center + div.media:has(img[alt="Self Service Application"]) {
+	display: inline-block;
+	vertical-align: middle;
+}
+p.text-align-center + article.media img[alt="Self Service Application"], p.text-align-center + div.media img[alt="Self Service Application"] {
+	display: inline-block;
+	vertical-align: middle;
+	width: auto;
+	height: 20px;
+}
+td:has(p.text-align-center + article.media img[alt="Self Service Application"]), td:has(p.text-align-center + div.media img[alt="Self Service Application"]) {
+	text-align: center;
+}
+li:has(.media img[alt="Self Service Application"]) .media {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+li .media img[alt="Self Service Application"] {
+	height: 20px;
+	width: auto;
+	display: inline-block;
+	vertical-align: middle;
+}
