@@ -1,5 +1,5 @@
 global-styles:
-  version: VERSION
+#  version: VERSION
   css:
     theme:
       'https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css': { type: external, minified: true}
