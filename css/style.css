@@ -186,9 +186,10 @@ p.text-align-center + article.media:has(img[alt="Self Service Application"]), p.
 }
 p.text-align-center + article.media img[alt="Self Service Application"], p.text-align-center + div.media img[alt="Self Service Application"] {
 	display: inline-block;
-	vertical-align: middle;
+	vertical-align: bottom;
 	width: auto;
 	height: 20px;
+	margin-bottom: 10px;
 }
 td:has(p.text-align-center + article.media img[alt="Self Service Application"]), td:has(p.text-align-center + div.media img[alt="Self Service Application"]) {
 	text-align: center;
