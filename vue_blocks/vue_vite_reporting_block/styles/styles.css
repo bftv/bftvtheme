@@ -148,6 +148,9 @@ svg.color-rec-svg rect.red {
     color: #F18A00;/*3DAE2B green*/
     padding-left: 25px;
 }
+.authentication a {
+    color: #003570;
+}
 .dropdown-item {
     display: block;
     width: 100%;
@@ -290,6 +293,9 @@ table {
 	color: red;
 	font-weight: bold;
 }
+.td-green {
+    color: #3DAE2B;
+}
 .action-column {
 	width: 180px;
 }
@@ -394,6 +400,13 @@ input[type="checkbox"], input[type="radio"] {
     min-width: auto !important;
     min-height: auto !important;
 }
+.btn-resend {
+    display: contents !important;
+    color: #13639e !important;
+}
+.btn-resend:hover {
+    color: #00b2e3 !important;
+}
 .custom-control-label {
 	font-size: small;
 }
@@ -492,6 +505,12 @@ a.fa-single-edit:visited {
 /*-----Text-----*/
 .fs-6 {
     font-size: 0.7rem !important;
+}
+
+/*----Icons----*/
+.info-icon {
+    cursor: pointer;
+    color: #999;
 }
 
 /*-----MultiSelect-----*/

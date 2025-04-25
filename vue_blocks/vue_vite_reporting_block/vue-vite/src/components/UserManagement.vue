@@ -5,13 +5,13 @@
         <span class="sr-only">Loading...</span>
       </div>
     </div>
-    <div v-if="accesslevel1r">
+    <div v-if="accessLevels.accesslevel1r">
       <div v-if="screenmsg" class="mt-5">
         <div :class="'alert alert--'+screenmsgtype">
           <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="screenmsgtype == 'error'"> Please contact one of the SuperAdmins through the Slack channel.</span>
         </div>
       </div>
-      <div v-if="!hidebody && accesslevel1" class="row mt-3">
+      <div v-if="!hidebody && accessLevels.accesslevel1" class="row mt-3">
         <div class="col-md-12 text-end">
           <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-add-user">+ Add a User</button>
         </div>
@@ -33,7 +33,12 @@
               <td>{{ person.department }}</td>
               <td class="text-capitalize">{{ roleAnalyser(person.role) }}</td>
               <td><span title="It shows user status." v-html="person.status == 1 ? '<i class=\'fa-solid fa-check color-green\'></i>' : '<i class=\'fa-solid fa-x color-red\'></i>'"></span> | <span title="It shows user e-mail notification status." v-html="person.notification == 1 ? '<i class=\'fa-regular fa-bell color-green\'></i>' : '<i class=\'fa-regular fa-bell-slash color-red\'></i>'"></span></td>
-              <td><a v-if="accesslevel1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-user" title="Edit user"><i class="fa-solid fa-pen-to-square"></i></a> <a v-if="accesslevel1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-del-user" title="Delete user"><i class="fa-solid fa-circle-xmark"></i></a></td>
+              <td>
+                  <a v-if="accessLevels.accesslevel1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-user" title="Edit user"><i class="fa-solid fa-pen-to-square"></i></a>&nbsp;
+                  <a v-if="accessLevels.accesslevel1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-del-user" title="Delete user"><i class="fa-solid fa-circle-xmark"></i></a>&nbsp;
+                  <button class="btn btn-sm btn-link btn-resend" v-if="accessLevels.accesslevel1r && person.role === 'labadmin' && dateOlderThan24Hours(person.last_report_sent)" @click="resendReport(person.loginid)" :title="'Send report to '+person.firstname+' '+person.lastname+'.'"><i class="fa-solid fa-paper-plane"></i></button>&nbsp;
+                  <button class="btn btn-sm btn-link btn-resend" v-if="accessLevels.accesslevel1 && person.role === 'labadmin'" @click="maskAndRedirect(person.loginid)" :title="'Mask as '+person.firstname+' '+person.lastname+'.'"><i class="fa-solid fa-masks-theater"></i></button>
+                </td>
             </tr>
           </tbody>
         </table>
@@ -160,11 +165,11 @@
               <div class="col-md-6">
                 <select name="role" id="role" v-model="selectedRecord.role">
                   <option>-- select an option --</option>
-                  <option v-if="accesslevel2" value="superadmin">SuperAdmin</option>
+                  <option v-if="accessLevels.accesslevel2" value="superadmin">SuperAdmin</option>
                   <option value="orgadmin">OrgAdmin</option>
-                  <option value="orgreportadmin">OrgReportAdmin</option>
+                  <option value="orgreportviewer">OrgReportViewer</option>
                   <option value="labadmin">LabAdmin</option>
-                  <option value="labreportadmin">LabReportAdmin</option>
+                  <option value="labreportviewer">LabReportViewer</option>
                 </select>
               </div>
             </div>
@@ -176,7 +181,7 @@
             </div>
             <div class="row m-2">
               <div class="col-md-8 offset-md-4">
-                <small>Below options only apply to the LabAdmins or LabReportAdmins.</small>
+                <small>Below options only apply to the LabAdmins or LabReportViewers.</small>
               </div>
             </div>
             <div class="row m-2">
@@ -214,7 +219,7 @@
                   placeholder="-- select an option --"
                   @input="updateSelectedAdgroups"
                 />
-                <small class="element-description">This only applies if the selected role is LabAdmin or LabReportAdmin.</small>
+                <small class="element-description">This only applies if the selected role is LabAdmin or LabReportViewers.</small>
               </div>
             </div>
           </div>
@@ -230,7 +235,7 @@
 </template>
 
 <script>
-import { navmixin } from '../mixins/navMixin.js';
+//import { navmixin } from '../mixins/navMixin.js';
 import { globalMixin } from '../mixins/globalMixin.js';
 import vSelect from 'vue-select';
 
@@ -238,7 +243,7 @@ export default {
   components: {
     'v-select': vSelect
   },
-  mixins: [navmixin, globalMixin],
+  mixins: [globalMixin],
   name: 'UserManagement',
 
   mounted: function(){
@@ -248,6 +253,47 @@ export default {
   methods: {
     updateSelectedAdgroups(value) {
       this.selectedAdgroups = value;
+    },
+    dateOlderThan24Hours(lastDate) {
+      const now = new Date();
+      const lastUsedDate = new Date(lastDate);
+      const differenceInMs = now - lastUsedDate;
+      const differenceInHours = differenceInMs / (1000 * 60 * 60);
+      return differenceInHours > 24;
+    },
+    resendReport(loginid){
+      this.loading = true;
+      var mode = 'resend_report';
+      axios.post('https://web.bftv.ucdavis.edu/reporting/user-resend-report.php', {
+        crossDomain: true,
+        myid: this.username,
+        token: this.token,
+        loginid: loginid,
+        mode: mode,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(response => {
+        this.screenmsg = response.data.message,
+        this.screenmsgtype = "success",
+        this.screenmsgicon = this.successicon,
+        this.listData = response.data.users,
+        this.listData.sort((a, b) => this.sortColumn('firstname', a, b))
+      }).catch(error => {
+        if(error.response.data.message){
+          this.screenmsg = error.response.data.message
+        } else if(error.data.message){
+          this.screenmsg = error.data.message
+        } else {
+          this.screenmsg = error.message
+        }
+        this.screenmsgtype = "error",
+        this.screenmsgicon = this.erroricon,
+        this.code = error.response.status
+      }).finally(() => {
+        this.loading = false;
+      });
+      window.scrollTo(0, 400);
     },
     addUser(e) {
       e.preventDefault();
@@ -267,7 +313,7 @@ export default {
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
         this.listData = response.data.users,
-        this.listData.sort(this.sortFname)
+        this.listData.sort((a, b) => this.sortColumn('firstname', a, b))
       }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
@@ -295,7 +341,10 @@ export default {
       var usrrole = document.getElementById('role').value;
       var usrname = document.getElementById('fullname').value;
       var usrnotification = document.getElementById('notification').checked;
-      var freq = document.querySelector('input[name="frequency"]:checked').value;
+      var freq = null;
+      if(document.querySelector('input[name="frequency"]:checked')){
+        freq = document.querySelector('input[name="frequency"]:checked').value;
+      }
       var usrstatus = document.getElementById('status_check').checked;
       var action = '';
       if(usrnotification == true){
@@ -323,13 +372,13 @@ export default {
         headers: {
           'Content-Type': 'application/json'
         }
-      }).then(response => {
+      }).then(response => {console.log(response);
         this.screenmsg = response.data.message,
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
         this.listData = response.data.users,
-        this.listData.sort(this.sortFname)
-      }).catch(error => {
+        this.listData.sort((a, b) => this.sortColumn('firstname', a, b))
+      }).catch(error => {console.log(error);
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
         } else if(error.data.message){
@@ -367,7 +416,7 @@ export default {
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
         this.listData = response.data.users,
-        this.listData.sort(this.sortFname)
+        this.listData.sort((a, b) => this.sortColumn('firstname', a, b))
       }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message

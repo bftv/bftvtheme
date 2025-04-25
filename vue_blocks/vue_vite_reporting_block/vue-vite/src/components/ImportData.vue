@@ -5,7 +5,7 @@
         <span class="sr-only">Loading...</span>
       </div>
     </div>
-    <div v-if="accesslevel1">
+    <div v-if="accessLevels.accesslevel1">
       <div v-if="screenmsg" class="mt-5">
         <div :class="'alert alert--'+screenmsgtype">
           <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="screenmsgtype == 'error'"> Please contact one of the SuperAdmins if you need more help.</span>
@@ -20,7 +20,7 @@
             <li><a href="https://web.bftv.ucdavis.edu/reporting/import_samples/users.csv">Import Users</a> - <small>Make sure the department column should be exactly the same as it is shown on AD. The role column can be superadmin, orgadmin, orgreportadmin, labadmin, or labreportadmin. OrgAdmins cannot import a user as superadmin. The adgroups column should be exactly as the ADGroup like CAES-BFTV-FST-MG-Lab-AXTaha.</small></li>
           </ol>
         </div>
-        <fieldset v-if="accesslevel2" class="form-group">
+        <fieldset v-if="accessLevels.accesslevel2" class="form-group">
           <legend>1- Import Departments</legend>
           <form method="post" @submit.prevent="importDep">
             <div class="row">
@@ -70,11 +70,11 @@
 </template>
 
 <script>
-import { navmixin } from '../mixins/navMixin.js';
+//import { navmixin } from '../mixins/navMixin.js';
 import { globalMixin } from '../mixins/globalMixin.js';
 
 export default {
-  mixins: [navmixin, globalMixin],
+  mixins: [globalMixin],
   name: 'ImportData',
 
   data() {

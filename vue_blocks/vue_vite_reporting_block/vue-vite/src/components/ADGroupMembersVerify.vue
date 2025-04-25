@@ -5,12 +5,12 @@
         <span class="sr-only">Loading...</span>
       </div>
     </div>
-    <div v-if="accesslevel1">
+    <div v-if="accessLevels.accesslevel1 && !maskeduser">
       <div class="alert alert--error">
         <i class="far fa-times-circle fa-2x alert--error-icon"></i> This page can only viewed by a LabAdmin.
       </div>
     </div>
-    <div v-else-if="accesslevel0">
+    <div v-else-if="accessLevels.accesslevel0">
       <div v-if="screenmsg" class="mt-5">
         <div :class="'alert alert--'+screenmsgtype">
           <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="screenmsgtype == 'error'"> Please contact one of the SuperAdmins through the Slack channel.</span>
@@ -56,11 +56,11 @@
 </template>
 
 <script>
-import { navmixin } from '../mixins/navMixin.js';
+//import { navmixin } from '../mixins/navMixin.js';
 import { globalMixin } from '../mixins/globalMixin.js';
 
 export default {
-  mixins: [navmixin, globalMixin],
+  mixins: [globalMixin],
   name: 'ADGroupMembersVerify',
 
   mounted: function(){

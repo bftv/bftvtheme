@@ -11,13 +11,16 @@
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item"><router-link :to="{name: 'adgmembers'}" class="nav-link"  @click="loader">ADGroup Members</router-link></li>
-                    <li v-if="accesslevel1r" class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="nav-mgmt" data-bs-toggle="dropdown">Management</a>
+                    <li class="nav-item"><router-link :to="{name: 'devices'}" class="nav-link"  @click="loader">Devices</router-link></li>
+                    <li class="nav-item"><router-link :to="{name: 'verify'}" class="nav-link"  @click="loader">Verify Members</router-link></li>
+                    <li v-if="accessLevels.accesslevel1r" class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="nav-mgmt" data-bs-toggle="dropdown">Management</a>
                         <ul class="dropdown-menu" aria-labelledby="nav-mgmt">
-                            <li v-if="accesslevel1r"><router-link :to="{name: 'users'}" class="dropdown-item" @click="loader">Users</router-link></li>
-                            <li v-if="accesslevel1"><router-link :to="{name: 'departments'}" class="dropdown-item" @click="loader">Departments</router-link></li>
-                            <li v-if="accesslevel1"><router-link :to="{name: 'adgroups'}" class="dropdown-item" @click="loader">AD Groups</router-link></li>
-                            <li v-if="accesslevel1"><router-link :to="{name: 'import'}" class="dropdown-item" @click="loader">Import</router-link></li>
-                            <li v-if="accesslevel1"><router-link :to="{name: 'sync'}" class="dropdown-item" @click="loader">Sync</router-link></li>
+                            <li v-if="accessLevels.accesslevel1r"><router-link :to="{name: 'users'}" class="dropdown-item" @click="loader">Users</router-link></li>
+                            <li v-if="accessLevels.accesslevel2"><router-link :to="{name: 'colleges'}" class="dropdown-item" @click="loader">Colleges</router-link></li>
+                            <li v-if="accessLevels.accesslevel1"><router-link :to="{name: 'departments'}" class="dropdown-item" @click="loader">Departments</router-link></li>
+                            <li v-if="accessLevels.accesslevel1"><router-link :to="{name: 'adgroups'}" class="dropdown-item" @click="loader">Labs/Groups</router-link></li>
+                            <li v-if="accessLevels.accesslevel1"><router-link :to="{name: 'import'}" class="dropdown-item" @click="loader">Import</router-link></li>
+                            <li v-if="accessLevels.accesslevel1"><router-link :to="{name: 'sync'}" class="dropdown-item" @click="loader">Sync</router-link></li>
                         </ul>
                     </li>
                 </ul>
@@ -25,11 +28,11 @@
             <span class="navbar-text user-info">
                 <span><a href="#" class="user-data-gear" data-bs-toggle="modal" data-bs-target="#modal-edit-self" title="Edit Your Settings"><i class="fa-solid fa-gear"></i></a> </span>
                 <span class="font-italic user-data-name">{{ curlName }} </span><span class="user-data-role font-italic secondary-color"> ({{ roleAnalyser(curlRole) }})</span>
-                <span v-if="!viewmode" class="authentication">{{ authText }}</span>
+                <span v-if="!viewmode" class="authentication">{{ authText }}<span v-if="maskeduser"> - <a href="" @click="maskeduser = null">unmask</a></span></span>
             </span>
         </div>
     </nav>
-    <div v-if="accesslevel0r" class="modal fade" id="modal-edit-self" tabindex="-1" aria-labelledby="modal-edit-self-label" aria-hidden="true">
+    <div v-if="accessLevels.accesslevel0r" class="modal fade" id="modal-edit-self" tabindex="-1" aria-labelledby="modal-edit-self-label" aria-hidden="true">
         <div class="modal-dialog modal-xl">
           <div class="modal-content">
             <div class="modal-header">

@@ -24,7 +24,8 @@ export var navmixin = {
             navscreenmsgtype: "",
             navscreenmsgicon: "",
             naverroricon: "far fa-times-circle fa-2x alert--error-icon",
-            navsuccessicon: "far fa-check-circle fa-2x alert--success-icon"
+            navsuccessicon: "far fa-check-circle fa-2x alert--success-icon",
+            maskeduser: null
         }
     },
     beforeMount: function(){//console.log(this.username);
@@ -59,7 +60,7 @@ export var navmixin = {
                     this.accesslevel1 = true;
                     this.accesslevel1r = true;
                     this.accesslevel2 = false;
-                } else if(this.curlRole == 'orgreportadmin'){
+                } else if(this.curlRole == 'orgreportviewer'){
                     this.accesslevel0 = false;
                     this.accesslevel0r = true;
                     this.accesslevel1 = false;
@@ -71,14 +72,14 @@ export var navmixin = {
                     this.accesslevel1 = false;
                     this.accesslevel1r = false;
                     this.accesslevel2 = false;
-                } else if(this.curlRole == 'labreportadmin'){
+                } else if(this.curlRole == 'labreportviewer'){
                     this.accesslevel0 = false;
                     this.accesslevel0r = true;
                     this.accesslevel1 = false;
                     this.accesslevel1r = false;
                     this.accesslevel2 = false;
                 }
-                if(this.curlRole == 'orgreportadmin' || this.curlRole == 'labadmin' || this.curlRole == 'labreportadmin'){
+                if(this.curlRole == 'orgreportviewer' || this.curlRole == 'labadmin' || this.curlRole == 'labreportviewer'){
                     this.viewmode = true;
                 }
             } else {
@@ -102,12 +103,12 @@ export var navmixin = {
                 crole = 'SuperAdmin'
             } else if(role == 'orgadmin'){
                 crole = 'OrgAdmin'
-            } else if(role == 'orgreportadmin'){
-                crole = 'OrgReportAdmin'
+            } else if(role == 'orgreportviewer'){
+                crole = 'OrgReportViewer'
             } else if(role == 'labadmin'){
                 crole = 'LabAdmin'
-            } else if(role == 'labreportadmin'){
-                crole = 'LabReportAdmin'
+            } else if(role == 'labreportviewer'){
+                crole = 'LabReportViewer'
             } else {
                 crole = 'none'
             }

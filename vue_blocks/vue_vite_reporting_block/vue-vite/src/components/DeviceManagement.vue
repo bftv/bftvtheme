@@ -60,7 +60,7 @@
 import { globalMixin } from '../mixins/globalMixin.js';
 export default {
   mixins: [globalMixin],
-  name: 'ADGroupMembers',
+  name: 'DeviceManagement',
 
   mounted: function(){
     const url = 'https://web.bftv.ucdavis.edu/reporting/adgroup-members-get.php'

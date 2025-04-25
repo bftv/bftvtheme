@@ -21,7 +21,7 @@ add_js:
   footer:
     'https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js': { minified: true, type: external, attributes: { integrity: sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3, crossorigin: anonymous }}
     'https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js': { minified: true, type: external, attributes: { integrity: sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V, crossorigin: anonymous }}
-    'https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js': { minified: true, type: external }
+    #'https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js': { minified: true, type: external }
     #'scripts/vue-router.js': {}
     #'scripts/scripts.js': { attributes: { type: 'module'} }
     'vue-vite/dist/assets/bundle.js': { minified: true, attributes: { type: 'module'} }
