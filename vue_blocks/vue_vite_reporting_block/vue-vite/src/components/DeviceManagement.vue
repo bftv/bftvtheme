@@ -58,6 +58,7 @@
 
 <script>
 import { globalMixin } from '../mixins/globalMixin.js';
+import axios from 'axios';
 export default {
   mixins: [globalMixin],
   name: 'DeviceManagement',

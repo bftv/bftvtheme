@@ -142,6 +142,7 @@
 <script>
 //import { navmixin } from '../mixins/navMixin.js';
 import { globalMixin } from '../mixins/globalMixin.js';
+import axios from 'axios';
 export default {
   mixins: [globalMixin],
   name: 'CollegeManagement',
