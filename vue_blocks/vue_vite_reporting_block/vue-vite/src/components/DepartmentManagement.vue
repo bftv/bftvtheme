@@ -527,7 +527,7 @@ export default {
         headers: {
           'Content-Type': 'application/json'
         }
-      }).then(response => {console.log(response);
+      }).then(response => {
         this.screenmsg = response.data.message,
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
