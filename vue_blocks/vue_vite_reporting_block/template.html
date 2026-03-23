@@ -11,16 +11,16 @@
             <div class="collapse navbar-collapse" id="navbarText">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item"><router-link :to="{name: 'adgmembers'}" class="nav-link"  @click="loader">ADGroup Members</router-link></li>
-                    <li class="nav-item"><router-link :to="{name: 'devices'}" class="nav-link"  @click="loader">Devices</router-link></li>
-                    <li class="nav-item"><router-link :to="{name: 'verify'}" class="nav-link"  @click="loader">Verify Members</router-link></li>
+                    <li class="nav-item" v-if="accessLevels.accesslevel3"><router-link :to="{name: 'devices'}" class="nav-link"  @click="loader">Devices</router-link></li>
+                    <li class="nav-item" v-if="curlRole === 'labadmin' || curlRole === 'labreportadmin'"><router-link :to="{name: 'verify'}" class="nav-link"  @click="loader">Verify Members</router-link></li>
                     <li v-if="accessLevels.accesslevel1r" class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="nav-mgmt" data-bs-toggle="dropdown">Management</a>
                         <ul class="dropdown-menu" aria-labelledby="nav-mgmt">
                             <li v-if="accessLevels.accesslevel1r"><router-link :to="{name: 'users'}" class="dropdown-item" @click="loader">Users</router-link></li>
-                            <li v-if="accessLevels.accesslevel2"><router-link :to="{name: 'colleges'}" class="dropdown-item" @click="loader">Colleges</router-link></li>
+                            <li v-if="accessLevels.accesslevel1"><router-link :to="{name: 'colleges'}" class="dropdown-item" @click="loader">Colleges</router-link></li>
                             <li v-if="accessLevels.accesslevel1"><router-link :to="{name: 'departments'}" class="dropdown-item" @click="loader">Departments</router-link></li>
                             <li v-if="accessLevels.accesslevel1"><router-link :to="{name: 'adgroups'}" class="dropdown-item" @click="loader">Labs/Groups</router-link></li>
                             <li v-if="accessLevels.accesslevel1"><router-link :to="{name: 'import'}" class="dropdown-item" @click="loader">Import</router-link></li>
-                            <li v-if="accessLevels.accesslevel1"><router-link :to="{name: 'sync'}" class="dropdown-item" @click="loader">Sync</router-link></li>
+                            <li v-if="accessLevels.accesslevel1"><router-link :to="{name: 'globalsettings'}" class="dropdown-item" @click="loader">Global Settings</router-link></li>
                         </ul>
                     </li>
                 </ul>
@@ -63,6 +63,14 @@
                             </div>
                             <div class="row m-2">
                                 <div class="col-md-4 fw-bold text-end">
+                                    College
+                                </div>
+                                <div class="col-md-6">
+                                    <span>{{ curlCol }}</span>
+                                </div>
+                            </div>
+                            <div class="row m-2">
+                                <div class="col-md-4 fw-bold text-end">
                                     Department
                                 </div>
                                 <div class="col-md-6">
@@ -89,7 +97,7 @@
                     </div>
                     <div class="col-md-6">
                         <fieldset class="form-group">
-                            <legend>E-mail Notifications</legend>
+                            <legend>User Settings</legend>
                             <div class="row">
                                 <div class="col-md-12">
                                     <input type="checkbox" id="email_notification" name="email_notification" :checked="curlNotify == '1'" />
@@ -110,6 +118,14 @@
                                     <label class="radio-check-label" for="freqannually">Annually</label>
                                 </div>
                                 <small><strong>Monthly</strong> e-mails are sent at the start of each month.<br/><strong>Quarterly</strong> e-mails are sent at the start of January, April, July, and October.<br/><strong>Annual</strong> e-mails are sent at the start of October.<br/>All e-mail notifications are sent at 8:15am.</small>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4 small fw-bold required">
+                                    Column Size<i class="fa-solid fa-circle-info info-icon ms-1" title="This sets the number of columns for license attributes on the ADGroup Members page. It can be any number between 1 to 6. The recommended number is 4."></i>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="number" name="usr_col_size" id="usr_col_size" :value="curlColSize" min="1" max="6" required>
+                                </div>
                             </div>
                         </fieldset>
                     </div>

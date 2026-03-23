@@ -302,6 +302,30 @@ table {
 .log-table {
 	font-size: small;
 }
+.attr-header {
+  position: relative;
+  text-align: center;
+}
+.table-header {
+    position: relative;
+    text-align: left;
+}
+.filter-link {
+  position: absolute;
+  right: 8px;
+  text-decoration: none;
+}
+.filter-link i {
+  color: #999;
+  transition: color 0.2s ease;
+}
+
+.filter-link:hover i, .filter-link:active i {
+  color: #fff;
+}
+.filter-link.activated i {
+  color: #fff;
+}
 
 /*-----Forms-----*/
 fieldset {
@@ -361,6 +385,43 @@ input[type="checkbox"], input[type="radio"] {
 	height: auto;
     margin-right: 0.5em;
 	transform: scale(1.3);
+}
+input[type="color"] {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: none;
+}
+
+/* Chrome / Edge / Safari */
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 50%;
+}
+.peaks-color-row {
+  height: 2.5em;              /* match your other row heights */
+  display: flex;
+  align-items: center;         /* vertical center */
+  justify-content: center;     /* horizontal center in the column */
+}
+
+/* make sure the color input doesn't align to baseline */
+.peaks-color-row input[type="color"] {
+  display: block;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: 50%;
 }
 .search-box {
     border-radius: 1rem !important;
@@ -437,6 +498,28 @@ input[type="checkbox"], input[type="radio"] {
     height: 6px;
     margin: 0 0.3em;
 }
+.filter-input-wrapper {
+  position: relative;
+  width: 15rem;
+}
+
+.filter-input-wrapper .filter-input {
+  padding-right: 2rem; /* space for the X */
+}
+
+.filter-input-wrapper .filter-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.filter-input-wrapper .filter-clear:hover {
+  color: #000;
+}
 /*------Alerts-----*/
 .alert {
     padding: 2em !important;
@@ -511,6 +594,10 @@ a.fa-single-edit:visited {
 .info-icon {
     cursor: pointer;
     color: #999;
+}
+
+.fa-15x {
+    font-size: 1.5em;
 }
 
 /*-----MultiSelect-----*/
