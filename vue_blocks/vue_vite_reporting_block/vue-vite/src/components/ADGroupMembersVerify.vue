@@ -23,16 +23,16 @@
               <table class='table table-bordered table-hover table-striped' style="width: 99%;">
                 <thead class='thead-light'>
                   <tr>
-                    <th colspan="2">{{ adgroup.alias ? adgroup.alias : adgroup.adgroup }} <small>({{ adgroup.members.length }} members)</small></th>
+                    <th colspan="2">{{ adgroup.alias ? adgroup.alias : adgroup.adgroup }} <small>({{ adgroup.members.length }} members) - <span>{{ roleAnalyser(adgroup.role) }}</span></small></th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="member in adgroup.members">
-                    <td><a :href="'mailto:'+member.mail">{{ member.displayName }}</a> <span v-if="!viewmode">({{ member.samAccountName }})</span></td>
-                    <td>
-                      <input type="radio" :id="`k-${adgroup.adgroup}-${member.objectGuid}`" :value="`k-${adgroup.adgroup}=${member.samAccountName}`" :name="`${adgroup.adgroup}-${member.objectGuid}`" checked>
+                    <td><a :href="'mailto:'+member.mail">{{ member.displayName }}</a> <span v-if="!viewmode">({{ member.samAccountName }})</span><span v-if="member.iam_status == false">&nbsp;<i class="fa-solid fa-user-xmark td-red" title="IAM record not found. The user has either not been fully entered into the system, is separating, or has separated form the University."></i></span></td>
+                    <td v-if="adgroup.role == 'labadmin'">
+                      <input type="radio" :id="`k-${adgroup.adgroup}-${member.objectGuid}`" :value="`k-${adgroup.adgroup}=${member.displayName} (${member.samAccountName})`" :name="`${adgroup.adgroup}-${member.objectGuid}`" checked>
                       <label class="radio-check-label" :for="`k-${adgroup.adgroup}-${member.objectGuid}`">Keep</label>
-                      <input type="radio" :id="`r-${adgroup.adgroup}-${member.objectGuid}`" :value="`r-${adgroup.adgroup}=${member.samAccountName}`" :name="`${adgroup.adgroup}-${member.objectGuid}`">
+                      <input type="radio" :id="`r-${adgroup.adgroup}-${member.objectGuid}`" :value="`r-${adgroup.adgroup}=${member.displayName} (${member.samAccountName})`" :name="`${adgroup.adgroup}-${member.objectGuid}`">
                       <label class="radio-check-label" :for="`r-${adgroup.adgroup}-${member.objectGuid}`">Remove</label>
                     </td>
                   </tr>
@@ -95,14 +95,15 @@ export default {
         myid: this.username,
         token: this.token,
         keepList: keep, removeList: remove,
+        mask: this.maskeduser,
         headers: {
           'Content-Type': 'application/json'
         }
-      }).then(response => {console.log(response);
+      }).then(response => {
         this.screenmsg = response.data.message,
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon
-      }).catch(error => {console.log(error);
+      }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
         } else if(error.data.message){

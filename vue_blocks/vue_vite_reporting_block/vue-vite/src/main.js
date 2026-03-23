@@ -7,8 +7,9 @@ import ADGroupManagement from './components/ADGroupManagement.vue';
 import ADGroupMembers from './components/ADGroupMembers.vue';
 import ADGroupMembersVerify from './components/ADGroupMembersVerify.vue';
 import DeviceManagement from './components/DeviceManagement.vue';
-import ADGroupSync from './components/ADGroupSync.vue';
+import GlobalSettings from './components/GlobalSettings.vue';
 import ImportData from './components/ImportData.vue';
+import axios from 'axios';
 
 //import mixins
 import store from './store';
@@ -22,7 +23,7 @@ const router = createRouter({
     { path: '/colleges', name: 'colleges', component: CollegeManagement },
     { path: '/adgroups', name: 'adgroups', component: ADGroupManagement },
     { path: '/users', name: 'users', component: UserManagement },
-    { path: '/sync', name: 'sync', component: ADGroupSync },
+    { path: '/global-settings', name: 'globalsettings', component: GlobalSettings },
     { path: '/import', name: 'import', component: ImportData },
     { path: '/verify', name: 'verify', component: ADGroupMembersVerify },
     { path: '/devices', name: 'devices', component: DeviceManagement },
@@ -52,10 +53,14 @@ const TheNavigation = {
       var crole;
       if(role == 'superadmin'){
           crole = 'SuperAdmin'
+      } else if(role == 'colladmin'){
+          crole = 'CollAdmin'
+      } else if(role == 'collreportadmin'){
+          crole = 'CollReportAdmin'
       } else if(role == 'orgadmin'){
           crole = 'OrgAdmin'
-      } else if(role == 'orgreportviewer'){
-          crole = 'OrgReportViewer'
+      } else if(role == 'orgreportadmin'){
+          crole = 'OrgReportAdmin'
       } else if(role == 'labadmin'){
           crole = 'LabAdmin'
       } else if(role == 'labreportviewer'){
@@ -102,18 +107,23 @@ const TheNavigation = {
       } else {
         notify = 0;
       }
+      var colnum = document.getElementById('usr_col_size').value;
       axios.post('https://web.bftv.ucdavis.edu/reporting/user-self-update.php', {
         crossDomain: true,
         myid: this.username,
         token: this.token,
-        notification: notify, frequency: freq,
+        notification: notify, frequency: freq, colnum: colnum,
         headers: {
           'Content-Type': 'application/json'
         }
       }).then(response => {
         this.navscreenmsg = response.data.message,
         this.navscreenmsgtype = "success",
-        this.navscreenmsgicon = this.successicon
+        this.navscreenmsgicon = this.successicon,
+        this.$store.commit('setCurlColSize', colnum);
+        if (this.$route.name === 'adgmembers') {
+          this.$router.go(0);
+        }
       }).catch(error => {
         if(error.response.data.message){
           this.navscreenmsg = error.response.data.message
@@ -156,6 +166,22 @@ const TheNavigation = {
         this.$store.commit('setCurlCode', value);
       }
     },
+    curlColid: {
+      get() {
+        return this.$store.state.curlColid;
+      },
+      set(value) {
+        this.$store.commit('setCurlColid', value);
+      }
+    },
+    curlCol: {
+      get() {
+        return this.$store.state.curlCol;
+      },
+      set(value) {
+        this.$store.commit('setCurlCol', value);
+      }
+    },
     curlDep: {
       get() {
         return this.$store.state.curlDep;
@@ -188,6 +214,14 @@ const TheNavigation = {
         this.$store.commit('setCurlFreq', value);
       }
     },
+    curlColSize: {
+      get() {
+        return this.$store.state.curlColSize;
+      },
+      set(value) {
+        this.$store.commit('setCurlColSize', value);
+      }
+    },
     maskeduser: {
       get() {
         return this.$store.state.maskeduser;
@@ -217,7 +251,9 @@ const TheNavigation = {
         accesslevel0r: this.$store.state.accesslevel0r,
         accesslevel1: this.$store.state.accesslevel1,
         accesslevel1r: this.$store.state.accesslevel1r,
-        accesslevel2: this.$store.state.accesslevel2
+        accesslevel2: this.$store.state.accesslevel2,
+        accesslevel2r: this.$store.state.accesslevel2r,
+        accesslevel3: this.$store.state.accesslevel3
       };
     },
     viewmode() {

@@ -11,10 +11,13 @@ export default createStore({
     curlCode: '',
     curlRole: '',
     curlName: '',
+    curlColid: '',
+    curlCol: '',
     curlDep: '',
     curlGrp: '',
     curlNotify: 0,
     curlFreq: '',
+    curlColSize: '',
     authenticated: '',
     authText: '',
     accesslevel0: false,
@@ -22,6 +25,8 @@ export default createStore({
     accesslevel1: false,
     accesslevel1r: false,
     accesslevel2: false,
+    accesslevel2r: false,
+    accesslevel3: false,
     viewmode: false,
     maskeduser: null
 },
@@ -30,16 +35,21 @@ mutations: {
     state.curlCode = payload.curlCode;
     state.curlRole = payload.curlRole;
     state.curlName = payload.curlName;
+    state.curlColid = payload.curlColid;
+    state.curlCol = payload.curlCol;
     state.curlDep = payload.curlDep;
     state.curlGrp = payload.curlGrp;
     state.curlNotify = payload.curlNotify;
     state.curlFreq = payload.curlFreq;
+    state.curlColSize = payload.curlColSize;
     state.authenticated = payload.authenticated;
     state.accesslevel0 = payload.accesslevel0;
     state.accesslevel0r = payload.accesslevel0r;
     state.accesslevel1 = payload.accesslevel1;
     state.accesslevel1r = payload.accesslevel1r;
     state.accesslevel2 = payload.accesslevel2;
+    state.accesslevel2r = payload.accesslevel2r;
+    state.accesslevel3 = payload.accesslevel3;
     state.viewmode = payload.viewmode;
   },
   setAuthText(state, text) {
@@ -54,6 +64,12 @@ mutations: {
   setCurlName(state, value) {
     state.curlName = value;
   },
+  setCurlColid(state, value) {
+    state.curlColid = value;
+  },
+  setCurlCol(state, value) {
+    state.curlCol = value;
+  },
   setCurlDep(state, value) {
     state.curlDep = value;
   },
@@ -65,6 +81,9 @@ mutations: {
   },
   setCurlFreq(state, value) {
     state.curlFreq = value;
+  },
+  setCurlColSize(state, value) {
+    state.curlColSize = value;
   },
   setMaskedUser(state, value) {
     state.maskeduser = value;
@@ -86,17 +105,22 @@ actions: {
             curlCode: response.data.response,
             curlRole: response.data.userrole,
             curlName: response.data.username,
+            curlCol: response.data.usercol,
+            curlColid: response.data.usercolid,
             curlDep: response.data.userdep,
             curlGrp: response.data.usergrps,
             curlNotify: response.data.usernotify,
             curlFreq: response.data.userfreq,
+            curlColSize: response.data.colsize,
             authenticated: response.data.authenticated,
-            accesslevel0: response.data.userrole == 'superadmin' || response.data.userrole == 'orgadmin',
-            accesslevel0r: response.data.userrole != 'anonymous',
-            accesslevel1: response.data.userrole == 'superadmin' || response.data.userrole == 'orgadmin',
-            accesslevel1r: response.data.userrole != 'anonymous',
-            accesslevel2: response.data.userrole == 'superadmin',
-            viewmode: ['orgreportviewer', 'labadmin', 'labreportviewer'].includes(response.data.userrole)
+            accesslevel0: response.data.userrole == 'superadmin' || response.data.userrole == 'colladmin' || response.data.userrole == 'orgadmin' || response.data.userrole == 'labadmin',
+            accesslevel0r: response.data.userrole == 'superadmin' || response.data.userrole == 'colladmin' || response.data.userrole == 'collreportadmin' || response.data.userrole == 'orgadmin' || response.data.userrole == 'labreportadmin' || response.data.userrole == 'labadmin' || response.data.userrole == 'labreportadmin',
+            accesslevel1: response.data.userrole == 'superadmin' || response.data.userrole == 'colladmin' || response.data.userrole == 'orgadmin',
+            accesslevel1r: response.data.userrole == 'superadmin' || response.data.userrole == 'colladmin' || response.data.userrole == 'collreportadmin' || response.data.userrole == 'orgadmin' || response.data.userrole == 'labreportadmin',
+            accesslevel2: response.data.userrole == 'superadmin' || response.data.userrole == 'colladmin',
+            accesslevel2r: response.data.userrole == 'superadmin' || response.data.userrole == 'colladmin' || response.data.userrole == 'collreportadmin',
+            accesslevel3: response.data.userrole == 'superadmin',
+            viewmode: ['labadmin', 'labreportadmin'].includes(response.data.userrole)
           };
           commit('setCurlData', payload);
           dispatch('checkAuth');

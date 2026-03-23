@@ -11,8 +11,14 @@
           <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="screenmsgtype == 'error'"> Please contact one of the SuperAdmins through the Slack channel.</span>
         </div>
       </div>
-      <div v-if="!hidebody && accessLevels.accesslevel1" class="row mt-3">
-        <div class="col-md-12 text-end">
+      <div v-if="!hidebody && accessLevels.accesslevel1r" class="row mt-3">
+        <div class="col-md-6">
+          <div class="filter-input-wrapper">
+            <input type="text" name="filtertxt" id="filtertxt" v-model.trim="filtertxt" @keydown.esc="clearFilter" class="form-control filter-input" style="border-radius: 10px !important; height: 2em !important; font-size: 0.8rem" placeholder="Filter users">
+            <span v-if="filtertxt" class="filter-clear" @click="clearFilter"><i class="fa-solid fa-xmark"></i></span>
+          </div>
+        </div>
+        <div v-if="accessLevels.accesslevel1" class="col-md-6 text-end">
           <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-add-user">+ Add a User</button>
         </div>
       </div>
@@ -20,24 +26,22 @@
         <table class='table table-bordered table-hover table-striped'>
           <thead class='thead-light'>
             <tr>
-              <th>Name</th>
-              <th>Department</th>
-              <th>Role</th>
+              <th class="table-header">Name<a href="#" class="filter-link" :class="{ activated: isSortActive('firstname') }" @click.prevent="toggleSort('firstname')"><i class="fa-solid" :class="getSortIcon('firstname')"></i></a></th>
+              <th class="table-header">Department<a href="#" class="filter-link" :class="{ activated: isSortActive('department') }" @click.prevent="toggleSort('department')"><i class="fa-solid" :class="getSortIcon('department')"></i></a></th>
               <th>Status</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="person in listData">
-              <td>{{ person.firstname }} {{ person.lastname }}</td>
+            <tr v-for="person in users">
+              <td>{{ person.firstname }} {{ person.lastname }} <span class="user-data-role secondary-color">({{ roleAnalyser(person.specific_role) }})</span></td>
               <td>{{ person.department }}</td>
-              <td class="text-capitalize">{{ roleAnalyser(person.role) }}</td>
-              <td><span title="It shows user status." v-html="person.status == 1 ? '<i class=\'fa-solid fa-check color-green\'></i>' : '<i class=\'fa-solid fa-x color-red\'></i>'"></span> | <span title="It shows user e-mail notification status." v-html="person.notification == 1 ? '<i class=\'fa-regular fa-bell color-green\'></i>' : '<i class=\'fa-regular fa-bell-slash color-red\'></i>'"></span></td>
+              <td><span title="User active status" v-html="person.status == 1 ? '<i class=\'fa-solid fa-check color-green\'></i>' : '<i class=\'fa-solid fa-x color-red\'></i>'"></span> | <span title="User e-mail notification status" v-html="person.notification == 1 ? '<i class=\'fa-regular fa-bell color-green\'></i>' : '<i class=\'fa-regular fa-bell-slash color-red\'></i>'"></span></td>
               <td>
-                  <a v-if="accessLevels.accesslevel1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-user" title="Edit user"><i class="fa-solid fa-pen-to-square"></i></a>&nbsp;
-                  <a v-if="accessLevels.accesslevel1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-del-user" title="Delete user"><i class="fa-solid fa-circle-xmark"></i></a>&nbsp;
-                  <button class="btn btn-sm btn-link btn-resend" v-if="accessLevels.accesslevel1r && person.role === 'labadmin' && dateOlderThan24Hours(person.last_report_sent)" @click="resendReport(person.loginid)" :title="'Send report to '+person.firstname+' '+person.lastname+'.'"><i class="fa-solid fa-paper-plane"></i></button>&nbsp;
-                  <button class="btn btn-sm btn-link btn-resend" v-if="accessLevels.accesslevel1 && person.role === 'labadmin'" @click="maskAndRedirect(person.loginid)" :title="'Mask as '+person.firstname+' '+person.lastname+'.'"><i class="fa-solid fa-masks-theater"></i></button>
+                  <a v-if="accessLevels.accesslevel1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-user" title="Edit user"><i class="fa-solid fa-pen-to-square"></i></a>
+                  <a v-if="accessLevels.accesslevel1" href="" @click="selectRecord(person)" data-bs-toggle="modal" data-bs-target="#modal-del-user" title="Delete user"><i class="fa-solid fa-circle-xmark ms-1"></i></a>
+                  <button class="btn btn-sm btn-link btn-resend" v-if="accessLevels.accesslevel1r && person.specific_role === 'labadmin' && dateOlderThan24Hours(person.last_report_sent)" @click="resendReport(person.loginid)" :title="'Send report to '+person.firstname+' '+person.lastname+'.'"><i class="fa-solid fa-paper-plane ms-1"></i></button>
+                  <button class="btn btn-sm btn-link btn-resend" v-if="accessLevels.accesslevel1 && (person.specific_role == 'labadmin' || person.specific_role == 'labreportadmin')" @click="maskAndRedirect(person.loginid, person.specific_role)" :title="'Mask as '+person.firstname+' '+person.lastname+'.'"><i class="fa-solid fa-masks-theater ms-1"></i></button>
                 </td>
             </tr>
           </tbody>
@@ -91,7 +95,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <input type="hidden" name="email" id="email" :value="selectedRecord.email" />
+            <input type="hidden" name="del_loginid" id="del_loginid" :value="selectedRecord.loginid" />
             <input type="hidden" name="department" id="department" :value="selectedRecord.department" />
             <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal" @click="unsetSelectedRecord()">Cancel</button>
             <button type="submit" class="btn btn-primary btn-sm">Yes</button>
@@ -159,21 +163,6 @@
               </div>
             </div>
             <div class="row m-2">
-              <div class="col-md-4 fw-bold text-end">
-                Role
-              </div>
-              <div class="col-md-6">
-                <select name="role" id="role" v-model="selectedRecord.role">
-                  <option>-- select an option --</option>
-                  <option v-if="accessLevels.accesslevel2" value="superadmin">SuperAdmin</option>
-                  <option value="orgadmin">OrgAdmin</option>
-                  <option value="orgreportviewer">OrgReportViewer</option>
-                  <option value="labadmin">LabAdmin</option>
-                  <option value="labreportviewer">LabReportViewer</option>
-                </select>
-              </div>
-            </div>
-            <div class="row m-2">
               <div class="col-md-6 offset-md-4">
                 <input type="checkbox" id="status_check" name="status_check" :value="selectedRecord.status" :checked="selectedRecord.status == '1'" />
                 <label class="radio-check-label" for="status_check">Enable User</label>
@@ -181,7 +170,7 @@
             </div>
             <div class="row m-2">
               <div class="col-md-8 offset-md-4">
-                <small>Below options only apply to the LabAdmins or LabReportViewers.</small>
+                <small>Below options only apply to the LabAdmins or LabReportAdmins.</small>
               </div>
             </div>
             <div class="row m-2">
@@ -207,19 +196,12 @@
             </div>
             <div class="row m-2">
               <div class="col-md-4 fw-bold text-end">
-                ADGroups
+                Lab/Group Relation
               </div>
               <div class="col-md-6">
-                <v-select
-                  multiple
-                  :options="adgroupOptions"
-                  :reduce="adgroup => adgroup.id"
-                  label="adgroup"
-                  v-model="selectedAdgroups"
-                  placeholder="-- select an option --"
-                  @input="updateSelectedAdgroups"
-                />
-                <small class="element-description">This only applies if the selected role is LabAdmin or LabReportViewers.</small>
+                  <p v-for="group in selectedRecord.adgroupDetails" class="mb-1">
+                    <span class="small">{{ group.alias }} <span class="user-data-role secondary-color">({{ roleAnalyser(group.role) }}<span v-if="group.is_pi == 1"> - PI/Supervisor</span>)</span></span>
+                  </p>
               </div>
             </div>
           </div>
@@ -238,26 +220,36 @@
 //import { navmixin } from '../mixins/navMixin.js';
 import { globalMixin } from '../mixins/globalMixin.js';
 import axios from 'axios';
-import vSelect from 'vue-select';
 
 export default {
-  components: {
-    'v-select': vSelect
-  },
   mixins: [globalMixin],
   name: 'UserManagement',
+
+  data() {
+    return {
+      sortKey: 'firstname',
+      sortDirection: 'asc'
+    }
+  },
+  created() {
+    this.sortKey = 'firstname';
+    this.sortDirection = 'asc';
+  },
 
   mounted: function(){
     const url = 'https://web.bftv.ucdavis.edu/reporting/users-get.php'
     this.getDataList(url, 'users')
   },
   methods: {
-    updateSelectedAdgroups(value) {
-      this.selectedAdgroups = value;
-    },
     dateOlderThan24Hours(lastDate) {
+      if (!lastDate) {
+        return true;
+      }
       const now = new Date();
       const lastUsedDate = new Date(lastDate);
+      if (isNaN(lastUsedDate.getTime())) {
+        return true;
+      }
       const differenceInMs = now - lastUsedDate;
       const differenceInHours = differenceInMs / (1000 * 60 * 60);
       return differenceInHours > 24;
@@ -278,8 +270,7 @@ export default {
         this.screenmsg = response.data.message,
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
-        this.listData = response.data.users,
-        this.listData.sort((a, b) => this.sortColumn('firstname', a, b))
+        this.listData = response.data.users
       }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
@@ -313,8 +304,7 @@ export default {
         this.screenmsg = response.data.message,
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
-        this.listData = response.data.users,
-        this.listData.sort((a, b) => this.sortColumn('firstname', a, b))
+        this.listData = response.data.users
       }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
@@ -339,7 +329,6 @@ export default {
       var modal = bootstrap.Modal.getInstance(document.getElementById('modal-user'));
       var usremail = document.getElementById('email').value;
       var usrdep = document.getElementById('department').value;
-      var usrrole = document.getElementById('role').value;
       var usrname = document.getElementById('fullname').value;
       var usrnotification = document.getElementById('notification').checked;
       var freq = null;
@@ -366,20 +355,21 @@ export default {
 
       axios.post('https://web.bftv.ucdavis.edu/reporting/user-update.php', {
         crossDomain: true,
-        email: usremail, department: usrdep, role: usrrole, name: usrname, notification: usrnotification, frequency: freq, enabled: usrstatus, mode: action,
-        adgroups: this.selectedAdgroups,
+        email: usremail, department: usrdep, name: usrname, notification: usrnotification, frequency: freq, enabled: usrstatus, mode: action,
         myid: this.username,
         token: this.token,
         headers: {
           'Content-Type': 'application/json'
         }
-      }).then(response => {console.log(response);
+      }).then(response => {
         this.screenmsg = response.data.message,
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
         this.listData = response.data.users,
-        this.listData.sort((a, b) => this.sortColumn('firstname', a, b))
-      }).catch(error => {console.log(error);
+        this.departments = response.data.departments,
+        this.adgroups = response.data.adgroups,
+        this.adgroups.sort((a, b) => this.sortColumn('adgroup', a, b))
+      }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
         } else if(error.data.message){
@@ -401,11 +391,11 @@ export default {
       e.preventDefault();
       this.loading = true;
       var modal = bootstrap.Modal.getInstance(document.getElementById('modal-del-user'));
-      var usremail = document.getElementById('email').value;
+      var deluser = document.getElementById('del_loginid').value;
       var dep = document.getElementById('department').value;
       axios.post('https://web.bftv.ucdavis.edu/reporting/user-delete.php', {
         crossDomain: true,
-        email: usremail,
+        deluser: deluser,
         department: dep,
         myid: this.username,
         token: this.token,
@@ -417,7 +407,9 @@ export default {
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
         this.listData = response.data.users,
-        this.listData.sort((a, b) => this.sortColumn('firstname', a, b))
+        this.departments = response.data.departments,
+        this.adgroups = response.data.adgroups,
+        this.adgroups.sort((a, b) => this.sortColumn('adgroup', a, b))
       }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
@@ -438,11 +430,49 @@ export default {
     },
   },
   computed: {
-    adgroupOptions() {
-      return this.adgroups.map(adgroup => ({
-        id: adgroup.id,
-        adgroup: adgroup.adgroup
-      }));
+    users() {
+      const mappedUsers = this.listData.map(user => {
+        const adgroups = typeof user.adgroups === 'string' ? user.adgroups.split(',') : [];
+        const adgroups_alias = typeof user.adgroups_alias === 'string' ? user.adgroups_alias.split(',') : [];
+        const grpids = typeof user.grpids === 'string' ? user.grpids.split(',').map(Number) : [];
+        const roles = typeof user.roles === 'string' ? user.roles.split(',') : [];
+        const is_pis = typeof user.is_pi === 'string' ? user.is_pi.split(',').map(Number) : [];
+
+        const adgroupDetails = adgroups.map((adgroup, index) => ({
+          adgroup: adgroup ?? null,
+          alias: adgroups_alias[index] ?? null,
+          grpid: grpids[index] ?? null,
+          role: roles[index] ?? null,
+          is_pi: is_pis[index] ?? null
+        }));
+
+        return {
+          id: user.id,
+          loginid: user.loginid,
+          firstname: user.firstname ?? '',
+          lastname: user.lastname ?? '',
+          email: user.email ?? '',
+          department: user.department ?? '',
+          depid: user.depid ?? '',
+          notification: user.notification ?? '',
+          frequency: user.frequency ?? '',
+          status: user.status ?? '',
+          last_report_sent: user.last_report_sent ?? '',
+          abbr: user.abbr ?? '',
+          specific_role: user.specific_role ?? '',
+          adgroupDetails
+        };
+      });
+
+      const filteredUsers = this.filterArray(mappedUsers, [
+        'firstname',
+        'lastname',
+        'loginid',
+        'email',
+        'department',
+        row => this.roleAnalyser(row.specific_role)
+      ]);
+      return this.sortArray(filteredUsers);
     }
   },
 };

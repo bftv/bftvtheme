@@ -16,12 +16,19 @@ export var globalMixin = {
             colleges: [],
             userList: [],
             adgroups: [],
+            attributeGroups: [],
             peaksTeam: [],
+            globalSettings: [],
             selectedAdgroups: [],
+            selectedUsers: [],
+            selectedViewers: [],
             selectedRecord: {
                 notification: 1,
             },
             searchValue: '',
+            sortKey: null,
+            sortDirection: 'asc',
+            filtertxt: '',
             loading: true
         }
     },
@@ -32,7 +39,7 @@ export var globalMixin = {
                 myid: this.username,
                 token: this.token,
                 mask: this.maskeduser
-            }).then(response => { //console.log (response);
+            }).then(response => {
                 if(response.status == 204){
                     this.screenmsg = "No records found.",
                     this.screenmsgtype = "error",
@@ -41,28 +48,33 @@ export var globalMixin = {
                     this.hidebody = true
                 } else {
                     if(type == 'data'){
-                        this.listData = response.data.dataList
+                        this.listData = response.data.dataList;
                     } else if(type == 'users'){
                         this.listData = response.data.users,
-                        this.listData.sort((a, b) => this.sortColumn('firstname', a, b)),
                         this.departments = response.data.departments,
                         this.adgroups = response.data.adgroups,
                         this.adgroups.sort((a, b) => this.sortColumn('adgroup', a, b))
                     } else if(type == 'department'){
                         this.listData = response.data.dataList,
-                        this.listData.sort((a, b) => this.sortColumn('department', a, b)),
+                        this.sortKey = 'department';
+                        this.sortDirection = 'asc';
+                        this.applySort('listData');
                         this.departments = response.data.departments,
                         this.departments.sort((a, b) => this.sortColumn('department', a, b)),
                         this.colleges = response.data.colleges,
                         this.colleges.sort((a, b) => this.sortColumn('college', a, b))
                     } else if(type == 'adgroup'){
                         this.listData = response.data.dataList,
-                        this.listData.sort((a, b) => this.sortColumn('alias', a, b)),
+                        this.sortKey = 'alias';
+                        this.sortDirection = 'asc';
+                        this.applySort('listData');
+                        this.attributeGroups = response.data.attr_groups,
                         this.departments = response.data.departments,
                         this.departments.sort((a, b) => this.sortColumn('department', a, b)),
                         this.userList = response.data.userList,
                         this.userList.sort((a, b) => this.sortColumn('firstname', a, b)),
                         this.peaksTeam = response.data.peaksTeam
+                        this.globalSettings = response.data.globalSettings[0]
                     } else {
                         this.listData = response.data.dataList
                     }
@@ -70,7 +82,7 @@ export var globalMixin = {
                     this.success = response.data.success,
                     this.code = response.data.code
                 }
-            }).catch(error => { console.log(error);
+            }).catch(error => {
                 if(error.response.status == 404 || error.response.status == 403 || error.response.status == 401 || error.response.status == 400){
                     this.screenmsg = error.response.data.message,
                     this.screenmsgtype = "error",
@@ -96,6 +108,91 @@ export var globalMixin = {
                 return (a[column] < b[column]) ? -1 : 1;
             }
         },
+        toggleSort(column, defaultDirection = 'asc') {
+            if (this.sortKey === column) {
+                this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.sortKey = column;
+                this.sortDirection = defaultDirection;
+            }
+        },
+        isSortActive(column) {
+            return this.sortKey === column;
+        },
+        getSortIcon(column) {
+            if (this.sortKey !== column || this.sortDirection === 'asc') {
+                return 'fa-arrow-down-short-wide';
+            }
+            return 'fa-arrow-down-wide-short';
+        },
+        getSortValue(row, key) {
+            if (!row || !key) return null;
+
+            if (typeof key === 'function') {
+                return key(row);
+            }
+
+            if (String(key).includes('.')) {
+                return String(key).split('.').reduce((obj, part) => {
+                return obj && obj[part] !== undefined ? obj[part] : null;
+                }, row);
+            }
+
+            return row[key] ?? null;
+        },
+        compareSortValues(a, b, direction = 'asc') {
+            const aEmpty = a === null || a === undefined || a === '';
+            const bEmpty = b === null || b === undefined || b === '';
+
+            if (aEmpty && bEmpty) return 0;
+            if (aEmpty) return 1;
+            if (bEmpty) return -1;
+
+            const aNum = typeof a === 'number' || (!isNaN(a) && a !== '' && a !== false);
+            const bNum = typeof b === 'number' || (!isNaN(b) && b !== '' && b !== false);
+
+            let result = 0;
+
+            if (aNum && bNum) {
+                result = Number(a) - Number(b);
+            } else {
+                result = String(a).localeCompare(String(b), undefined, {
+                numeric: true,
+                sensitivity: 'base'
+                });
+            }
+
+            return direction === 'asc' ? result : result * -1;
+        },
+        sortArray(array, sortKey = null, sortDirection = null) {
+            if (!Array.isArray(array)) return [];
+
+            const activeKey = sortKey ?? this.sortKey;
+            const activeDirection = sortDirection ?? this.sortDirection;
+
+            if (!activeKey) return [...array];
+
+            return [...array].sort((a, b) => {
+                const aVal = this.getSortValue(a, activeKey);
+                const bVal = this.getSortValue(b, activeKey);
+                return this.compareSortValues(aVal, bVal, activeDirection);
+            });
+        },
+        applySort(arrayName, sortKey = null, sortDirection = null) {
+            if (!Array.isArray(this[arrayName])) return;
+
+            const activeKey = sortKey ?? this.sortKey;
+            const activeDirection = sortDirection ?? this.sortDirection;
+
+            if (!activeKey) return;
+
+            this[arrayName] = [...this[arrayName]].sort((a, b) => {
+                const aVal = this.getSortValue(a, activeKey);
+                const bVal = this.getSortValue(b, activeKey);
+                return this.compareSortValues(aVal, bVal, activeDirection);
+            });
+        },
+
         convertDateFormat(dateString, type, time=false) {
             if(type == 'date'){
                 const dateParts = dateString.split('-');
@@ -130,23 +227,41 @@ export var globalMixin = {
         },
         selectRecord: function(row){
             this.selectedRecord = { ...row };
-            if(this.selectedRecord.grpids){
-                this.selectedRecord.grpids = JSON.parse(this.selectedRecord.grpids);
-                this.selectedRecord.grpids = this.selectedRecord.grpids.map(String);
-                this.selectedAdgroups = this.adgroups.filter(adgroup =>
-                    this.selectedRecord.grpids.includes(adgroup.id)
+            if(this.selectedRecord.usrids){
+                this.selectedRecord.usrids = JSON.parse(this.selectedRecord.usrids);
+                this.selectedRecord.usrids = this.selectedRecord.usrids.map(String);
+                this.selectedUsers = this.userOptions.filter(user =>
+                    this.selectedRecord.usrids.includes(String(user.id)) &&
+                    user.loginid !== this.selectedRecord.pi &&
+                    user.adgroupDetails.some(detail =>
+                        String(detail.grpid) === String(this.selectedRecord.id) &&
+                        detail.role === 'labadmin'
+                    )
+                );
+
+                this.selectedViewers = this.userOptions.filter(user =>
+                    this.selectedRecord.usrids.includes(String(user.id)) &&
+                    user.loginid !== this.selectedRecord.pi &&
+                    user.adgroupDetails.some(detail =>
+                        String(detail.grpid) === String(this.selectedRecord.id) &&
+                        detail.role === 'labreportadmin'
+                    )
                 );
             }
         },
         unsetSelectedRecord: function(){
             this.selectedRecord = {};
             this.selectedAdgroups = [];
+            this.selectedUsers = [];
+            this.selectedViewers = [];
         },
         updateField(fieldName, event) {
             this.selectedRecord[fieldName] = event.target.value;
         },
+        updateGlobalField(fieldName, event) {
+            this.globalSettings[fieldName] = event.target.value;
+        },
         updateMultipleValueField(fieldName, index, event, delimiter = ';') {
-            //const valuesArray = this.selectedRecord[fieldName].split(delimiter);
             const valuesArray = this.selectedRecord[fieldName]?.split(delimiter) || [];
             if (event.target.type === 'checkbox') {
                 valuesArray[index] = event.target.checked ? 'true' : 'false';
@@ -155,22 +270,32 @@ export var globalMixin = {
             }
             this.selectedRecord[fieldName] = valuesArray.join(delimiter);
         },
-        maskAndRedirect(loginid) {
-            this.maskeduser = loginid;
-            this.$router.push('/');
+        maskAndRedirect(loginid, role) {
+            //const url = 'https://web.bftv.ucdavis.edu/reporting/get-specifics.php';
+            if(this.$store.state.accesslevel1 && role != 'superadmin'  && role != 'colladmin' && role != 'collreportadmin'){
+                this.maskeduser = loginid;
+                this.$router.push('/');
+            } else {
+                this.screenmsg = "You cannot mask as "+loginid+"!";
+                this.screenmsgtype = "error";
+            }
         },
         roleAnalyser(role){
             var crole;
             if(role == 'superadmin'){
                 crole = 'SuperAdmin'
+            } else if(role == 'colladmin'){
+                crole = 'CollAdmin'
+            } else if(role == 'collreportadmin'){
+                crole = 'CollReportAdmin'
             } else if(role == 'orgadmin'){
                 crole = 'OrgAdmin'
-            } else if(role == 'orgreportviewer'){
-                crole = 'OrgReportViewer'
+            } else if(role == 'orgreportadmin'){
+                crole = 'OrgReportAdmin'
             } else if(role == 'labadmin'){
                 crole = 'LabAdmin'
-            } else if(role == 'labreportviewer'){
-                crole = 'LabReportViewer'
+            } else if(role == 'labreportadmin'){
+                crole = 'LabReportAdmin'
             } else {
                 crole = 'none'
             }
@@ -178,6 +303,42 @@ export var globalMixin = {
         },
         loader: function(){
             this.loading = true;
+        },
+        clearFilter() {
+            this.filtertxt = '';
+        },
+        normalizeFilterValue(value) {
+            if (value === null || value === undefined) return '';
+            return String(value).toLowerCase().trim();
+        },
+
+        getNestedValue(obj, path) {
+            if (!obj || !path) return null;
+
+            if (typeof path === 'function') {
+            return path(obj);
+            }
+
+            return String(path).split('.').reduce((acc, part) => {
+            return acc && acc[part] !== undefined ? acc[part] : null;
+            }, obj);
+        },
+        filterArray(items, fields = [], minChars = 3) {
+            if (!Array.isArray(items)) return [];
+
+            const keyword = this.normalizeFilterValue(this.filtertxt);
+
+            if (keyword.length < minChars) {
+            return items;
+            }
+
+            return items.filter(item => {
+            return fields.some(field => {
+                const rawValue = this.getNestedValue(item, field);
+                const value = this.normalizeFilterValue(rawValue);
+                return value.includes(keyword);
+            });
+            });
         }
     },
     computed: {
@@ -191,50 +352,74 @@ export var globalMixin = {
         },
         curlName: {
             get() {
-            return this.$store.state.curlName;
+                return this.$store.state.curlName;
             },
             set(value) {
-            this.$store.commit('setCurlName', value);
+                this.$store.commit('setCurlName', value);
             }
         },
         curlCode: {
             get() {
-            return this.$store.state.curlCode;
+                return this.$store.state.curlCode;
             },
             set(value) {
-            this.$store.commit('setCurlCode', value);
+                this.$store.commit('setCurlCode', value);
+            }
+        },
+        curlColid: {
+            get() {
+                return this.$store.state.curlColid;
+            },
+            set(value) {
+                this.$store.commit('setCurlColid', value);
+            }
+        },
+        curlCol: {
+            get() {
+                return this.$store.state.curlCol;
+            },
+            set(value) {
+                this.$store.commit('setCurlCol', value);
             }
         },
         curlDep: {
             get() {
-            return this.$store.state.curlDep;
+                return this.$store.state.curlDep;
             },
             set(value) {
-            this.$store.commit('setCurlDep', value);
+                this.$store.commit('setCurlDep', value);
             }
         },
         curlGrp: {
             get() {
-            return this.$store.state.curlGrp;
+                return this.$store.state.curlGrp;
             },
             set(value) {
-            this.$store.commit('setCurlGrp', value);
+                this.$store.commit('setCurlGrp', value);
             }
         },
         curlNotify: {
             get() {
-            return this.$store.state.curlNotify;
+                return this.$store.state.curlNotify;
             },
             set(value) {
-            this.$store.commit('setCurlNotify', value);
+                this.$store.commit('setCurlNotify', value);
             }
         },
         curlFreq: {
             get() {
-            return this.$store.state.curlFreq;
+                return this.$store.state.curlFreq;
             },
             set(value) {
-            this.$store.commit('setCurlFreq', value);
+                this.$store.commit('setCurlFreq', value);
+            }
+        },
+        curlColSize: {
+            get() {
+                return this.$store.state.curlColSize;
+            },
+            set(value) {
+                this.$store.commit('setCurlColSize', value);
             }
         },
         maskeduser: {
@@ -266,7 +451,9 @@ export var globalMixin = {
             accesslevel0r: this.$store.state.accesslevel0r,
             accesslevel1: this.$store.state.accesslevel1,
             accesslevel1r: this.$store.state.accesslevel1r,
-            accesslevel2: this.$store.state.accesslevel2
+            accesslevel2: this.$store.state.accesslevel2,
+            accesslevel2r: this.$store.state.accesslevel2r,
+            accesslevel3: this.$store.state.accesslevel3
             };
         },
         viewmode() {

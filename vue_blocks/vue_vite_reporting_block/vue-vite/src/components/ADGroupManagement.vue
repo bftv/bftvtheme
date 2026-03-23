@@ -11,8 +11,14 @@
             <i :class="screenmsgicon"></i> {{ screenmsg }} <span v-if="screenmsgtype == 'error'"> Please contact one of the SuperAdmins through the Slack channel.</span>
           </div>
         </div>
-        <div v-if="!hidebody" class="row mt-3">
-          <div class="col-md-12 text-end">
+        <div v-if="!hidebody && !loading" class="row mt-3">
+          <div class="col-md-6">
+            <div class="filter-input-wrapper">
+              <input type="text" name="filtertxt" id="filtertxt" v-model.trim="filtertxt" @keydown.esc="clearFilter" class="form-control filter-input" style="border-radius: 10px !important; height: 2em !important; font-size: 0.8rem" placeholder="Filter ADGroups">
+              <span v-if="filtertxt" class="filter-clear" @click="clearFilter"><i class="fa-solid fa-xmark"></i></span>
+            </div>
+          </div>
+          <div class="col-md-6 text-end">
             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-add-adg">+ Add a New Lab/Group</button>
           </div>
         </div>
@@ -20,14 +26,14 @@
           <table class='table table-bordered table-hover table-striped'>
             <thead class='thead-light'>
               <tr>
-                <th>Lab/Group</th>
-                <th>ADGroup</th>
-                <th>Managed By</th>
+                <th class="table-header">Lab/Group<a href="#" class="filter-link" :class="{ activated: isSortActive('alias') }" @click.prevent="toggleSort('alias'); applySort('listData')"><i class="fa-solid" :class="getSortIcon('alias')"></i></a></th>
+                <th class="table-header">ADGroup<a href="#" class="filter-link" :class="{ activated: isSortActive('adgroup') }" @click.prevent="toggleSort('adgroup'); applySort('listData')"><i class="fa-solid" :class="getSortIcon('adgroup')"></i></a></th>
+                <th class="table-header">Managed By<a href="#" class="filter-link" :class="{ activated: isSortActive('department') }" @click.prevent="toggleSort('department'); applySort('listData')"><i class="fa-solid" :class="getSortIcon('department')"></i></a></th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="adgroup in listData">
+              <tr v-for="adgroup in filteredAdGroups">
                 <td>{{ adgroup.alias }}</td>
                 <td>{{ adgroup.adgroup }}</td>
                 <td>{{ adgroup.department}}</td>
@@ -104,6 +110,7 @@
                       <option>-- select a user --</option>
                       <option v-for="user in userList" :key="user" :value="user.loginid">{{ user.firstname }} {{ user.lastname }}</option>
                     </select>
+                    <small class="element-description">Secondary Approver is a multi-choice list.</small>
                   </div>
                 </div>
               </fieldset>
@@ -254,10 +261,32 @@
                     Secondary Approver
                   </div>
                   <div class="col-md-6">
-                    <select name="upd_secondapprover" id="upd_secondapprover" v-model="selectedRecord.secondapprover">
-                      <option value="">-- select a user --</option>
-                      <option v-for="user in userList" :key="user" :value="user.loginid">{{ user.firstname }} {{ user.lastname }}</option>
-                    </select>
+                    <v-select
+                      multiple
+                      :options="filteredUserOptions"
+                      label="userName"
+                      v-model="selectedUsers"
+                      placeholder="-- select an option --"
+                      :taggable="false"
+                      :close-on-select="false"
+                    />
+                  </div>
+                </div>
+                <div class="row m-2">
+                  <div class="col-md-4 fw-bold text-end">
+                    Viewer
+                  </div>
+                  <div class="col-md-6">
+                    <v-select
+                      multiple
+                      :options="filteredUserOptions"
+                      label="userName"
+                      v-model="selectedViewers"
+                      placeholder="-- select an option --"
+                      :taggable="false"
+                      :close-on-select="false"
+                    />
+                    <small class="element-description">Secondary Approver and Viewer are a multi-choice lists.</small>
                   </div>
                 </div>
                 <div class="row m-2">
@@ -265,7 +294,7 @@
                     <i class="fa-solid fa-triangle-exclamation"></i>
                   </div>
                   <div class="col-md-6">
-                    <small>Removing <strong>"PI/Supervior"</strong> or <strong>"Second Approver"</strong> doesn't remove the relation between the user and the ADGroup. To remove the relation, it needs to be done from <strong>"User Management"</strong>.</small>
+                    <small>Choosing the same person for multiple roles will grant them the least privileged role.</small>
                   </div>
                 </div>
               </fieldset>
@@ -336,7 +365,11 @@
   //import { navmixin } from '../mixins/navMixin.js';
   import { globalMixin } from '../mixins/globalMixin.js';
   import axios from 'axios';
+  import vSelect from 'vue-select';
   export default {
+    components: {
+      'v-select': vSelect
+    },
     mixins: [globalMixin],
     name: 'ADGroupManagement',
 
@@ -347,6 +380,10 @@
           { adgroup: '', displayName: '', visible: false }
         ]
       };
+    },
+    created() {
+      this.sortKey = 'alias';
+      this.sortDirection = 'asc';
     },
     mounted: function(){
       const url = 'https://web.bftv.ucdavis.edu/reporting/adgroup-get.php'
@@ -406,7 +443,11 @@
           this.screenmsgtype = "success",
           this.screenmsgicon = this.successicon,
           this.listData = response.data.dataList,
-          this.departments = response.data.departments
+          this.sortKey = 'alias';
+          this.sortDirection = 'asc';
+          this.applySort('listData');
+          this.departments = response.data.departments,
+          this.departments.sort((a, b) => this.sortColumn('department', a, b))
         }).catch(error => {
           if(error.response.data.message){
             this.screenmsg = error.response.data.message
@@ -438,7 +479,6 @@
         var adgdep = document.getElementById('upd_dep').value;
         var adguid = document.getElementById('upd_guid').value;
         var pi = document.getElementById('upd_pi').value;
-        var sap = document.getElementById('upd_secondapprover').value;
         var adgs = 'none';
         var adgsdp = 'none';
         var adgsv = 'none';
@@ -457,22 +497,32 @@
         } else {
           action = 'save'
         }
+        const userids = this.selectedUsers.map(item => item.loginid);
+        const viewerids = this.selectedViewers.map(item => item.loginid);
 
         axios.post('https://web.bftv.ucdavis.edu/reporting/adgroup-update.php', {
           crossDomain: true,
           myid: this.username,
           token: this.token,
-          id: adgid, adgroup: adgroup, alias: als, dep: adgdep, guid: adguid, pi: pi, secondap: sap, inherit: inh, adgroups: adgs, adgroupsdp: adgsdp, adgroupsvisibility: adgsv, mode: action,
+          id: adgid, adgroup: adgroup, alias: als, dep: adgdep, guid: adguid, pi: pi, secondap: userids, viewers: viewerids, inherit: inh, adgroups: adgs, adgroupsdp: adgsdp, adgroupsvisibility: adgsv, mode: action,
           headers: {
             'Content-Type': 'application/json'
           }
-        }).then(response => { console.log(response);
+        }).then(response => {
           this.screenmsg = response.data.message,
           this.screenmsgtype = "success",
           this.screenmsgicon = this.successicon,
           this.listData = response.data.dataList,
-          this.departments = response.data.departments
-        }).catch(error => { console.log(error);
+          this.sortKey = 'alias';
+          this.sortDirection = 'asc';
+          this.applySort('listData');
+          this.departments = response.data.departments,
+          this.departments.sort((a, b) => this.sortColumn('department', a, b)),
+          this.userList = response.data.userList,
+          this.userList.sort((a, b) => this.sortColumn('firstname', a, b)),
+          this.peaksTeam = response.data.peaksTeam
+          this.globalSettings = response.data.globalSettings[0]
+        }).catch(error => {
           if(error.response.data.message){
             this.screenmsg = error.response.data.message
           } else if(error.data.message){
@@ -509,7 +559,11 @@
           this.screenmsgtype = "success",
           this.screenmsgicon = this.successicon,
           this.listData = response.data.dataList,
-          this.departments = response.data.departments
+          this.sortKey = 'alias';
+          this.sortDirection = 'asc';
+          this.applySort('listData');
+          this.departments = response.data.departments,
+          this.departments.sort((a, b) => this.sortColumn('department', a, b))
         }).catch(error => {
           if(error.response.data.message){
             this.screenmsg = error.response.data.message
@@ -553,11 +607,39 @@
           this.selectedRecord.atr_adgroupsvisiblity = value.join(';');
         }
       },
+      userOptions() {
+        return this.userList.map(user => {
+          const adgroups = typeof user.adgroups === 'string' ? user.adgroups.split(',') : [];
+          const grpids = typeof user.grpids === 'string' ? user.grpids.split(',').map(Number) : [];
+          const roles = typeof user.roles === 'string' ? user.roles.split(',') : [];
+          const is_pis = typeof user.is_pi === 'string' ? user.is_pi.split(',').map(Number) : [];
+
+          const adgroupDetails = adgroups.map((adgroup, index) => ({
+            adgroup: adgroup ?? null,
+            grpid: grpids[index] ?? null,
+            role: roles[index] ?? null,
+            is_pi: is_pis[index] ?? null
+          }));
+
+          return {
+            id: user.id,
+            loginid: user.loginid,
+            userName: `${user.firstname} ${user.lastname}`,
+            adgroupDetails
+          };
+        });
+      },
+      filteredUserOptions() {
+        return this.userOptions.filter(user => user.loginid !== this.selectedRecord.pi);
+      },
+      filteredAdGroups() {
+        return this.filterArray(this.listData, ['alias', 'adgroup', 'department']);
+      }
     },
     watch: {
       selectedRecord(newValue) {
         if (newValue && newValue.inherit !== undefined) {
-          this.isInherited = newValue.inherit === '1';
+          this.isInherited = Number(newValue.inherit) === 1;
         }
       },
     },

@@ -20,7 +20,7 @@
             <li><a href="https://web.bftv.ucdavis.edu/reporting/import_samples/users.csv">Import Users</a> - <small>Make sure the department column should be exactly the same as it is shown on AD. The role column can be superadmin, orgadmin, orgreportadmin, labadmin, or labreportadmin. OrgAdmins cannot import a user as superadmin. The adgroups column should be exactly as the ADGroup like CAES-BFTV-FST-MG-Lab-AXTaha.</small></li>
           </ol>
         </div>
-        <fieldset v-if="accessLevels.accesslevel2" class="form-group">
+        <fieldset v-if="accessLevels.accesslevel3" class="form-group">
           <legend>1- Import Departments</legend>
           <form method="post" @submit.prevent="importDep">
             <div class="row">

@@ -12,6 +12,7 @@ export var navmixin = {
             curlGrp: '',
             curlNotify: 0,
             curlFreq: '',
+            curlColSize: '',
             authenticated: '',
             authText: '',
             accesslevel0: false,
@@ -19,6 +20,8 @@ export var navmixin = {
             accesslevel1: false,
             accesslevel1r: false,
             accesslevel2: false,
+            accesslevel2r: false,
+            accesslevel3: false,
             viewmode: false,
             navscreenmsg: "",
             navscreenmsgtype: "",
@@ -28,7 +31,7 @@ export var navmixin = {
             maskeduser: null
         }
     },
-    beforeMount: function(){//console.log(this.username);
+    beforeMount: function(){
         axios.post('https://web.bftv.ucdavis.edu/reporting/connector.php', {
             crossDomain: true,
             loginid: this.username,
@@ -37,7 +40,7 @@ export var navmixin = {
             headers: {
                 'Content-Type': 'application/json'
             }
-        }).then(response => {//console.log(response);
+        }).then(response => {
             this.curlCode = response.data.response
             if(this.curlCode == 1 || this.curlCode == 3){
                 this.curlRole = response.data.userrole,
@@ -46,6 +49,7 @@ export var navmixin = {
                 this.curlGrp = response.data.usergrps,
                 this.curlNotify = response.data.usernotify,
                 this.curlFreq = response.data.userfreq,
+                this.curlColSize = response.data.colsize,
                 this.authenticated = response.data.authenticated,
                 this.check_auth()
                 if(this.curlRole == 'superadmin'){
@@ -54,32 +58,58 @@ export var navmixin = {
                     this.accesslevel1 = true;
                     this.accesslevel1r = true;
                     this.accesslevel2 = true;
+                    this.accesslevel2r = true;
+                    this.accesslevel3 = true;
+                } else if(this.curlRole == 'colladmin'){
+                    this.accesslevel0 = true;
+                    this.accesslevel0r = true;
+                    this.accesslevel1 = true;
+                    this.accesslevel1r = true;
+                    this.accesslevel2 = true;
+                    this.accesslevel2r = true;
+                    this.accesslevel3 = false;
+                } else if(this.curlRole == 'collreportadmin'){
+                    this.accesslevel0 = false;
+                    this.accesslevel0r = true;
+                    this.accesslevel1 = false;
+                    this.accesslevel1r = true;
+                    this.accesslevel2 = false;
+                    this.accesslevel2r = true;
+                    this.accesslevel3 = false;
                 } else if(this.curlRole == 'orgadmin'){
                     this.accesslevel0 = true;
                     this.accesslevel0r = true;
                     this.accesslevel1 = true;
                     this.accesslevel1r = true;
                     this.accesslevel2 = false;
-                } else if(this.curlRole == 'orgreportviewer'){
+                    this.accesslevel2r = false;
+                    this.accesslevel3 = false;
+                } else if(this.curlRole == 'orgreportadmin'){
                     this.accesslevel0 = false;
                     this.accesslevel0r = true;
                     this.accesslevel1 = false;
                     this.accesslevel1r = true;
                     this.accesslevel2 = false;
+                    this.accesslevel2r = false;
+                    this.accesslevel3 = false;
                 } else if(this.curlRole == 'labadmin'){
                     this.accesslevel0 = true;
                     this.accesslevel0r = true;
                     this.accesslevel1 = false;
                     this.accesslevel1r = false;
                     this.accesslevel2 = false;
-                } else if(this.curlRole == 'labreportviewer'){
+                    this.accesslevel2r = false;
+                    this.accesslevel3 = false;
+                } else if(this.curlRole == 'labreportadmin'){
                     this.accesslevel0 = false;
                     this.accesslevel0r = true;
                     this.accesslevel1 = false;
                     this.accesslevel1r = false;
                     this.accesslevel2 = false;
+                    this.accesslevel2r = false;
+                    this.accesslevel3 = false;
                 }
-                if(this.curlRole == 'orgreportviewer' || this.curlRole == 'labadmin' || this.curlRole == 'labreportviewer'){
+                if(this.curlRole == 'labadmin' || this.curlRole == 'labreportadmin'){
                     this.viewmode = true;
                 }
             } else {
@@ -101,10 +131,14 @@ export var navmixin = {
             var crole;
             if(role == 'superadmin'){
                 crole = 'SuperAdmin'
+            } else if(role == 'colladmin'){
+                crole = 'CollAdmin'
+            } else if(role == 'collreportadmin'){
+                crole = 'CollReportAdmin'
             } else if(role == 'orgadmin'){
                 crole = 'OrgAdmin'
-            } else if(role == 'orgreportviewer'){
-                crole = 'OrgReportViewer'
+            } else if(role == 'orgreportadmin'){
+                crole = 'OrgReportAdmin'
             } else if(role == 'labadmin'){
                 crole = 'LabAdmin'
             } else if(role == 'labreportviewer'){

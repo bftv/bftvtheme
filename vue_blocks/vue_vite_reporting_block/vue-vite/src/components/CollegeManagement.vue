@@ -12,7 +12,13 @@
         </div>
       </div>
       <div class="row mt-3">
-        <div  v-if="accessLevels.accesslevel2 && authenticated" class="col-md-12 text-end">
+        <div class="col-md-6">
+          <div class="filter-input-wrapper">
+            <input type="text" name="filtertxt" id="filtertxt" v-model.trim="filtertxt" @keydown.esc="clearFilter" class="form-control filter-input" style="border-radius: 10px !important; height: 2em !important; font-size: 0.8rem" placeholder="Filter colleges">
+            <span v-if="filtertxt" class="filter-clear" @click="clearFilter"><i class="fa-solid fa-xmark"></i></span>
+          </div>
+        </div>
+        <div v-if="accessLevels.accesslevel3 && authenticated" class="col-md-6 text-end">
           <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-add-college">+ Add a College</button>
         </div>
       </div>
@@ -20,16 +26,20 @@
         <table class='table table-bordered table-hover table-striped'>
           <thead class='thead-light'>
             <tr>
-              <th>College</th>
-              <th>Abbr</th>
+              <th class="table-header">College<a href="#" class="filter-link" :class="{ activated: isSortActive('college') }" @click.prevent="toggleSort('college'); applySort('listData')"><i class="fa-solid" :class="getSortIcon('college')"></i></a></th>
+              <th class="table-header">Abbr<a href="#" class="filter-link" :class="{ activated: isSortActive('abbr') }" @click.prevent="toggleSort('abbr'); applySort('listData')"><i class="fa-solid" :class="getSortIcon('abbr')"></i></a></th>
+              <th class="table-header">Admin Group</th>
+               <th class="table-header">Viewer Group</th>
               <th v-if="accessLevels.accesslevel2"></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="college in listData">
+            <tr v-for="college in filteredColleges">
               <td>{{ college.college }}</td>
               <td>{{ college.abbr }}</td>
-              <td v-if="accessLevels.accesslevel2"><a href="" @click="selectRecord(college)" data-bs-toggle="modal" data-bs-target="#modal-edit-college" title="Edit College"><i class="fa-solid fa-pen-to-square"></i></a> <a href="" @click="selectRecord(college)" data-bs-toggle="modal" data-bs-target="#modal-del-college" title="Delete College"><i class="fa-solid fa-circle-xmark"></i></a></td>
+              <td>{{ college.coladgrp }}</td>
+              <td>{{ college.vieweradgrp }}</td>
+              <td v-if="accessLevels.accesslevel2"><a href="" @click="selectRecord(college)" data-bs-toggle="modal" data-bs-target="#modal-edit-college" title="Edit College"><i class="fa-solid fa-pen-to-square"></i></a> <a v-if="accessLevels.accesslevel3" href="" @click="selectRecord(college)" data-bs-toggle="modal" data-bs-target="#modal-del-college" title="Delete College"><i class="fa-solid fa-circle-xmark"></i></a></td>
             </tr>
           </tbody>
         </table>
@@ -42,7 +52,7 @@
     </div>
   </div>
   <!-- Modal Add -->
-  <div  v-if="accessLevels.accesslevel2" class="modal fade" id="modal-add-college" tabindex="-1" aria-labelledby="modal-add-college-label" aria-hidden="true">
+  <div  v-if="accessLevels.accesslevel3" class="modal fade" id="modal-add-college" tabindex="-1" aria-labelledby="modal-add-college-label" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
@@ -67,6 +77,22 @@
                 <input type="text" id="abbr" name="abbr">
               </div>
             </div>
+            <div class="row m-2">
+              <div class="col-md-4 fw-bold text-end required">
+                Admin AD Group
+              </div>
+              <div class="col-md-6">
+                <input type="text" id="adminadgroup" name="adminadgroup" required>
+              </div>
+            </div>
+            <div class="row m-2">
+              <div class="col-md-4 fw-bold text-end required">
+                Viewer AD Group
+              </div>
+              <div class="col-md-6">
+                <input type="text" id="vieweradgroup" name="vieweradgroup" required>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Close</button>
@@ -77,7 +103,7 @@
     </div>
   </div>
   <!-- Modal Delete -->
-  <div  v-if="accessLevels.accesslevel2" class="modal fade" id="modal-del-college" tabindex="-1" aria-labelledby="modal-del-college-label" aria-hidden="true">
+  <div  v-if="accessLevels.accesslevel3" class="modal fade" id="modal-del-college" tabindex="-1" aria-labelledby="modal-del-college-label" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -127,6 +153,22 @@
                 <input type="text" id="upd_abbr" name="upd_abbr" :value="selectedRecord.abbr" @input="updateField('abbr', $event)">
               </div>
             </div>
+            <div class="row m-2">
+              <div class="col-md-4 fw-bold text-end required">
+                Admin AD Group
+              </div>
+              <div class="col-md-6">
+                <input type="text" id="upd_adminadgroup" name="upd_adminadgroup" :value="selectedRecord.coladgrp" @input="updateField('coladgrp', $event)" required>
+              </div>
+            </div>
+            <div class="row m-2">
+              <div class="col-md-4 fw-bold text-end required">
+                Viewer AD Group
+              </div>
+              <div class="col-md-6">
+                <input type="text" id="upd_vieweradgroup" name="upd_vieweradgroup" :value="selectedRecord.vieweradgrp" @input="updateField('vieweradgrp', $event)" required>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <input type="hidden" name="upd_colid" id="upd_colid" :value="selectedRecord.id" @input="updateField('id', $event)" />
@@ -140,12 +182,16 @@
 </template>
 
 <script>
-//import { navmixin } from '../mixins/navMixin.js';
 import { globalMixin } from '../mixins/globalMixin.js';
 import axios from 'axios';
 export default {
   mixins: [globalMixin],
   name: 'CollegeManagement',
+
+  created() {
+    this.sortKey = 'college';
+    this.sortDirection = 'asc';
+  },
 
   mounted: function(){
     const url = 'https://web.bftv.ucdavis.edu/reporting/col-get.php'
@@ -158,11 +204,13 @@ export default {
       var modal = bootstrap.Modal.getInstance(document.getElementById('modal-add-college'));
       var col = document.getElementById('college').value;
       var abb = document.getElementById('abbr').value;
+      var adminadgrp = document.getElementById('adminadgroup').value;
+      var vieweradgrp = document.getElementById('vieweradgroup').value;
       axios.post('https://web.bftv.ucdavis.edu/reporting/col-add.php', {
         crossDomain: true,
         myid: this.username,
         token: this.token,
-        college: col, abbreviation: abb,
+        college: col, abbreviation: abb, adminadgrp: adminadgrp, vieweradgrp: vieweradgrp,
         headers: {
           'Content-Type': 'application/json'
         }
@@ -170,7 +218,10 @@ export default {
         this.screenmsg = response.data.message,
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
-        this.listData = response.data.dataList
+        this.listData = response.data.dataList,
+        this.sortKey = 'college';
+        this.sortDirection = 'asc';
+        this.applySort('listData');
       }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
@@ -197,12 +248,14 @@ export default {
       var colid = document.getElementById('upd_colid').value;
       var col = document.getElementById('upd_college').value;
       var abb = document.getElementById('upd_abbr').value;
+      var adminadgrp = document.getElementById('upd_adminadgroup').value;
+      var vieweradgrp = document.getElementById('upd_vieweradgroup').value;
 
       axios.post('https://web.bftv.ucdavis.edu/reporting/col-update.php', {
         crossDomain: true,
         myid: this.username,
         token: this.token,
-        id: colid, college: col, abbreviation: abb,
+        id: colid, college: col, abbreviation: abb, adminadgrp: adminadgrp, vieweradgrp: vieweradgrp,
         headers: {
           'Content-Type': 'application/json'
         }
@@ -210,7 +263,10 @@ export default {
         this.screenmsg = response.data.message,
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
-        this.listData = response.data.dataList
+        this.listData = response.data.dataList,
+        this.sortKey = 'college';
+        this.sortDirection = 'asc';
+        this.applySort('listData');
       }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
@@ -246,7 +302,10 @@ export default {
         this.screenmsg = response.data.message,
         this.screenmsgtype = "success",
         this.screenmsgicon = this.successicon,
-        this.listData = response.data.dataList
+        this.listData = response.data.dataList,
+        this.sortKey = 'college';
+        this.sortDirection = 'asc';
+        this.applySort('listData');
       }).catch(error => {
         if(error.response.data.message){
           this.screenmsg = error.response.data.message
@@ -266,6 +325,11 @@ export default {
       window.scrollTo(0, 400);
     },
   },
+  computed: {
+    filteredColleges() {
+      return this.filterArray(this.listData, ['college', 'abbr']);
+    }
+  }
 };
 </script>
 
