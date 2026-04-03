@@ -1,9 +1,9 @@
 /* Main URLs */
 const host = window.location.hostname;console.log(host);
 
-if (host === 'bftv.ucdavis.edu') {
+if (host === 'www.bftv.ucdavis.edu') {
   mainURL = 'https://web.bftv.ucdavis.edu/keycardmgmt/';
-} else if(host === 'bftv.local') {
+} elseif(host === 'bftv.local') {
 	mainURL = 'https://web-dev.bftv.ucdavis.edu/keycardmgmt-dev/';
 }console.log(mainURL);
 const blockID = document.getElementsByClassName('vue-keymgmt-block')[0].id;
