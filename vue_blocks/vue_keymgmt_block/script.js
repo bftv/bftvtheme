@@ -1,5 +1,11 @@
 /* Main URLs */
-mainURL = 'https://web.bftv.ucdavis.edu/keycardmgmt/';
+const host = window.location.hostname;
+
+if (host === 'bftv.ucdavis.edu') {
+  mainURL = 'https://web.bftv.ucdavis.edu/keycardmgmt/';
+} else if(host === 'bftv.local') {
+	mainURL = 'https://web-dev.bftv.ucdavis.edu/keycardmgmt-dev/';
+}
 const blockID = document.getElementsByClassName('vue-keymgmt-block')[0].id;
 window.onmessage = function(event){
     if (event.data[0] == 'pageHeight') {
@@ -16,9 +22,9 @@ var keymgmtCmp = {
 
     data: function() {
         return {
-			iframeurl: '',
-			iframesrc: '',
-			height: '1000px'
+					iframeurl: '',
+					iframesrc: '',
+					height: '1000px'
         }
     },
 
@@ -28,7 +34,10 @@ var keymgmtCmp = {
 
     methods: {
 		getURL: function(){
-			this.iframeurl = this.$route.query.sid;
+			const hashParams = new URLSearchParams(window.location.search);
+			//console.log(hashParams.has('sid'));
+			//console.log(hashParams.get('sid'));
+			this.iframeurl = hashParams.get('sid');
 			if(this.iframeurl){
 				this.iframesrc = mainURL+'index.php?sid='+this.iframeurl
 			} else {
