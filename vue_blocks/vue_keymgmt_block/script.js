@@ -1,11 +1,11 @@
 /* Main URLs */
-const host = window.location.hostname;
+const host = window.location.hostname;console.log(host);
 
 if (host === 'bftv.ucdavis.edu') {
   mainURL = 'https://web.bftv.ucdavis.edu/keycardmgmt/';
 } else if(host === 'bftv.local') {
 	mainURL = 'https://web-dev.bftv.ucdavis.edu/keycardmgmt-dev/';
-}
+}console.log(mainURL);
 const blockID = document.getElementsByClassName('vue-keymgmt-block')[0].id;
 window.onmessage = function(event){
     if (event.data[0] == 'pageHeight') {
@@ -42,7 +42,7 @@ var keymgmtCmp = {
 				this.iframesrc = mainURL+'index.php?sid='+this.iframeurl
 			} else {
 				this.iframesrc = mainURL
-			}
+			}console.log(this.iframesrc);
 		},
 	}
 }
