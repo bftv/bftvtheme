@@ -67,7 +67,7 @@ hr {
 .user-data-dep {
 	display: block;
     font-size: 12px;
-    margin-left: 21px;
+    padding-left: 25px;
     color: gray;
     font-weight: 600;
 }
