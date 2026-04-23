@@ -164,7 +164,7 @@
             </div>
             <div class="row m-2">
               <div class="col-md-6 offset-md-4">
-                <input type="checkbox" id="status_check" name="status_check" :value="selectedRecord.status" :checked="selectedRecord.status == '1'" />
+                <input type="checkbox" id="status_check" name="status_check" :value="selectedRecord.status" v-model="usr_status" />
                 <label class="radio-check-label" for="status_check">Enable User</label>
               </div>
             </div>
@@ -175,7 +175,7 @@
             </div>
             <div class="row m-2">
               <div class="col-md-6 offset-md-4">
-                <input type="checkbox" id="notification" name="notification" :checked="selectedRecord.notification == '1'" />
+                <input type="checkbox" id="notification" name="notification" v-model="usr_notification" />
                 <label class="radio-check-label" for="notification">E-mail Notification</label>
               </div>
             </div>
@@ -473,6 +473,26 @@ export default {
         row => this.roleAnalyser(row.specific_role)
       ]);
       return this.sortArray(filteredUsers);
+    },
+    usr_status: {
+      get() {
+        return this.selectedRecord && this.selectedRecord.status == '1';
+      },
+      set(val) {
+        if (this.selectedRecord) {
+          this.selectedRecord.status = val ? '1' : '0';
+        }
+      }
+    },
+    usr_notification: {
+      get() {
+        return this.selectedRecord && this.selectedRecord.notification == '1';
+      },
+      set(val) {
+        if (this.selectedRecord) {
+          this.selectedRecord.notification = val ? '1' : '0';
+        }
+      }
     }
   },
 };

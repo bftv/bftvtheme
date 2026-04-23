@@ -24,7 +24,7 @@
               <div class="col-md-4">
                 <label for="attr_cols" class="required">Attribute Columns</label>
                 <input type="number" id="attr_cols" name="attr_cols" max="10" :value="globalSettings.attr_cols" @input="updateGlobalField('attr_cols', $event)" required>
-                <div><small class="element-description">Recommended number of diplayed columns is 4.</small></div>
+                <div><small class="element-description">Defaul displayed column number for attributes for new users. Recommended column layout is 4.</small></div>
               </div>
               <div class="col-md-4">
                 <label for="recurs_loop" class="required">Recursive Loop Protection</label>

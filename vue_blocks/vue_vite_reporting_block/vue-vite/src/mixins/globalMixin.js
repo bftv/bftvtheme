@@ -39,7 +39,7 @@ export var globalMixin = {
                 myid: this.username,
                 token: this.token,
                 mask: this.maskeduser
-            }).then(response => {
+            }).then(response => {console.log(response);
                 if(response.status == 204){
                     this.screenmsg = "No records found.",
                     this.screenmsgtype = "error",
@@ -82,7 +82,7 @@ export var globalMixin = {
                     this.success = response.data.success,
                     this.code = response.data.code
                 }
-            }).catch(error => {
+            }).catch(error => {console.log(error);
                 if(error.response.status == 404 || error.response.status == 403 || error.response.status == 401 || error.response.status == 400){
                     this.screenmsg = error.response.data.message,
                     this.screenmsgtype = "error",

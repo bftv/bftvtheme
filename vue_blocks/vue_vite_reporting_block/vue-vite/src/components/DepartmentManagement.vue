@@ -379,7 +379,7 @@
               </div>
               <div class="row m-2">
                 <div class="col-md-6 offset-md-4">
-                  <input type="checkbox" id="upd_maindep" name="upd_maindep" :checked="selectedRecord.maindep == '1'" />
+                  <input type="checkbox" id="upd_maindep" name="upd_maindep" v-model="upd_maindep" />
                   <label class="radio-check-label" for="upd_maindep">Main Department</label>
                 </div>
               </div>
@@ -912,6 +912,16 @@ export default {
     },
     filteredDepartments() {
       return this.filterArray(this.listData, ['department', 'abbr']);
+    },
+    upd_maindep: {
+      get() {
+        return this.selectedRecord && this.selectedRecord.maindep == '1';
+      },
+      set(val) {
+        if (this.selectedRecord) {
+          this.selectedRecord.maindep = val ? '1' : '0';
+        }
+      }
     }
   },
   watch: {
