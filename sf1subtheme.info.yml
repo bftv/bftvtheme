@@ -2,7 +2,7 @@ name: SiteFarme One - Subtheme
 type: theme
 description: This is a subtheme of Sitefarm One
 package: SiteFarm
-core_version_requirement: ">=10"
+core_version_requirement: ^10 || ^11
 
 base theme: sitefarm_one
 
