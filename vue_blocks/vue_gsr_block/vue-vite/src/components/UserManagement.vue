@@ -364,7 +364,7 @@
     },
 
     mounted: function(){
-      var url = 'https://web.bftv.ucdavis.edu/gsr/users-get.php';
+      var url = this.baseurl+'/users-get.php';
       this.getDataList(url, 'users')
     },
     methods: {
@@ -378,7 +378,7 @@
         if(document.querySelector('input[name="userteam"]:checked')){
           team = document.querySelector('input[name="userteam"]:checked').value;
         }
-        axios.post('https://web.bftv.ucdavis.edu/gsr/user-add.php', {
+        axios.post(this.baseurl+'/user-add.php', {
           crossDomain: true,
           email: usremail, role: usrrole, team: team,
           myid: this.username,
@@ -440,7 +440,7 @@
         } else {
           action = 'save'
         }
-        axios.post('https://web.bftv.ucdavis.edu/gsr/user-update.php', {
+        axios.post(this.baseurl+'/user-update.php', {
           crossDomain: true,
           cfname: usrcfname, clname: usrclname, role: usrrole, team: team, email: usremail, phone: usrphone, enabled: usrstatus, name: usrname, department: usrdep, datasource: usrsrc,
           myid: this.username,
@@ -479,7 +479,7 @@
         var modal = bootstrap.Modal.getInstance(document.getElementById('modal-del-user'));
         var usremail = document.getElementById('email').value;
         var dep = document.getElementById('department').value;
-        axios.post('https://web.bftv.ucdavis.edu/gsr/user-delete.php', {
+        axios.post(this.baseurl+'/user-delete.php', {
           crossDomain: true,
           email: usremail,
           department: dep,

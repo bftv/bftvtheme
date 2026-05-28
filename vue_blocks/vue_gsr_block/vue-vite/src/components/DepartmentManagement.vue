@@ -66,7 +66,7 @@
               <td>&nbsp;</td>
             </tr>
             <tr v-for="department in filteredData">
-              <td>{{ department.department }} ({{ department.abbr }})</td>
+              <td>{{ department.department }} <span v-if="department.abbr !== ''">({{ department.abbr }})</span></td>
               <td><span v-if="department.parentdep">{{ getDepartmentById(department.parentdep) }}</span></td>
               <td>{{ department.support_email }}</td>
               <td><a href="" @click="selectRecord(department)" data-bs-toggle="modal" data-bs-target="#modal-edit-dep" title="Edit department"><i class="fa-solid fa-pen-to-square"></i></a> <a v-if="accessLevels.level2" href="" @click="selectRecord(department)" data-bs-toggle="modal" data-bs-target="#modal-del-dep" title="Delete department"><i class="fa-solid fa-circle-xmark"></i></a></td>
@@ -541,7 +541,7 @@ export default {
   },
 
   mounted: function(){
-    const url = 'https://web.bftv.ucdavis.edu/gsr/dep-get.php'
+    const url = this.baseurl+'/dep-get.php'
     this.getDataList(url, 'department')
   },
   methods: {
@@ -604,7 +604,7 @@ export default {
       } else {
         notpay2 = 0;
       }
-      axios.post('https://web.bftv.ucdavis.edu/gsr/dep-add.php', {
+      axios.post(this.baseurl+'/dep-add.php', {
         crossDomain: true,
         myid: this.username,
         token: this.token,
@@ -693,7 +693,7 @@ export default {
       } else {
         notpay2 = 0;
       }
-      axios.post('https://web.bftv.ucdavis.edu/gsr/dep-update.php', {
+      axios.post(this.baseurl+'/dep-update.php', {
         crossDomain: true,
         myid: this.username,
         token: this.token,
@@ -730,7 +730,7 @@ export default {
       this.loading = true;
       var modal = bootstrap.Modal.getInstance(document.getElementById('modal-del-dep'));
       var depid = document.getElementById('del_depid').value;
-      axios.post('https://web.bftv.ucdavis.edu/gsr/dep-delete.php', {
+      axios.post(this.baseurl+'/dep-delete.php', {
         crossDomain: true,
         depid: depid,
         myid: this.username,

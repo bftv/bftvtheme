@@ -3,11 +3,11 @@ machine_name: vue-key-report-block
 type: pdb
 description: 'Key Report Management'
 package: Vue
-core: '8.x'
+core_version_requirement: ">=10"
 module_status: active
 presentation: vue
-template: template.html            
+template: template.html
 add_js:
-  footer:        
+  footer:
         'vue-router.js': {}
         'script.js': {}

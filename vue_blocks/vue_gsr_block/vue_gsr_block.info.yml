@@ -3,7 +3,7 @@ machine_name: vue-gsr-block
 type: pdb
 description: 'Allow Accounting and Advising section to manage GSR applications.'
 package: Vue
-core: '8.x'
+core_version_requirement: ">=10"
 module_status: active
 presentation: vue
 template: template.html

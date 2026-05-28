@@ -74,7 +74,13 @@ function sf1subtheme_preprocess_node(array &$vars) {//var_dump($vars['node']);
 	}
 
 	//$node = \Drupal::routeMatch()->getParameter('node');
+	$session = \Drupal::service('session');
+	//\Drupal::logger('custom')->notice('<pre>' . print_r($session->all(), TRUE) . '</pre>');
+  $cas_username = $session->get('cas_username');
+	$token = \Drupal::service('session')->getId();
+	$token = base64_encode($token);
 	$current_user = \Drupal::currentUser();
+	$uid = $current_user->id();
 	$node = $vars['node']->id();
 	if ($node) { // check we have a node object.
 		// 6198/6356 = dev assignment / live assignment
@@ -84,21 +90,17 @@ function sf1subtheme_preprocess_node(array &$vars) {//var_dump($vars['node']);
 			$cache_metadata = new CacheableMetadata();
 			$cache_metadata->addCacheContexts(['user']);
 			$vars['#cache']['contexts'] = $cache_metadata->getCacheContexts();
-			$uid = $current_user->id();
-			$role = $current_user->getRoles();
-			$cas = \Drupal::service('cas.user_manager')->getCasUsernameForAccount($uid);
+			//$uid =
+
 			//$cas = $vars['#cache']['tags']['user'];echo $cas."<br/>";
 
-			if($cas){
-				//$token = Drupal\Component\Utility\Crypt::hashBase64(\Drupal::service('session')->getId());
+			if($uid > 0){
+				$role = $current_user->getRoles();
 				$email = \Drupal::currentUser()->getEmail();
-				$token = \Drupal::service('session')->getId();
-				$token = base64_encode($token);
-
+				$cas_username = \Drupal::service('cas.user_manager')->getCasUsernameForAccount($uid);
 			} else {
-				$cas = 'anonymous';
-				$token = 'none';
 				$email = 'none';
+				$role = ['anonymous'];
 			}
 
 			if(in_array('site_manager', $role) || in_array('site_builder', $role)){
@@ -111,7 +113,7 @@ function sf1subtheme_preprocess_node(array &$vars) {//var_dump($vars['node']);
 
 			//expose to JS
 			$vars['#attached']['drupalSettings']['assignments'] = [
-				'username' => $cas,
+				'username' => $cas_username,
 				'useremail' => $email,
 				'role' => $role,
 				'token' => $token

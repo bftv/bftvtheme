@@ -53,12 +53,12 @@ export var globalMixin = {
           this.metaData = response.data.metadata;
           this.departments = response.data.departments;
           var id = false;
-          if(this.$route.query.sid){
-            id = this.$route.query.sid
+          if(this.$route.query.sn){
+            id = this.$route.query.sn
           }
           if(id){
             this.currentOriginalListData = this.listData;
-            this.filterObjectByKeyValue("sid", id);
+            this.filterObjectByKeyValue("sn", id);
           } else {
             if(this.curlRole != 'submitter'){
               if(section == 'new'){
@@ -264,7 +264,7 @@ export var globalMixin = {
     authenticate(){
       var w = 600;
       var h = 800;
-      var url = 'https://web.bftv.ucdavis.edu/gsr/auth.php';
+      var url = this.baseurl+'/auth.php';
       var LeftPosition = (screen.width) ? (screen.width-w)/2 : 0;
       var TopPosition = (screen.height) ? (screen.height-h)/2 : 0;
       var settings = 'height='+h+',width='+w+',top='+TopPosition+',left='+LeftPosition+',scrollbars=yes,resizable';
@@ -378,5 +378,8 @@ export var globalMixin = {
     token() {
       return this.$store.state.token;
     },
+    baseurl() {
+      return this.$store.state.baseurl;
+    }
   }
 }

@@ -153,7 +153,7 @@
     name: 'Settings',
 
     mounted: function(){
-      const url = 'https://web.bftv.ucdavis.edu/gsr/settings-get.php'
+      const url = this.baseurl+'/settings-get.php'
       this.getDataList(url, 'settings')
     },
     methods: {
@@ -174,7 +174,7 @@
         }
         var gemail = document.getElementById('genericemail').value;
         var sid = document.getElementById('settingid').value;
-        axios.post('https://web.bftv.ucdavis.edu/gsr/settings-update.php', {
+        axios.post(this.baseurl+'/settings-update.php', {
           crossDomain: true,
           myid: this.username,
           token: this.token,
@@ -212,7 +212,7 @@
         var es = document.getElementById('upd_subject').value;
         var eb = document.getElementById('upd_body').value;
 
-        axios.post('https://web.bftv.ucdavis.edu/gsr/email-update.php', {
+        axios.post(this.baseurl+'/email-update.php', {
           crossDomain: true,
           myid: this.username,
           token: this.token,

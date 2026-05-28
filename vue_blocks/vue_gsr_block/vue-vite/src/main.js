@@ -12,7 +12,12 @@ import store from './store';
 /* Components */
 const TheNavigation = {
   template: '#nav-template',
-  created() {
+  beforeCreate() {
+    // Dispatch 'updateBaseUrl' first to ensure 'baseurl' is set
+    this.$store.dispatch('updateBaseUrl');
+  },
+  async created() {
+    await this.$store.dispatch('updateBaseUrl');
     this.$store.dispatch('fetchUserData');
   },
   methods: {

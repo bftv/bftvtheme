@@ -21,8 +21,12 @@ export default createStore({
     accesslevel1: false,
     accesslevel2: false,
     viewermode: false,
+    baseurl: 'https://web.bftv.ucdavis.edu/gsr',
   },
   mutations: {
+    SET_BASEURL(state, newUrl) {
+      state.baseurl = newUrl;
+    },
     setCurlCode(state, code) {
       state.curlCode = code;
     },
@@ -59,8 +63,16 @@ export default createStore({
     },
   },
   actions: {
+    updateBaseUrl({ commit }) {
+      const url = window.location.href;
+      if (url.includes('gsr.sf.ucdavis.edu') || url.includes('gsr.caes.ucdavis.edu') || url.includes('169.237.124.76')) {
+        commit('SET_BASEURL', 'https://caes-gsrtool.caes.ucdavis.edu');
+      } else if (url.includes('bftv.local') || url.includes('bftv.ucdavis.edu')) {
+        commit('SET_BASEURL', 'https://web.bftv.ucdavis.edu/gsr');
+      }
+    },
     fetchUserData({ commit, state }) {
-      axios.post('https://web.bftv.ucdavis.edu/gsr/connector.php', {
+      axios.post(state.baseurl+'/connector.php', {
         crossDomain: true,
         loginid: state.username,
         token: state.token,

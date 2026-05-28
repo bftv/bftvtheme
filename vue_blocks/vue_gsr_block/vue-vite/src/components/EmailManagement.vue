@@ -193,7 +193,7 @@ export default {
   },
 
   mounted: function(){
-    const url = 'https://web.bftv.ucdavis.edu/gsr/email-get.php'
+    const url = this.baseurl+'/email-get.php'
     this.getDataList(url, 'department')
   },
   methods: {
@@ -206,7 +206,7 @@ export default {
       var es = document.getElementById('upd_subject').value;
       var eb = document.getElementById('upd_body').value;
 
-      axios.post('https://web.bftv.ucdavis.edu/gsr/email-update.php', {
+      axios.post(this.baseurl+'/email-update.php', {
         crossDomain: true,
         myid: this.username,
         token: this.token,
@@ -245,7 +245,7 @@ export default {
       var did = document.getElementById('res_emailid').value;
       var depid = document.getElementById('res_emaildepid').value;
       var et = document.getElementById('res_emailtype').value;
-      axios.post('https://web.bftv.ucdavis.edu/gsr/email-restore.php', {
+      axios.post(this.baseurl+'/email-restore.php', {
         crossDomain: true,
         id: did, depid: depid, type: et,
         myid: this.username,

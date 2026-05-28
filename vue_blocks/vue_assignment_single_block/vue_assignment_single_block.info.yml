@@ -3,7 +3,7 @@ machine_name: vue-single-assignment-block
 type: pdb
 description: 'Show assignments for staff and PI'
 package: Vue
-core: '8.x'
+core_version_requirement: ">=10"
 module_status: active
 presentation: vue
 template: template.html

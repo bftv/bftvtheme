@@ -3,7 +3,7 @@ machine_name: vue-crashplan-block
 type: pdb
 description: 'Shows reports about CrashPlan for specific users'
 package: Vue
-core: '8.x'
+core_version_requirement: ">=10"
 module_status: active
 presentation: vue
 component: true
@@ -15,10 +15,10 @@ add_css:
 add_js:
   footer:
         'moment.min.js': {}
-        'https://unpkg.com/axios/dist/axios.min.js': {type: external} 
+        'https://unpkg.com/axios/dist/axios.min.js': {type: external}
         'vue-router.js': {}
         'script.js': {}
-configuration:  
+configuration:
   ShowActive:
     type: checkbox
     title: 'Show only active devices'

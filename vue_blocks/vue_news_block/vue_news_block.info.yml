@@ -3,7 +3,7 @@ machine_name: vue-news-block
 type: pdb
 description: 'Getting news from news.bftv.ucdavis.edu and rendering it on this website'
 package: Vue
-core: '8.x'
+core_version_requirement: ">=10"
 module_status: active
 presentation: vue
 component: true

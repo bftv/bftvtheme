@@ -21,7 +21,7 @@ export var navmixin = {
       viewermode: false,
     }
   },
-  beforeMount: function(){console.log("before mount triggered");
+  beforeMount: function(){
     axios.post('https://web.bftv.ucdavis.edu/gsr/connector.php', {
       crossDomain: true,
       loginid: this.username,

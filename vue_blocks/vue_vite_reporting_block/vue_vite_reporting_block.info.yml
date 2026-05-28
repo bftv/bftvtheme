@@ -4,7 +4,7 @@ component: True
 type: pdb
 description: 'Allow authenticated users to use the reporting applications.'
 package: Vue
-core_version_requirement: ^8 || ^9
+core_version_requirement: ">=10"
 module_status: active
 presentation: vue
 template: template.html

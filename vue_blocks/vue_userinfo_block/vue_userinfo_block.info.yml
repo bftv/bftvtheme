@@ -3,14 +3,14 @@ machine_name: vue-userinfo-block
 type: pdb
 description: 'IAM API to extract user information'
 package: Vue
-core: '8.x'
+core_version_requirement: ">=10"
 module_status: active
 presentation: vue
 component: true
 template: template.html
 add_css:
     header:
-        
+
 add_js:
   footer:
         'vue-router.js': {}
